@@ -7,18 +7,24 @@ export default defineConfig({
   testDir: "./tests/e2e",
   fullyParallel: false,
   workers: 2,
-  reporter: "list",
+  reporter: [
+    ["list"],
+    ["junit", { outputFile: "/tmp/scirad-responsive-playwright-results/junit.xml" }],
+  ],
   outputDir: "/tmp/scirad-responsive-playwright-results",
   use: {
     baseURL,
     browserName: "chromium",
     launchOptions: executablePath ? { executablePath } : {},
+    screenshot: "only-on-failure",
     trace: "retain-on-failure",
+    video: "retain-on-failure",
   },
   webServer: {
-    command: "npm run start -- --hostname 127.0.0.1 --port 4387",
+    command: "node scripts/serve-standalone-for-playwright.mjs",
     url: `${baseURL}/`,
     reuseExistingServer: false,
+    env: { HOSTNAME: "127.0.0.1", PORT: "4387" },
     timeout: 60_000,
   },
 });
