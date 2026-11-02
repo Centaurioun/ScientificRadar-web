@@ -8,6 +8,11 @@
 export type ReadingMeasureOption = "700" | "600" | "560";
 export type HeroVariantOption = "standard" | "compact";
 
+/** Compact is the owner-approved homepage default; standard remains selectable. */
+export function resolveHeroVariant(value?: string): HeroVariantOption {
+  return value === "standard" ? "standard" : "compact";
+}
+
 export const DESIGN_TOKENS = {
   layout: {
     pageMax: "1320px",
