@@ -12,7 +12,7 @@ import {
   formatPublicationDate,
   getCategoryName,
 } from "@/lib/content/repository";
-import { HeroVariantOption } from "@/lib/design/tokens";
+import { resolveHeroVariant } from "@/lib/design/tokens";
 
 interface HomePageProps {
   searchParams: Promise<{ hero?: string }>;
@@ -20,8 +20,7 @@ interface HomePageProps {
 
 export default async function HomePage({ searchParams }: HomePageProps) {
   const resolvedParams = await searchParams;
-  const heroVariant: HeroVariantOption =
-    resolvedParams.hero === "compact" ? "compact" : "standard";
+  const heroVariant = resolveHeroVariant(resolvedParams.hero);
 
   const allArticles = await contentRepository.listPublicArticles();
   const categories = await contentRepository.getCategories();

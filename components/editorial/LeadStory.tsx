@@ -18,7 +18,7 @@ interface LeadStoryProps {
 export default function LeadStory({
   article,
   authors,
-  variant = "standard",
+  variant = "compact",
 }: LeadStoryProps) {
   const categoryName = getCategoryName(article.categorySlug);
   const typeLabel = getEditorialTypeLabel(article.editorialType);

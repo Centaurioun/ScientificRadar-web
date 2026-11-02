@@ -11,6 +11,7 @@ import {
   ReadingMeasureOption,
 } from "@/lib/design/tokens";
 import { sanitizeCanonicalBodyHtml } from "@/lib/content/sanitizer";
+import { renderScientificMath } from "@/lib/content/math";
 import ScientificFigure from "./ScientificFigure";
 import CitationList from "./CitationList";
 import AuthorProfile from "./AuthorProfile";
@@ -255,6 +256,7 @@ export default function ArticleReader({
                   }
 
                   case "math": {
+                    const renderedMath = renderScientificMath(block.tex);
                     return (
                       <div
                         key={block.id}
@@ -269,21 +271,11 @@ export default function ArticleReader({
                           aria-label={block.tex}
                           className="font-math text-base sm:text-lg text-[var(--sr-ink)] py-3 px-2 overflow-x-auto whitespace-nowrap"
                         >
-                          {block.tex
-                            .replace(/\\int_\{0\}\^\{\\varepsilon_f\}/g, "∫₀^εf ")
-                            .replace(/\\sigma\(\\varepsilon\)\\, d\\varepsilon/g, "σ(ε) dε")
-                            .replace(/\\approx/g, "≈")
-                            .replace(/\\text\{([^}]+)\}/g, "$1")
-                            .replace(/\\cdot/g, "·")
-                            .replace(/\^\{-3\}/g, "⁻³")
-                            .replace(
-                              /\\frac\{\(p\\text\{O\}_2\)\^\{n_H\}\}\{\(P_\{50\}\)\^\{n_H\} \+ \(p\\text\{O\}_2\)\^\{n_H\}\}/g,
-                              "(pO₂)^nH / [ (P₅₀)^nH + (pO₂)^nH ]"
-                            )
-                            .replace(
-                              /\\frac\{V_0\}\{\\pi\} \\arctan\\left\(\\frac\{x\}\{D\}\\right\)/g,
-                              "(V₀ / π) · arctan(x / D)"
-                            )}
+                          {renderedMath ? (
+                            <span dangerouslySetInnerHTML={{ __html: renderedMath }} />
+                          ) : (
+                            <code className="whitespace-pre-wrap break-words">{block.tex}</code>
+                          )}
                         </div>
                         <p className="mt-2 text-xs sm:text-[13px] font-sans text-[var(--sr-ink-secondary)] leading-relaxed">
                           {block.explanation}
