@@ -5,3 +5,7 @@ coverage/
 *.log
 .env*
 !.env.example
+test-results/
+*.tsbuildinfo
+pr_body.md
+

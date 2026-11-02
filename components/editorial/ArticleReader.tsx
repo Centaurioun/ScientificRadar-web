@@ -29,7 +29,7 @@ interface ResponsiveArticleTocProps {
   sourceCount: number;
 }
 
-function ResponsiveArticleToc({
+export function ResponsiveArticleToc({
   headings,
   sourceCount,
 }: ResponsiveArticleTocProps) {
