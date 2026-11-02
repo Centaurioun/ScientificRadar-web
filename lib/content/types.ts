@@ -3,15 +3,31 @@
  * Matches Blueprint v2.1 §5, §12.5, and §12.6.
  */
 
+export const PUBLICATION_CONTRACT_VERSION = "1.0.0" as const;
+
 export type EditorialType =
   | "news"
   | "feature"
   | "explainer"
   | "research-digest";
 
-export type PublicationStatus = "demo" | "draft" | "published";
+export type PublicationStatus =
+  | "demo"
+  | "draft"
+  | "in_review"
+  | "scheduled"
+  | "published"
+  | "archived"
+  | "withdrawn";
 
 export type SupportedLocale = "en" | "tr";
+
+export interface ArticleHeadingOutlineItem {
+  type: "heading";
+  id: string;
+  level: 2 | 3;
+  text: string;
+}
 
 export interface PublicSource {
   id: string;
@@ -155,6 +171,55 @@ export interface PublicArticle {
   seo?: {
     title?: string;
     description?: string;
+    canonicalUrl?: string;
+    noindex?: boolean;
+  };
+  revisionId?: string;
+  revisionNumber?: number;
+  translationGroupId?: string;
+  withdrawnAt?: string;
+  withdrawalReason?: string;
+}
+
+/**
+ * Versioned Studio -> Web Publication Snapshot Contract (v1.0.0).
+ * Represents an immutable, reviewed, server-verifiable article snapshot.
+ */
+export interface PublishedSnapshotRecordV1 {
+  contractVersion: typeof PUBLICATION_CONTRACT_VERSION;
+  articleId: string;
+  revisionId: string;
+  revisionNumber: number;
+  slug: string;
+  locale: SupportedLocale;
+  translationGroupId?: string;
+  editorialType: EditorialType;
+  status: PublicationStatus;
+  title: string;
+  dek: string;
+  summary: string;
+  categorySlug: string;
+  subcategorySlugs: string[];
+  tagSlugs: string[];
+  authorIds: string[];
+  authors?: PublicAuthor[];
+  publishedAt: string;
+  updatedAt?: string;
+  withdrawnAt?: string;
+  withdrawalReason?: string;
+  readingTimeMinutes: number;
+  featuredRank?: number;
+  mostReadDemoRank?: number;
+  hero?: PublicMedia;
+  blocks: ArticleBlock[];
+  bodyHtml?: string;
+  headings?: ArticleHeadingOutlineItem[];
+  sources: PublicSource[];
+  relatedIds: string[];
+  seo?: {
+    title?: string;
+    description?: string;
+    canonicalUrl?: string;
     noindex?: boolean;
   };
 }
@@ -166,6 +231,7 @@ export interface PublishedContentRepository {
     tagSlug?: string;
     query?: string;
     editorialType?: EditorialType;
+    locale?: SupportedLocale;
     limit?: number;
   }): Promise<PublicArticle[]>;
   getPublicArticle(slug: string): Promise<PublicArticle | null>;

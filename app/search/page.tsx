@@ -6,17 +6,18 @@ import SiteHeader from "@/components/site/SiteHeader";
 import Footer from "@/components/site/Footer";
 import EditorialCard from "@/components/editorial/EditorialCard";
 import { contentRepository } from "@/lib/content/repository";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
 interface SearchPageProps {
   searchParams: Promise<{ q?: string }>;
 }
 
-export const metadata: Metadata = {
-  title: "Search Articles & Scientific Archive",
+export const metadata: Metadata = buildPageMetadata({
+  routeType: "search",
+  pathname: "/search",
   description:
     "Search across ScientificRadar demonstration features, explainers, and research digests.",
-  robots: { index: false, follow: false },
-};
+});
 
 const SUGGESTED_QUERIES = [
   "spider silk",

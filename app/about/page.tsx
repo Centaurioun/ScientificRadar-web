@@ -4,13 +4,14 @@ import Link from "next/link";
 import SiteHeader from "@/components/site/SiteHeader";
 import Footer from "@/components/site/Footer";
 import { DESIGN_TOKENS, READING_MEASURE_PRESETS } from "@/lib/design/tokens";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "About ScientificRadar & Editorial Standards",
+export const metadata: Metadata = buildPageMetadata({
+  routeType: "about",
+  pathname: "/about",
   description:
     "Original mission, editorial typography system, scientific publishing integrity rules, and Stage A standalone reader architecture for ScientificRadar Web.",
-  robots: { index: false, follow: false },
-};
+});
 
 export default function AboutPage() {
   return (

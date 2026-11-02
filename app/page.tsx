@@ -13,6 +13,13 @@ import {
   getCategoryName,
 } from "@/lib/content/repository";
 import { resolveHeroVariant } from "@/lib/design/tokens";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = buildPageMetadata({
+  routeType: "home",
+  pathname: "/",
+});
 
 interface HomePageProps {
   searchParams: Promise<{

@@ -1,7 +1,14 @@
 import React from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import SiteHeader from "@/components/site/SiteHeader";
 import Footer from "@/components/site/Footer";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+
+export const metadata: Metadata = buildPageMetadata({
+  routeType: "not-found",
+  pathname: "/404",
+});
 
 export default function NotFound() {
   return (

@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 import {
   ArticleBlock,
+  ArticleHeadingOutlineItem,
   PublicArticle,
   PublicAuthor,
 } from "@/lib/content/types";
@@ -11,7 +12,7 @@ import {
   READING_MEASURE_PRESETS,
   ReadingMeasureOption,
 } from "@/lib/design/tokens";
-import { sanitizeCanonicalBodyHtml } from "@/lib/content/sanitizer";
+import { prepareCanonicalBodyHtml } from "@/lib/content/sanitizer";
 import { renderScientificMath } from "@/lib/content/math";
 import ScientificFigure from "./ScientificFigure";
 import CitationList from "./CitationList";
@@ -25,7 +26,7 @@ interface ArticleReaderProps {
 }
 
 interface ResponsiveArticleTocProps {
-  headings: Extract<ArticleBlock, { type: "heading" }>[];
+  headings: ArticleHeadingOutlineItem[];
   sourceCount: number;
 }
 
@@ -140,10 +141,19 @@ export default function ArticleReader({
 }: ArticleReaderProps) {
   const [measure, setMeasure] = useState<ReadingMeasureOption>(initialMeasure);
 
-  const headings = article.blocks.filter(
+  const preparedHtml = article.bodyHtml
+    ? prepareCanonicalBodyHtml(article.bodyHtml, { sources: article.sources })
+    : null;
+
+  const blockHeadings = article.blocks.filter(
     (b): b is Extract<ArticleBlock, { type: "heading" }> =>
       b.type === "heading" && b.level === 2
   );
+
+  const headings: ArticleHeadingOutlineItem[] =
+    preparedHtml && preparedHtml.headings.length > 0
+      ? preparedHtml.headings
+      : blockHeadings;
 
   const sourceMap = new Map(article.sources.map((s) => [s.id, s]));
   const activePreset = READING_MEASURE_PRESETS[measure];
@@ -260,12 +270,12 @@ export default function ArticleReader({
             headings={headings}
             sourceCount={article.sources.length}
           />
-          {article.bodyHtml ? (
+          {preparedHtml ? (
             <div
               data-testid="article-prose-container"
               className="article-prose font-editorial text-[var(--sr-ink)] space-y-6"
               dangerouslySetInnerHTML={{
-                __html: sanitizeCanonicalBodyHtml(article.bodyHtml),
+                __html: preparedHtml.html,
               }}
             />
           ) : (

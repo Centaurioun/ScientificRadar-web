@@ -1,4 +1,11 @@
 import DOMPurify from "isomorphic-dompurify";
+import { renderScientificMath } from "./math";
+import {
+  ArticleBlock,
+  ArticleHeadingOutlineItem,
+  PublicArticle,
+  PublicSource,
+} from "./types";
 
 /**
  * Diacritic-tolerant public search for English and Turkish editorial content.
@@ -18,6 +25,17 @@ export function normalizeSearchText(input: string): string {
     .replace(/ç/g, "c")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
+}
+
+export function slugifyHeadingText(input: string): string {
+  const normalized = normalizeSearchText(input)
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .slice(0, 64)
+    .replace(/^-|-$/g, "");
+  return normalized ? `section-${normalized}` : "section-heading";
 }
 
 // This boundary protects *published* Studio bodyHtml from HTML/script injection.
@@ -40,7 +58,7 @@ const ALLOWED_ATTR = [
 ];
 
 const PER_TAG_ATTRS: Record<string, ReadonlySet<string>> = {
-  a: new Set(["href", "rel", "target", "data-knowledge-term"]),
+  a: new Set(["href", "rel", "target", "data-knowledge-term", "data-citation-source-id"]),
   caption: new Set(["data-text-align"]),
   div: new Set(["data-text-align", "data-math-tex", "data-math-display"]),
   figure: new Set([
@@ -164,4 +182,147 @@ export function sanitizeCanonicalBodyHtml(
   const root = fragment.ownerDocument.createElement("div");
   root.appendChild(fragment);
   return root.innerHTML;
+}
+
+/**
+ * Prepares canonical bodyHtml for public reader rendering while extracting
+ * a deterministic heading outline (H2s) for the Table of Contents, rendering
+ * controlled KaTeX math (`data-math-tex`), and wiring citation back-links
+ * (`data-citation-source-id`).
+ */
+export function prepareCanonicalBodyHtml(
+  rawHtml: string,
+  options?: {
+    sources?: PublicSource[];
+    trustedImageSources?: ReadonlySet<string>;
+  }
+): {
+  html: string;
+  headings: ArticleHeadingOutlineItem[];
+} {
+  const sanitized = sanitizeCanonicalBodyHtml(
+    rawHtml,
+    options?.trustedImageSources
+  );
+  if (!sanitized) {
+    return { html: "", headings: [] };
+  }
+
+  const fragment = DOMPurify.sanitize(sanitized, {
+    ALLOWED_TAGS,
+    ALLOWED_ATTR,
+    ALLOW_DATA_ATTR: false,
+    ALLOW_ARIA_ATTR: false,
+    ALLOW_UNKNOWN_PROTOCOLS: false,
+    RETURN_DOM_FRAGMENT: true,
+  }) as DocumentFragment;
+
+  const headings: ArticleHeadingOutlineItem[] = [];
+  const usedIds = new Set<string>();
+  const sourceMap = new Map((options?.sources ?? []).map((s) => [s.id, s]));
+
+  // First pass: collect existing valid IDs
+  for (const el of Array.from(fragment.querySelectorAll("[id]"))) {
+    const existingId = el.getAttribute("id");
+    if (existingId) usedIds.add(existingId);
+  }
+
+  for (const element of Array.from(fragment.querySelectorAll("*"))) {
+    const tag = element.localName.toLowerCase();
+
+    if (tag === "h2" || tag === "h3") {
+      const text = (element.textContent ?? "").trim();
+      if (!text) continue;
+
+      let headingId = element.getAttribute("id") ?? "";
+      if (!headingId || !HTML_ID.test(headingId)) {
+        const base = slugifyHeadingText(text);
+        headingId = base;
+        let counter = 2;
+        while (usedIds.has(headingId)) {
+          headingId = `${base}-${counter}`;
+          counter += 1;
+        }
+        element.setAttribute("id", headingId);
+        usedIds.add(headingId);
+      }
+
+      if (tag === "h2") {
+        headings.push({
+          type: "heading",
+          id: headingId,
+          level: 2,
+          text,
+        });
+      }
+    }
+
+    if ((tag === "div" || tag === "span") && element.hasAttribute("data-math-tex")) {
+      const tex = element.getAttribute("data-math-tex") ?? "";
+      const displayAttr = element.getAttribute("data-math-display");
+      const isDisplay = displayAttr === "block" || (tag === "div" && displayAttr !== "inline");
+      const renderedMath = renderScientificMath(tex, isDisplay);
+
+      element.setAttribute("role", "math");
+      element.setAttribute("aria-label", tex);
+      if (renderedMath) {
+        element.innerHTML = renderedMath;
+      } else {
+        element.textContent = tex;
+      }
+    }
+
+    if (tag === "sup" && element.hasAttribute("data-citation-source-id")) {
+      const srcId = element.getAttribute("data-citation-source-id") ?? "";
+      if (srcId && !element.querySelector("a")) {
+        const src = sourceMap.get(srcId);
+        const rawText = (element.textContent ?? "").replace(/^\[|\]$/g, "").trim();
+        const label = src?.label ?? (rawText || "?");
+        const anchor = element.ownerDocument.createElement("a");
+        anchor.setAttribute("id", `cite-${srcId}`);
+        anchor.setAttribute("href", `#ref-${srcId}`);
+        anchor.setAttribute("data-citation-source-id", srcId);
+        anchor.setAttribute("aria-label", `Reference ${label}`);
+        anchor.textContent = `[${label}]`;
+        element.textContent = "";
+        element.appendChild(anchor);
+      }
+    }
+  }
+
+  const root = fragment.ownerDocument.createElement("div");
+  root.appendChild(fragment);
+  return {
+    html: root.innerHTML,
+    headings,
+  };
+}
+
+export function extractHeadingsFromBodyHtml(
+  rawHtml: string,
+  trustedImageSources?: ReadonlySet<string>
+): ArticleHeadingOutlineItem[] {
+  return prepareCanonicalBodyHtml(rawHtml, { trustedImageSources }).headings;
+}
+
+/**
+ * Resolves the canonical H2 outline for an article whether it is backed by
+ * structured `blocks` or a sanitized `bodyHtml` snapshot.
+ */
+export function resolveArticleHeadings(
+  article: Pick<PublicArticle, "blocks" | "bodyHtml" | "sources">
+): ArticleHeadingOutlineItem[] {
+  if (article.bodyHtml && article.bodyHtml.trim().length > 0) {
+    const fromHtml = prepareCanonicalBodyHtml(article.bodyHtml, {
+      sources: article.sources,
+    }).headings;
+    if (fromHtml.length > 0) {
+      return fromHtml;
+    }
+  }
+
+  return article.blocks.filter(
+    (b): b is Extract<ArticleBlock, { type: "heading" }> & { level: 2 } =>
+      b.type === "heading" && b.level === 2
+  );
 }

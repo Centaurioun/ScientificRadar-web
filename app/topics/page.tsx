@@ -6,13 +6,12 @@ import SiteHeader from "@/components/site/SiteHeader";
 import Footer from "@/components/site/Footer";
 import EditorialCard from "@/components/editorial/EditorialCard";
 import { contentRepository } from "@/lib/content/repository";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Topics & Scientific Disciplines Directory",
-  description:
-    "Explore ScientificRadar articles across Physics, Biology, Medicine & Health, Chemistry, Technology, Earth & Climate, and Society & Research.",
-  robots: { index: false, follow: false },
-};
+export const metadata: Metadata = buildPageMetadata({
+  routeType: "topics-directory",
+  pathname: "/topics",
+});
 
 export default async function TopicsDirectoryPage() {
   const [categories, allArticles] = await Promise.all([

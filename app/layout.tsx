@@ -3,6 +3,8 @@ import { Merriweather, Inter } from "next/font/google";
 import "katex/dist/katex.min.css";
 import "./globals.css";
 
+import { DEFAULT_SITE_TITLE, SITE_BRAND_NAME } from "@/lib/seo/metadata";
+
 const merriweather = Merriweather({
   subsets: ["latin", "latin-ext"],
   weight: ["300", "400", "700", "900"],
@@ -20,28 +22,13 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "ScientificRadar — Science Journalism, Explainers & Research Digests",
-    template: "%s | ScientificRadar",
+    default: DEFAULT_SITE_TITLE,
+    template: `%s | ${SITE_BRAND_NAME}`,
   },
-  description:
-    "Independent scientific publication delivering long-form features, mechanistic explainers, and transparent research digests across physics, biology, chemistry, and earth sciences.",
   robots: {
     index: false,
     follow: false,
     nocache: true,
-  },
-  openGraph: {
-    title: "ScientificRadar — Science Journalism, Explainers & Research Digests",
-    description:
-      "In-depth long-form science journalism, mechanistic explainers, and research digests across the physical, life, and earth sciences.",
-    type: "website",
-    siteName: "ScientificRadar",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "ScientificRadar — Science Journalism, Explainers & Research Digests",
-    description:
-      "In-depth long-form science journalism, mechanistic explainers, and research digests across the physical, life, and earth sciences.",
   },
 };
 

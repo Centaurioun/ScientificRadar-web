@@ -10,12 +10,13 @@ import {
   PublicAuthor,
   PublicCategory,
   PublishedContentRepository,
+  SupportedLocale,
 } from "./types";
 
 /**
- * Ensures draft records never leak into public reader listings or routes.
- * In Stage A, "demo" and "published" articles are visible, whereas "draft"
- * is strictly excluded.
+ * Ensures draft, scheduled, archived, in_review, and withdrawn records
+ * never leak into public reader listings or routes.
+ * In Stage A, "demo" and "published" articles are visible.
  */
 export function isPubliclyVisibleArticle(article: PublicArticle): boolean {
   return article.status === "demo" || article.status === "published";
@@ -29,6 +30,7 @@ export function filterArticles(
     tagSlug?: string;
     query?: string;
     editorialType?: EditorialType;
+    locale?: SupportedLocale;
     limit?: number;
   }
 ): PublicArticle[] {
@@ -50,6 +52,10 @@ export function filterArticles(
 
   if (options?.editorialType) {
     result = result.filter((a) => a.editorialType === options.editorialType);
+  }
+
+  if (options?.locale) {
+    result = result.filter((a) => a.locale === options.locale);
   }
 
   if (options?.query && options.query.trim().length > 0) {
@@ -112,6 +118,7 @@ class InMemoryDemoContentRepository implements PublishedContentRepository {
     tagSlug?: string;
     query?: string;
     editorialType?: EditorialType;
+    locale?: SupportedLocale;
     limit?: number;
   }): Promise<PublicArticle[]> {
     return filterArticles(DEMO_ARTICLES, options);

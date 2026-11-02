@@ -6,6 +6,7 @@ import SiteHeader from "@/components/site/SiteHeader";
 import Footer from "@/components/site/Footer";
 import EditorialCard from "@/components/editorial/EditorialCard";
 import { contentRepository } from "@/lib/content/repository";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
 interface TopicSlugPageProps {
   params: Promise<{ slug: string }>;
@@ -23,16 +24,17 @@ export async function generateMetadata({
   const { slug } = await params;
   const category = await contentRepository.getCategoryBySlug(slug);
   if (!category) {
-    return {
+    return buildPageMetadata({
+      routeType: "not-found",
+      pathname: `/topics/${slug}`,
       title: "Topic Not Found",
-      robots: { index: false, follow: false },
-    };
+    });
   }
-  return {
-    title: `${category.name} — Science Stories & Explainers`,
-    description: category.description,
-    robots: { index: false, follow: false },
-  };
+  return buildPageMetadata({
+    routeType: "topic-landing",
+    pathname: `/topics/${category.slug}`,
+    category,
+  });
 }
 
 export default async function TopicLandingPage({

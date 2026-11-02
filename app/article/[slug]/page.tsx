@@ -10,6 +10,8 @@ import NewsletterDemo from "@/components/editorial/NewsletterDemo";
 import { contentRepository } from "@/lib/content/repository";
 import { ReadingMeasureOption } from "@/lib/design/tokens";
 
+import { buildPageMetadata } from "@/lib/seo/metadata";
+
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ measure?: string; designReview?: string }>;
@@ -29,28 +31,18 @@ export async function generateMetadata({
   const article = await contentRepository.getPublicArticle(slug);
 
   if (!article) {
-    return {
+    return buildPageMetadata({
+      routeType: "not-found",
+      pathname: `/article/${slug}`,
       title: "Article Not Found",
-      robots: { index: false, follow: false },
-    };
+    });
   }
 
-  return {
-    title: article.seo?.title ?? article.title,
-    description: article.seo?.description ?? article.summary,
-    robots: {
-      index: false,
-      follow: false,
-      nocache: true,
-    },
-    openGraph: {
-      title: article.title,
-      description: article.dek || article.summary,
-      type: "article",
-      publishedTime: article.publishedAt,
-      modifiedTime: article.updatedAt ?? article.publishedAt,
-    },
-  };
+  return buildPageMetadata({
+    routeType: "article",
+    pathname: `/article/${article.slug}`,
+    article,
+  });
 }
 
 export default async function ArticlePage({
