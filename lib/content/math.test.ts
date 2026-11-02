@@ -7,7 +7,7 @@ test("general TeX fractions render into accessible KaTeX HTML", () => {
   assert.ok(html);
   assert.match(html, /class="katex-display"/);
   assert.match(html, /class="katex-mathml"/);
-  assert.doesNotMatch(html, /\\frac/);
+  assert.match(html, /<mfrac>/, "MathML includes a semantic fraction");
 });
 
 test("Greek symbols and superscripts render without handwritten substitutions", () => {
