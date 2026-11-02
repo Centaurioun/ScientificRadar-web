@@ -29,7 +29,7 @@ export default function SiteHeader({ activeCategorySlug }: SiteHeaderProps) {
               categories={DEMO_CATEGORIES}
               activeCategorySlug={activeCategorySlug}
             />
-            <div className="hidden md:flex items-center gap-5 text-xs font-medium text-[var(--sr-muted)]">
+            <div className="hidden lg:flex items-center gap-5 text-xs font-medium text-[var(--sr-muted)]">
               <Link
                 href="/topics"
                 className="hover:text-[var(--sr-ink)] transition-colors whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-[var(--sr-accent)]"
