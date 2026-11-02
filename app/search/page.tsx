@@ -111,8 +111,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           aria-live="polite"
           className="site-container py-12"
         >
-          <div className="mb-8 pb-3 border-b border-[var(--sr-rule)] flex items-baseline justify-between flex-wrap gap-2">
-            <h2 className="font-editorial text-xl font-bold text-[var(--sr-ink)]">
+          <div className="mb-8 pb-3 border-b border-[var(--sr-rule)] flex items-baseline justify-between flex-wrap gap-2 min-w-0">
+            <h2 className="font-editorial text-xl font-bold text-[var(--sr-ink)] min-w-0 max-w-full break-words [overflow-wrap:anywhere]">
               {query
                 ? `Search results for “${query}”`
                 : "All Demonstration Stories"}
@@ -135,9 +135,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           ) : (
             <div
               data-testid="search-empty-state"
-              className="max-w-xl mx-auto my-8 p-8 rounded-sm bg-[var(--sr-surface)] border border-[var(--sr-rule)] text-center space-y-3"
+              className="max-w-xl mx-auto my-8 p-6 sm:p-8 rounded-sm bg-[var(--sr-surface)] border border-[var(--sr-rule)] text-center space-y-3"
             >
-              <h3 className="font-editorial text-lg font-bold text-[var(--sr-ink)]">
+              <h3 className="font-editorial text-lg font-bold text-[var(--sr-ink)] min-w-0 max-w-full break-words [overflow-wrap:anywhere]">
                 No matching articles found for “{query}”
               </h3>
               <p className="text-sm text-[var(--sr-muted)] leading-relaxed">

@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { ChevronDown } from "lucide-react";
 import {
   ArticleBlock,
   PublicArticle,
@@ -20,12 +21,122 @@ interface ArticleReaderProps {
   article: PublicArticle;
   authors: PublicAuthor[];
   initialMeasure?: ReadingMeasureOption;
+  showReviewControls?: boolean;
+}
+
+interface ResponsiveArticleTocProps {
+  headings: Extract<ArticleBlock, { type: "heading" }>[];
+  sourceCount: number;
+}
+
+export function ResponsiveArticleToc({
+  headings,
+  sourceCount,
+}: ResponsiveArticleTocProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        if (
+          typeof document !== "undefined" &&
+          document.getElementById("mobile-navigation-drawer")
+        ) {
+          return;
+        }
+        event.preventDefault();
+        setIsOpen(false);
+        triggerRef.current?.focus();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen]);
+
+  if (headings.length === 0) {
+    return null;
+  }
+
+  const handleNavKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+    if (event.key === "Escape" && isOpen) {
+      event.preventDefault();
+      event.stopPropagation();
+      setIsOpen(false);
+      triggerRef.current?.focus();
+    }
+  };
+
+  return (
+    <nav
+      aria-label="Table of contents"
+      data-testid="responsive-toc"
+      onKeyDown={handleNavKeyDown}
+      className="xl:hidden my-6 p-4 rounded-sm bg-[var(--sr-surface)] border border-[var(--sr-rule)]"
+    >
+      <button
+        type="button"
+        ref={triggerRef}
+        aria-expanded={isOpen}
+        aria-controls="mobile-toc-panel"
+        data-testid="responsive-toc-trigger"
+        onClick={() => setIsOpen((prev) => !prev)}
+        className="flex items-center justify-between w-full text-left font-semibold uppercase tracking-wider text-xs text-[var(--sr-ink)] cursor-pointer min-h-[44px] focus-visible:outline-2 focus-visible:outline-[var(--sr-accent)] focus-visible:outline-offset-2"
+      >
+        <span>In This Article</span>
+        <ChevronDown
+          aria-hidden="true"
+          className={`w-4 h-4 text-[var(--sr-muted)] transition-transform duration-200 shrink-0 ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      <div
+        id="mobile-toc-panel"
+        data-testid="responsive-toc-panel"
+        hidden={!isOpen}
+        className={isOpen ? "pt-3 border-t border-[var(--sr-rule)] mt-3" : "hidden"}
+      >
+        <ul className="space-y-2 border-l border-[var(--sr-rule)] pl-3 text-xs text-[var(--sr-muted)]">
+          {headings.map((h) => (
+            <li key={h.id}>
+              <a
+                href={`#${h.id}`}
+                onClick={() => setIsOpen(false)}
+                className="block py-1 hover:text-[var(--sr-accent)] transition-colors leading-snug break-words [overflow-wrap:anywhere] focus-visible:outline-2 focus-visible:outline-[var(--sr-accent)] focus-visible:outline-offset-2"
+              >
+                {h.text}
+              </a>
+            </li>
+          ))}
+          {sourceCount > 0 && (
+            <li>
+              <a
+                href="#references-heading"
+                onClick={() => setIsOpen(false)}
+                className="block py-1 hover:text-[var(--sr-accent)] transition-colors leading-snug break-words [overflow-wrap:anywhere] focus-visible:outline-2 focus-visible:outline-[var(--sr-accent)] focus-visible:outline-offset-2"
+              >
+                Sources &amp; References ({sourceCount})
+              </a>
+            </li>
+          )}
+        </ul>
+      </div>
+    </nav>
+  );
 }
 
 export default function ArticleReader({
   article,
   authors,
   initialMeasure = "700",
+  showReviewControls = false,
 }: ArticleReaderProps) {
   const [measure, setMeasure] = useState<ReadingMeasureOption>(initialMeasure);
 
@@ -56,42 +167,44 @@ export default function ArticleReader({
       }
       className="site-container pb-12"
     >
-      {/* Reading Measure Comparator Control Bar (For Owner 600px vs 700px Evaluation) */}
-      <div className="max-w-[var(--sr-reading-max)] mx-auto mb-8 p-3 rounded-sm bg-[var(--sr-surface)] border border-[var(--sr-rule)] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-        <div className="text-xs text-[var(--sr-ink-secondary)]">
-          <span className="font-semibold text-[var(--sr-ink)]">
-            Reading Column Width:
-          </span>{" "}
-          <span data-testid="active-reading-measure-label">
-            {activePreset.label}
-          </span>
-        </div>
+      {/* Reading Measure Comparator Control Bar (Revealed only in ?designReview=1 mode) */}
+      {showReviewControls && (
+        <div className="max-w-[var(--sr-reading-max)] mx-auto mb-8 p-3 rounded-sm bg-[var(--sr-surface)] border border-[var(--sr-rule)] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div className="text-xs text-[var(--sr-ink-secondary)]">
+            <span className="font-semibold text-[var(--sr-ink)]">
+              Reading Column Width:
+            </span>{" "}
+            <span data-testid="active-reading-measure-label">
+              {activePreset.label}
+            </span>
+          </div>
 
-        <div
-          role="group"
-          aria-label="Select article reading column width"
-          className="inline-flex items-center gap-1 bg-white p-1 rounded-sm border border-[var(--sr-rule)] self-start sm:self-auto"
-        >
-          {(["700", "600", "560"] as ReadingMeasureOption[]).map((opt) => {
-            const isSelected = measure === opt;
-            return (
-              <button
-                key={opt}
-                type="button"
-                onClick={() => handleMeasureChange(opt)}
-                aria-pressed={isSelected}
-                className={`px-2.5 py-1 text-xs font-medium rounded-sm transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                  isSelected
-                    ? "bg-[var(--sr-accent)] text-white font-semibold"
-                    : "text-[var(--sr-muted)] hover:text-[var(--sr-ink)]"
-                }`}
-              >
-                {opt}px
-              </button>
-            );
-          })}
+          <div
+            role="group"
+            aria-label="Select article reading column width"
+            className="inline-flex items-center gap-1 bg-white p-1 rounded-sm border border-[var(--sr-rule)] self-start sm:self-auto"
+          >
+            {(["700", "600", "560"] as ReadingMeasureOption[]).map((opt) => {
+              const isSelected = measure === opt;
+              return (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => handleMeasureChange(opt)}
+                  aria-pressed={isSelected}
+                  className={`px-2.5 py-1 text-xs font-medium rounded-sm transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    isSelected
+                      ? "bg-[var(--sr-accent)] text-white font-semibold"
+                      : "text-[var(--sr-muted)] hover:text-[var(--sr-ink)]"
+                  }`}
+                >
+                  {opt}px
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Quanta/Knowable-inspired Layout: Optional Desktop Left Rail OUTSIDE Reading Column */}
       <div className="relative xl:grid xl:grid-cols-[220px_minmax(0,1fr)_220px] xl:gap-8 items-start">
@@ -143,6 +256,10 @@ export default function ArticleReader({
 
         {/* Central Article Body Column */}
         <div className="min-w-0">
+          <ResponsiveArticleToc
+            headings={headings}
+            sourceCount={article.sources.length}
+          />
           {article.bodyHtml ? (
             <div
               data-testid="article-prose-container"

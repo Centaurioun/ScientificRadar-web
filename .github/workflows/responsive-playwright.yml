@@ -1,0 +1,65 @@
+name: Responsive Playwright Verification
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - main
+      - "codex/**"
+      - "fix/**"
+      - "feat/reader-first-responsive-ux-2026-11-02"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: responsive-playwright-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  responsive-playwright:
+    name: Lint, typecheck, build, and responsive browser tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      # Keep Node aligned with the repository's existing quality workflow; update deliberately.
+      - name: Set up Node.js 26.13.0
+        uses: actions/setup-node@v4
+        with:
+          node-version: "26.13.0"
+
+      # There is no committed package lock. npm resolves the declared ranges for
+      # each run; this install is intentionally not described as frozen/reproducible.
+      - name: Install npm dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Install Playwright Chromium and operating-system dependencies
+        run: npx playwright install --with-deps chromium
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run TypeScript checks
+        run: npx tsc --noEmit
+
+      - name: Build production application
+        run: npm run build
+
+      - name: Run responsive Playwright suite
+        run: npx playwright test
+
+      - name: Upload Playwright traces, screenshots, video, and JUnit results on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: responsive-playwright-failure-${{ github.run_id }}
+          path: /tmp/scirad-responsive-playwright-results/
+          if-no-files-found: warn
+          retention-days: 14

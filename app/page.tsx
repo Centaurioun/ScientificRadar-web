@@ -15,12 +15,16 @@ import {
 import { resolveHeroVariant } from "@/lib/design/tokens";
 
 interface HomePageProps {
-  searchParams: Promise<{ hero?: string }>;
+  searchParams: Promise<{
+    hero?: string;
+    designReview?: string;
+  }>;
 }
 
 export default async function HomePage({ searchParams }: HomePageProps) {
   const resolvedParams = await searchParams;
-  const heroVariant = resolveHeroVariant(resolvedParams.hero);
+  const heroVariant = resolveHeroVariant(resolvedParams?.hero);
+  const isReviewMode = resolvedParams?.designReview === "1";
 
   const allArticles = await contentRepository.listPublicArticles();
   const categories = await contentRepository.getCategories();
@@ -60,38 +64,45 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       <SiteHeader />
 
       <main id="main-content" className="flex-1">
-        {/* Accessible Page-Level H1 Utility Strip + Hero Variant Switcher */}
-        <div className="border-b border-[var(--sr-rule-subtle)] bg-[var(--sr-surface)]/60">
-          <div className="site-container py-2 flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--sr-muted)]">
-            <h1 className="font-medium text-[var(--sr-ink-secondary)]">
-              ScientificRadar — Independent Science Magazine &amp; Long-Form
-              Research Explainers
-            </h1>
-            <div className="flex items-center gap-2">
-              <span>Hero Layout:</span>
-              <Link
-                href="/?hero=standard"
-                className={`px-2 py-0.5 rounded-sm transition-colors ${
-                  heroVariant === "standard"
-                    ? "bg-[var(--sr-accent)] text-white font-semibold"
-                    : "hover:text-[var(--sr-ink)]"
-                }`}
-              >
-                Standard Cover
-              </Link>
-              <Link
-                href="/?hero=compact"
-                className={`px-2 py-0.5 rounded-sm transition-colors ${
-                  heroVariant === "compact"
-                    ? "bg-[var(--sr-accent)] text-white font-semibold"
-                    : "hover:text-[var(--sr-ink)]"
-                }`}
-              >
-                Compact Cover
-              </Link>
+        {/* Accessible Page-Level H1 & Conditional Hero Variant Switcher */}
+        {isReviewMode ? (
+          <div className="border-b border-[var(--sr-rule-subtle)] bg-[var(--sr-surface)]/60">
+            <div className="site-container py-2 flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--sr-muted)]">
+              <h1 className="font-medium text-[var(--sr-ink-secondary)]">
+                ScientificRadar — Independent Science Magazine &amp; Long-Form
+                Research Explainers
+              </h1>
+              <div className="flex items-center gap-2">
+                <span>Hero Layout:</span>
+                <Link
+                  href="/?hero=standard&designReview=1"
+                  className={`px-2 py-0.5 rounded-sm transition-colors ${
+                    heroVariant === "standard"
+                      ? "bg-[var(--sr-accent)] text-white font-semibold"
+                      : "hover:text-[var(--sr-ink)]"
+                  }`}
+                >
+                  Standard Cover
+                </Link>
+                <Link
+                  href="/?hero=compact&designReview=1"
+                  className={`px-2 py-0.5 rounded-sm transition-colors ${
+                    heroVariant === "compact"
+                      ? "bg-[var(--sr-accent)] text-white font-semibold"
+                      : "hover:text-[var(--sr-ink)]"
+                  }`}
+                >
+                  Compact Cover
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <h1 className="sr-only">
+            ScientificRadar — Independent Science Magazine &amp; Long-Form
+            Research Explainers
+          </h1>
+        )}
 
         {/* 1. Lead Editorial Feature Hero (Knowable-inspired balanced scale) */}
         <LeadStory
@@ -131,17 +142,17 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               </div>
             </div>
 
-            {/* Editors' Picks / Most Read Demo Rail (Spans 4 columns) */}
+            {/* Editor's Selection Demo Rail (Spans 4 columns) */}
             <aside
-              aria-labelledby="most-read-heading"
+              aria-labelledby="editor-selection-heading"
               className="lg:col-span-4 lg:pl-8 lg:border-l border-[var(--sr-rule)]"
             >
               <div className="pb-2 mb-5 border-b border-[var(--sr-rule)] flex items-baseline justify-between gap-2">
                 <h2
-                  id="most-read-heading"
+                  id="editor-selection-heading"
                   className="font-editorial text-lg sm:text-xl font-bold text-[var(--sr-ink)]"
                 >
-                  Editors’ Picks &amp; Most Read
+                  Editor’s Selection
                 </h2>
                 <span className="text-[11px] font-medium uppercase tracking-wider text-[var(--sr-muted)]">
                   Curated Demo Order
@@ -181,31 +192,33 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               </ol>
 
               {/* Quick Reading Width Comparison Callout for Owner Review */}
-              <div className="mt-8 p-4 rounded-sm bg-[var(--sr-surface)] border border-[var(--sr-rule)] space-y-2">
-                <div className="text-xs font-semibold uppercase tracking-wider text-[var(--sr-accent)]">
-                  Typography &amp; Measure Evaluation
+              {isReviewMode && (
+                <div className="mt-8 p-4 rounded-sm bg-[var(--sr-surface)] border border-[var(--sr-rule)] space-y-2">
+                  <div className="text-xs font-semibold uppercase tracking-wider text-[var(--sr-accent)]">
+                    Typography &amp; Measure Evaluation
+                  </div>
+                  <p className="text-xs text-[var(--sr-ink-secondary)] leading-relaxed">
+                    Compare the long-form reading column at{" "}
+                    <strong>700px (Owner Default)</strong> and{" "}
+                    <strong>600px (Compact Comparison)</strong> on our two anchor
+                    feature articles:
+                  </p>
+                  <div className="pt-1 flex flex-wrap gap-2">
+                    <Link
+                      href="/article/spider-silk-hierarchical-protein-mechanics?measure=700&designReview=1"
+                      className="px-2.5 py-1.5 text-xs font-semibold bg-white border border-[var(--sr-rule)] rounded-sm text-[var(--sr-ink)] hover:border-[var(--sr-accent)] hover:text-[var(--sr-accent)]"
+                    >
+                      Spider Silk (700px)
+                    </Link>
+                    <Link
+                      href="/article/spider-silk-hierarchical-protein-mechanics?measure=600&designReview=1"
+                      className="px-2.5 py-1.5 text-xs font-semibold bg-white border border-[var(--sr-rule)] rounded-sm text-[var(--sr-ink)] hover:border-[var(--sr-accent)] hover:text-[var(--sr-accent)]"
+                    >
+                      Spider Silk (600px)
+                    </Link>
+                  </div>
                 </div>
-                <p className="text-xs text-[var(--sr-ink-secondary)] leading-relaxed">
-                  Compare the long-form reading column at{" "}
-                  <strong>700px (Owner Default)</strong> and{" "}
-                  <strong>600px (Compact Comparison)</strong> on our two anchor
-                  feature articles:
-                </p>
-                <div className="pt-1 flex flex-wrap gap-2">
-                  <Link
-                    href="/article/spider-silk-hierarchical-protein-mechanics?measure=700"
-                    className="px-2.5 py-1.5 text-xs font-semibold bg-white border border-[var(--sr-rule)] rounded-sm text-[var(--sr-ink)] hover:border-[var(--sr-accent)] hover:text-[var(--sr-accent)]"
-                  >
-                    Spider Silk (700px)
-                  </Link>
-                  <Link
-                    href="/article/spider-silk-hierarchical-protein-mechanics?measure=600"
-                    className="px-2.5 py-1.5 text-xs font-semibold bg-white border border-[var(--sr-rule)] rounded-sm text-[var(--sr-ink)] hover:border-[var(--sr-accent)] hover:text-[var(--sr-accent)]"
-                  >
-                    Spider Silk (600px)
-                  </Link>
-                </div>
-              </div>
+              )}
             </aside>
           </div>
         </section>
@@ -227,13 +240,25 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 Molecular Life, Chemistry &amp; Therapeutics
               </h2>
             </div>
-            <Link
-              href="/topics/chemistry"
-              className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-[var(--sr-accent)] hover:underline"
-            >
-              <span>Explore Chemistry &amp; Biology</span>
-              <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-            </Link>
+            <div className="flex items-center flex-wrap gap-1.5 text-xs font-semibold uppercase tracking-wider text-[var(--sr-accent)]">
+              <span className="text-[var(--sr-muted)]">Explore:</span>
+              <Link
+                href="/topics/chemistry"
+                className="hover:underline hover:text-[var(--sr-ink)] transition-colors"
+              >
+                Chemistry
+              </Link>
+              <span aria-hidden="true" className="text-[var(--sr-muted)]">
+                ·
+              </span>
+              <Link
+                href="/topics/biology"
+                className="hover:underline hover:text-[var(--sr-ink)] transition-colors"
+              >
+                Biology
+              </Link>
+              <ArrowRight className="w-3.5 h-3.5 text-[var(--sr-accent)] ml-0.5" aria-hidden="true" />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -260,13 +285,25 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 Earth Geodesy, Paleoclimate &amp; Quantum Matter
               </h2>
             </div>
-            <Link
-              href="/topics/earth-climate"
-              className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-[var(--sr-accent)] hover:underline"
-            >
-              <span>Explore Earth &amp; Physics</span>
-              <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-            </Link>
+            <div className="flex items-center flex-wrap gap-1.5 text-xs font-semibold uppercase tracking-wider text-[var(--sr-accent)]">
+              <span className="text-[var(--sr-muted)]">Explore:</span>
+              <Link
+                href="/topics/earth-climate"
+                className="hover:underline hover:text-[var(--sr-ink)] transition-colors"
+              >
+                Earth &amp; Climate
+              </Link>
+              <span aria-hidden="true" className="text-[var(--sr-muted)]">
+                ·
+              </span>
+              <Link
+                href="/topics/physics"
+                className="hover:underline hover:text-[var(--sr-ink)] transition-colors"
+              >
+                Physics
+              </Link>
+              <ArrowRight className="w-3.5 h-3.5 text-[var(--sr-accent)] ml-0.5" aria-hidden="true" />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
