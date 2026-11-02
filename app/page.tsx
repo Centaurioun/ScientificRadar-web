@@ -21,7 +21,7 @@ interface HomePageProps {
 export default async function HomePage({ searchParams }: HomePageProps) {
   const resolvedParams = await searchParams;
   const heroVariant: HeroVariantOption =
-    resolvedParams.hero === "compact" ? "compact" : "standard";
+    resolvedParams.hero === "standard" ? "standard" : "compact";
 
   const allArticles = await contentRepository.listPublicArticles();
   const categories = await contentRepository.getCategories();
