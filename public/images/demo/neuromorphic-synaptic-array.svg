@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="1200" height="750" role="img" aria-labelledby="neuro-title neuro-desc">
+  <title id="neuro-title">Memristive Neuromorphic Crossbar Array for Analog In-Memory Computing</title>
+  <desc id="neuro-desc">Diagram of a hafnium-oxide resistive switching crossbar array executing matrix-vector multiplication via Ohm's and Kirchhoff's laws.</desc>
+  <rect width="1200" height="750" fill="#14171F"/>
+  <g font-family="Inter, system-ui, sans-serif">
+    <text x="60" y="54" font-size="12" font-weight="600" fill="#F4A261" letter-spacing="1.5">NEUROMORPHIC HARDWARE · ANALOG IN-MEMORY COMPUTING</text>
+    <text x="60" y="88" font-family="Georgia, serif" font-size="24" font-weight="700" fill="#F8F9FA">Sub-Picojoule Synaptic Weight Updates in HfO₂₋ₓ Filamentary Crossbars</text>
+    <line x1="60" y1="108" x2="1140" y2="108" stroke="#283040" stroke-width="1"/>
+  </g>
+
+  <g transform="translate(120, 150)">
+    <!-- Wordlines (Horizontal) -->
+    <g stroke="#48CAE4" stroke-width="5">
+      <line x1="60" y1="90" x2="680" y2="90"/>
+      <line x1="60" y1="210" x2="680" y2="210"/>
+      <line x1="60" y1="330" x2="680" y2="330"/>
+    </g>
+    <!-- Bitlines (Vertical) -->
+    <g stroke="#E4B363" stroke-width="5">
+      <line x1="200" y1="20" x2="200" y2="430"/>
+      <line x1="380" y1="20" x2="380" y2="430"/>
+      <line x1="560" y1="20" x2="560" y2="430"/>
+    </g>
+    <!-- Memristor Junctions -->
+    <g fill="#E76F51" stroke="#FFFFFF" stroke-width="2">
+      <circle cx="200" cy="90" r="14"/><circle cx="380" cy="90" r="14"/><circle cx="560" cy="90" r="14"/>
+      <circle cx="200" cy="210" r="14"/><circle cx="380" cy="210" r="14"/><circle cx="560" cy="210" r="14"/>
+      <circle cx="200" cy="330" r="14"/><circle cx="380" cy="330" r="14"/><circle cx="560" cy="330" r="14"/>
+    </g>
+    <g font-family="Inter, sans-serif" font-size="14" fill="#CBD5E0">
+      <text x="10" y="95">V₁</text><text x="10" y="215">V₂</text><text x="10" y="335">V₃</text>
+      <text x="200" y="465" text-anchor="middle">I₁ = Σ Vᵢ Gᵢ₁</text>
+      <text x="380" y="465" text-anchor="middle">I₂ = Σ Vᵢ Gᵢ₂</text>
+      <text x="560" y="465" text-anchor="middle">I₃ = Σ Vᵢ Gᵢ₃</text>
+    </g>
+    <rect x="730" y="60" width="240" height="320" rx="8" fill="#1E2430" stroke="#3D485E"/>
+    <text x="850" y="110" font-family="Georgia, serif" font-size="18" fill="#FFFFFF" text-anchor="middle">Physical Law Compute</text>
+    <text x="850" y="155" font-family="Inter, sans-serif" font-size="13" fill="#A0AEC0" text-anchor="middle">Ohm's Law: I = V · G</text>
+    <text x="850" y="195" font-family="Inter, sans-serif" font-size="13" fill="#A0AEC0" text-anchor="middle">Kirchhoff Summation</text>
+    <text x="850" y="245" font-family="Inter, sans-serif" font-size="13" fill="#64DFDF" text-anchor="middle">Eliminates von Neumann</text>
+    <text x="850" y="268" font-family="Inter, sans-serif" font-size="13" fill="#64DFDF" text-anchor="middle">memory-bus bottleneck</text>
+  </g>
+  <text x="60" y="685" font-family="Inter, sans-serif" font-size="12" fill="#89A7B0">ORIGINAL SCIENTIFICRADAR ILLUSTRATION · DEMO ARCHIVE FIG-SR-2026-08 · LICENSE: CC0 / PUBLIC DOMAIN ILLUSTRATIVE DEMO</text>
+</svg>

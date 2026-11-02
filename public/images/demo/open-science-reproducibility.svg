@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="1200" height="750" role="img" aria-labelledby="repro-title repro-desc">
+  <title id="repro-title">Computational Reproducibility Pipeline and Registered Report Architecture</title>
+  <desc id="repro-desc">Diagram comparing traditional post-hoc publication bias against pre-registered peer-reviewed protocols and deterministic container execution.</desc>
+  <rect width="1200" height="750" fill="#182026"/>
+  <g font-family="Inter, system-ui, sans-serif">
+    <text x="60" y="54" font-size="12" font-weight="600" fill="#A7E8BD" letter-spacing="1.5">METASCIENCE &amp; EPISTEMOLOGY · REGISTERED REPORTS WORKFLOW</text>
+    <text x="60" y="88" font-family="Georgia, serif" font-size="24" font-weight="700" fill="#F8F9FA">Separating Hypothesis Evaluation from Statistical Significance Thresholds</text>
+    <line x1="60" y1="108" x2="1140" y2="108" stroke="#2D3B45" stroke-width="1"/>
+  </g>
+  <g transform="translate(80, 155)">
+    <rect x="0" y="0" width="310" height="440" rx="8" fill="#202B33" stroke="#48A9A6" stroke-width="2"/>
+    <text x="155" y="48" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#68B0AB" text-anchor="middle">STAGE 1 PEER REVIEW</text>
+    <text x="155" y="85" font-family="Georgia, serif" font-size="19" fill="#FFFFFF" text-anchor="middle">Protocol &amp; Power Analysis</text>
+    <text x="155" y="140" font-family="Inter, sans-serif" font-size="13" fill="#CBD5E0" text-anchor="middle">Sampling plan locked</text>
+    <text x="155" y="170" font-family="Inter, sans-serif" font-size="13" fill="#CBD5E0" text-anchor="middle">In-Principle Acceptance (IPA)</text>
+    <text x="155" y="200" font-family="Inter, sans-serif" font-size="13" fill="#A7E8BD" text-anchor="middle">Before data collection</text>
+
+    <rect x="365" y="0" width="310" height="440" rx="8" fill="#202B33" stroke="#E4B363" stroke-width="2"/>
+    <text x="520" y="48" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#E4B363" text-anchor="middle">DETERMINISTIC EXECUTION</text>
+    <text x="520" y="85" font-family="Georgia, serif" font-size="19" fill="#FFFFFF" text-anchor="middle">Cryptographic Provenance</text>
+    <text x="520" y="140" font-family="Inter, sans-serif" font-size="13" fill="#CBD5E0" text-anchor="middle">Immutable raw data hashes</text>
+    <text x="520" y="170" font-family="Inter, sans-serif" font-size="13" fill="#CBD5E0" text-anchor="middle">Containerized analysis environment</text>
+    <text x="520" y="200" font-family="Inter, sans-serif" font-size="13" fill="#E4B363" text-anchor="middle">Zero p-hacking or HARKing</text>
+
+    <rect x="730" y="0" width="310" height="440" rx="8" fill="#202B33" stroke="#64DFDF" stroke-width="2"/>
+    <text x="885" y="48" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#64DFDF" text-anchor="middle">STAGE 2 ARCHIVAL</text>
+    <text x="885" y="85" font-family="Georgia, serif" font-size="19" fill="#FFFFFF" text-anchor="middle">Outcome-Neutral Publication</text>
+    <text x="885" y="140" font-family="Inter, sans-serif" font-size="13" fill="#CBD5E0" text-anchor="middle">Null and positive findings</text>
+    <text x="885" y="170" font-family="Inter, sans-serif" font-size="13" fill="#CBD5E0" text-anchor="middle">published with equal priority</text>
+    <text x="885" y="200" font-family="Inter, sans-serif" font-size="13" fill="#64DFDF" text-anchor="middle">Unbiased effect-size distribution</text>
+  </g>
+  <text x="60" y="685" font-family="Inter, sans-serif" font-size="12" fill="#89A7B0">ORIGINAL SCIENTIFICRADAR ILLUSTRATION · DEMO ARCHIVE FIG-SR-2026-09 · LICENSE: CC0 / PUBLIC DOMAIN ILLUSTRATIVE DEMO</text>
+</svg>

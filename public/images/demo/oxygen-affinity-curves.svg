@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 660" width="1200" height="660" role="img" aria-labelledby="o2-title o2-desc">
+  <title id="o2-title">Oxygen Equilibrium Dissociation Curves Across Respiratory Metalloproteins</title>
+  <desc id="o2-desc">Sigmoidal and hyperbolic oxygen saturation curves plotting fractional saturation Y against partial pressure PO2 for high-affinity chlorocruorin, cooperative vertebrate hemoglobin, and cold-adapted cephalopod hemocyanin.</desc>
+  <rect width="1200" height="660" fill="#F7F7F4"/>
+  <rect x="24" y="24" width="1152" height="612" rx="6" fill="#FFFFFF" stroke="#DCE2E4" stroke-width="1.5"/>
+
+  <g font-family="Inter, system-ui, sans-serif">
+    <text x="64" y="66" font-size="12" font-weight="600" fill="#15747B" letter-spacing="1.4">ALLOSTERIC COOPERATIVITY &amp; BOHR SHIFT · HILL EQUATION KINETICS</text>
+    <text x="64" y="96" font-family="Georgia, serif" font-size="22" font-weight="700" fill="#181C21">Oxygen binding affinity (P₅₀) adapts to habitat partial pressure and metabolic demand</text>
+  </g>
+
+  <g transform="translate(115, 135)">
+    <!-- Grid -->
+    <g stroke="#E9ECEE" stroke-width="1">
+      <line x1="0" y1="0" x2="940" y2="0"/>
+      <line x1="0" y1="100" x2="940" y2="100"/>
+      <line x1="0" y1="200" x2="940" y2="200"/>
+      <line x1="0" y1="300" x2="940" y2="300"/>
+      <line x1="188" y1="0" x2="188" y2="400"/>
+      <line x1="376" y1="0" x2="376" y2="400"/>
+      <line x1="564" y1="0" x2="564" y2="400"/>
+      <line x1="752" y1="0" x2="752" y2="400"/>
+      <line x1="940" y1="0" x2="940" y2="400"/>
+    </g>
+
+    <!-- P50 Reference Horizontal Dashed Line -->
+    <line x1="0" y1="200" x2="940" y2="200" stroke="#8D99AE" stroke-width="1.5" stroke-dasharray="5 5"/>
+    <text x="930" y="192" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#525B65" text-anchor="end">P₅₀ Threshold (50% O₂ Saturation)</text>
+
+    <!-- Axes -->
+    <line x1="0" y1="0" x2="0" y2="400" stroke="#181C21" stroke-width="2"/>
+    <line x1="0" y1="400" x2="940" y2="400" stroke="#181C21" stroke-width="2"/>
+
+    <!-- Y labels -->
+    <g font-family="Inter, sans-serif" font-size="13" fill="#525B65" text-anchor="end">
+      <text x="-14" y="404">0%</text>
+      <text x="-14" y="304">25%</text>
+      <text x="-14" y="204">50%</text>
+      <text x="-14" y="104">75%</text>
+      <text x="-14" y="6">100%</text>
+    </g>
+    <text x="-60" y="200" transform="rotate(-90, -60, 200)" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#181C21" text-anchor="middle">Fractional O₂ Saturation (Y)</text>
+
+    <!-- X labels -->
+    <g font-family="Inter, sans-serif" font-size="13" fill="#525B65" text-anchor="middle">
+      <text x="0" y="428">0</text>
+      <text x="188" y="428">20</text>
+      <text x="376" y="428">40</text>
+      <text x="564" y="428">60</text>
+      <text x="752" y="428">80</text>
+      <text x="940" y="428">100</text>
+    </g>
+    <text x="470" y="464" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#181C21" text-anchor="middle">Oxygen Partial Pressure pO₂ (mmHg)</text>
+
+    <!-- Curve 1: Monomeric Myoglobin / High-affinity Hemerythrin -->
+    <path d="M 0 400 C 18 180, 75 65, 320 25 L 940 12" fill="none" stroke="#9D4EDD" stroke-width="3"/>
+    <text x="145" y="52" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#7B2CBF">Sipunculid Hemerythrin (nH ≈ 1.1, P₅₀ = 4 mmHg)</text>
+
+    <!-- Curve 2: Mammalian Hemoglobin (pH 7.4) -->
+    <path d="M 0 400 C 110 390, 175 280, 250 200 C 330 110, 480 35, 940 18" fill="none" stroke="#D64045" stroke-width="3.5"/>
+    <circle cx="250" cy="200" r="5" fill="#D64045"/>
+    <text x="275" y="155" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#D64045">Vertebrate Hemoglobin (pH 7.4, nH = 2.9)</text>
+
+    <!-- Curve 3: Antarctic Octopod Hemocyanin (2°C) -->
+    <path d="M 0 400 C 160 392, 270 300, 365 200 C 470 100, 620 45, 940 26" fill="none" stroke="#0096C7" stroke-width="3.5"/>
+    <circle cx="365" cy="200" r="5" fill="#0096C7"/>
+    <text x="435" y="135" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#0077B6">Cephalopod Hemocyanin (nH = 3.4, strong Bohr shift)</text>
+
+    <!-- Curve 4: Sabellid Chlorocruorin -->
+    <path d="M 0 400 C 220 395, 390 320, 510 200 C 640 85, 790 48, 940 34" fill="none" stroke="#40916C" stroke-width="3" stroke-dasharray="6 4"/>
+    <circle cx="510" cy="200" r="5" fill="#40916C"/>
+    <text x="540" y="226" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#2D6A4F">Annelid Chlorocruorin (P₅₀ ≈ 54 mmHg)</text>
+  </g>
+</svg>

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="1200" height="750" role="img" aria-labelledby="vent-title vent-desc">
+  <title id="vent-title">Alkaline Hydrothermal Vent Proton Gradients and Prebiotic Carbon Fixation</title>
+  <desc id="vent-desc">Cross-section of a microporous iron-nickel-sulfide hydrothermal chimney separating alkaline vent fluid (pH 10) from acidic Hadean ocean water (pH 6).</desc>
+  <rect width="1200" height="750" fill="#101B21"/>
+  <g font-family="Inter, system-ui, sans-serif">
+    <text x="60" y="54" font-size="12" font-weight="600" fill="#74C69D" letter-spacing="1.5">PREBIOTIC GEOCHEMISTRY · CHEMIOSMOTIC DISEQUILIBRIUM</text>
+    <text x="60" y="88" font-family="Georgia, serif" font-size="24" font-weight="700" fill="#F4F6F7">Fe(Ni)S Catalytic Mineral Walls Coupling H₂ Oxidation to CO₂ Reduction</text>
+    <line x1="60" y1="108" x2="1140" y2="108" stroke="#253D47" stroke-width="1"/>
+  </g>
+
+  <g transform="translate(80, 145)">
+    <!-- Left: Alkaline Hydrothermal Fluid -->
+    <rect x="0" y="0" width="380" height="480" rx="8" fill="#162F38" stroke="#3B7A8C"/>
+    <text x="190" y="46" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#64DFDF" text-anchor="middle">ALKALINE VENT FLUID (pH 9.5–11)</text>
+    <text x="190" y="76" font-family="Georgia, serif" font-size="18" fill="#FFFFFF" text-anchor="middle">Serpentinization Efflux</text>
+    <text x="190" y="130" font-family="Inter, sans-serif" font-size="15" fill="#A7E8BD" text-anchor="middle">High [H₂] + [OH⁻] + [HS⁻]</text>
+    <text x="190" y="165" font-family="Inter, sans-serif" font-size="13" fill="#9BB5BC" text-anchor="middle">T ≈ 60–90 °C · Low proton activity</text>
+
+    <!-- Center: Fe(Ni)S Mineral Membrane -->
+    <rect x="400" y="0" width="240" height="480" rx="6" fill="#2A2D34" stroke="#E4B363" stroke-width="2"/>
+    <text x="520" y="46" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#E4B363" text-anchor="middle">Fe(Ni)S MINERAL BARRIER</text>
+    <text x="520" y="74" font-family="Georgia, serif" font-size="16" fill="#FFFFFF" text-anchor="middle">Mackinawite / Greigite</text>
+    <circle cx="520" cy="220" r="46" fill="#3D405B" stroke="#E4B363" stroke-width="2"/>
+    <text x="520" y="216" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#F4A261" text-anchor="middle">Fe₄S₄-like</text>
+    <text x="520" y="236" font-family="Inter, sans-serif" font-size="12" fill="#FFFFFF" text-anchor="middle">Nanocluster</text>
+    <text x="520" y="340" font-family="Inter, sans-serif" font-size="13" fill="#E4B363" text-anchor="middle">Δψ + ΔpH ≈ 180–240 mV</text>
+
+    <!-- Right: Acidic Hadean Ocean -->
+    <rect x="660" y="0" width="380" height="480" rx="8" fill="#1B2A38" stroke="#457B9D"/>
+    <text x="850" y="46" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#90E0EF" text-anchor="middle">HADEAN OCEAN (pH 5.5–6.0)</text>
+    <text x="850" y="76" font-family="Georgia, serif" font-size="18" fill="#FFFFFF" text-anchor="middle">Dissolved CO₂ &amp; Fe²⁺ Reservoir</text>
+    <text x="850" y="130" font-family="Inter, sans-serif" font-size="15" fill="#90E0EF" text-anchor="middle">High [CO₂] + [H⁺] + [Fe²⁺]</text>
+    <text x="850" y="165" font-family="Inter, sans-serif" font-size="13" fill="#9BB5BC" text-anchor="middle">Proton influx drives CO₂ → Formate / Acetate</text>
+  </g>
+  <text x="60" y="685" font-family="Inter, sans-serif" font-size="12" fill="#89A7B0">ORIGINAL SCIENTIFICRADAR ILLUSTRATION · DEMO ARCHIVE FIG-SR-2026-05 · LICENSE: CC0 / PUBLIC DOMAIN ILLUSTRATIVE DEMO</text>
+</svg>

@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 680" width="1200" height="680" role="img" aria-labelledby="stress-title stress-desc">
+  <title id="stress-title">Comparative Stress-Strain Profiles of Natural and Synthetic Structural Fibers</title>
+  <desc id="stress-desc">Engineering stress-strain curves comparing Argiope aurantia dragline silk, Kevlar 49, high-tensile steel, and Bombyx mori silkworm silk, highlighting the work of fracture area under the curve.</desc>
+  <rect width="1200" height="680" fill="#F7F7F4"/>
+  <rect x="24" y="24" width="1152" height="632" rx="6" fill="#FFFFFF" stroke="#DCE2E4" stroke-width="1.5"/>
+
+  <g font-family="Inter, system-ui, sans-serif">
+    <text x="64" y="68" font-size="12" font-weight="600" fill="#15747B" letter-spacing="1.4">MECHANICAL PERFORMANCE COMPARISON · STRESS–STRAIN CONSTITUTIVE BEHAVIOR</text>
+    <text x="64" y="98" font-family="Georgia, serif" font-size="22" font-weight="700" fill="#181C21">Toughness emerges from the synergy of high tensile strength and large extensibility</text>
+  </g>
+
+  <!-- Plot Area -->
+  <g transform="translate(110, 140)">
+    <!-- Grid Lines -->
+    <g stroke="#E9ECEE" stroke-width="1">
+      <line x1="0" y1="0" x2="960" y2="0"/>
+      <line x1="0" y1="90" x2="960" y2="90"/>
+      <line x1="0" y1="180" x2="960" y2="180"/>
+      <line x1="0" y1="270" x2="960" y2="270"/>
+      <line x1="0" y1="360" x2="960" y2="360"/>
+
+      <line x1="192" y1="0" x2="192" y2="420"/>
+      <line x1="384" y1="0" x2="384" y2="420"/>
+      <line x1="576" y1="0" x2="576" y2="420"/>
+      <line x1="768" y1="0" x2="768" y2="420"/>
+      <line x1="960" y1="0" x2="960" y2="420"/>
+    </g>
+
+    <!-- Shaded Toughness Area under Spider Dragline Silk -->
+    <path d="M 0 420 L 42 315 C 180 295, 420 220, 680 110 L 680 420 Z" fill="#15747B" fill-opacity="0.12"/>
+
+    <!-- Axes -->
+    <line x1="0" y1="0" x2="0" y2="420" stroke="#181C21" stroke-width="2"/>
+    <line x1="0" y1="420" x2="960" y2="420" stroke="#181C21" stroke-width="2"/>
+
+    <!-- Y-axis ticks & labels (Stress in GPa) -->
+    <g font-family="Inter, sans-serif" font-size="13" fill="#525B65" text-anchor="end">
+      <text x="-14" y="424">0.0</text>
+      <text x="-14" y="334">1.0</text>
+      <text x="-14" y="244">2.0</text>
+      <text x="-14" y="154">3.0</text>
+      <text x="-14" y="64">4.0</text>
+    </g>
+    <text x="-62" y="210" transform="rotate(-90, -62, 210)" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#181C21" text-anchor="middle">Engineering Stress σ (GPa)</text>
+
+    <!-- X-axis ticks & labels (Strain in %) -->
+    <g font-family="Inter, sans-serif" font-size="13" fill="#525B65" text-anchor="middle">
+      <text x="0" y="446">0%</text>
+      <text x="192" y="446">10%</text>
+      <text x="384" y="446">20%</text>
+      <text x="576" y="446">30%</text>
+      <text x="768" y="446">40%</text>
+      <text x="960" y="446">50%</text>
+    </g>
+    <text x="480" y="482" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#181C21" text-anchor="middle">Engineering Strain ε (%)</text>
+
+    <!-- Curve 1: Kevlar 49 (High stiffness, low strain ~2.8%, 3.6 GPa) -->
+    <path d="M 0 420 L 54 96" fill="none" stroke="#B84A39" stroke-width="3.5"/>
+    <circle cx="54" cy="96" r="5" fill="#B84A39"/>
+    <text x="68" y="92" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#B84A39">Kevlar 49 (σ = 3.6 GPa, ε = 2.7%)</text>
+    <text x="68" y="110" font-family="Inter, sans-serif" font-size="12" fill="#6C757D">Toughness ≈ 50 MJ·m⁻³ (Brittle fracture)</text>
+
+    <!-- Curve 2: High-Tensile Steel -->
+    <path d="M 0 420 L 18 285 L 35 280" fill="none" stroke="#495057" stroke-width="3" stroke-dasharray="6 4"/>
+    <circle cx="35" cy="280" r="4.5" fill="#495057"/>
+    <text x="50" y="276" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#495057">High-Tensile Steel (1.5 GPa)</text>
+
+    <!-- Curve 3: Major Ampullate Dragline Silk -->
+    <path d="M 0 420 L 42 315 C 180 295, 420 220, 680 110" fill="none" stroke="#15747B" stroke-width="4"/>
+    <circle cx="42" cy="315" r="5" fill="#15747B"/>
+    <circle cx="680" cy="110" r="6" fill="#15747B"/>
+    <text x="530" y="88" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#15747B">Major Ampullate Dragline Silk</text>
+    <text x="530" y="106" font-family="Inter, sans-serif" font-size="12" fill="#181C21">Yield knee + strain hardening · Toughness ≈ 165 MJ·m⁻³</text>
+
+    <!-- Curve 4: Bombyx mori Silkworm Silk -->
+    <path d="M 0 420 L 32 365 C 130 355, 250 335, 365 310" fill="none" stroke="#C88A2B" stroke-width="3"/>
+    <circle cx="365" cy="310" r="5" fill="#C88A2B"/>
+    <text x="380" y="314" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#9C6818">Bombyx mori Silk (0.6 GPa, 19%)</text>
+
+    <!-- Curve 5: Flagelliform Capture Spiral Silk -->
+    <path d="M 0 420 C 320 412, 640 375, 920 290" fill="none" stroke="#5A67D8" stroke-width="2.5" stroke-dasharray="4 4"/>
+    <circle cx="920" cy="290" r="4.5" fill="#5A67D8"/>
+    <text x="670" y="348" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#434190">Flagelliform Spiral Silk (extends &gt;200%)</text>
+
+    <!-- Annotation inside shaded region -->
+    <text x="310" y="335" font-family="Georgia, serif" font-style="italic" font-size="15" fill="#0F595E">Shaded integral ∫ σ dε represents dissipated impact energy per unit volume</text>
+  </g>
+</svg>

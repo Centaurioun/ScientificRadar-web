@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="1200" height="750" role="img" aria-labelledby="anatolia-title anatolia-desc">
+  <title id="anatolia-title">Kuzey Anadolu Fay Zonu Tektonik Kayma Hızları ve Gerinim Birikimi</title>
+  <desc id="anatolia-desc">Jeodezik GNSS hız vektörleri, kilitli asperite segmentleri ve Marmara sismik boşluğu boyunca yıllık kayma hızı dağılımı.</desc>
+  <rect width="1200" height="750" fill="#121E24"/>
+  <g font-family="Inter, system-ui, sans-serif">
+    <text x="60" y="54" font-size="12" font-weight="600" fill="#68B0AB" letter-spacing="1.4">TEKTONİK JEODEZİ · KUZEY ANADOLU FAY ZONU (KAFZ) KAYMA VEKTÖRLERİ</text>
+    <text x="60" y="88" font-family="Georgia, serif" font-size="24" font-weight="700" fill="#F4F6F7">Anadolu Levhasının Batıya Kaçışı ve Kabuksal Gerinim Hızı (24±1 mm/yıl)</text>
+    <line x1="60" y1="106" x2="1140" y2="106" stroke="#284652" stroke-width="1"/>
+  </g>
+
+  <!-- Map & Fault Trace Schematic -->
+  <g transform="translate(60, 135)">
+    <rect width="1080" height="495" rx="8" fill="#182830" stroke="#2D4B57" stroke-width="1.5"/>
+
+    <!-- Stable Eurasian Plate Label -->
+    <text x="540" y="65" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="#89A7B0" text-anchor="middle" letter-spacing="2">AVRASYA LEVHASI (SABİT REFERANS ÇERÇEVESİ)</text>
+
+    <!-- Curved North Anatolian Fault Trace -->
+    <path d="M 980 245 C 760 155, 420 145, 110 225" fill="none" stroke="#E06D53" stroke-width="5"/>
+    <path d="M 320 176 C 220 195, 150 235, 95 268" fill="none" stroke="#E4B363" stroke-width="3" stroke-dasharray="8 6"/>
+
+    <!-- Fault Segment Nodes -->
+    <g fill="#F4F6F7" font-family="Inter, sans-serif" font-size="12" font-weight="600">
+      <circle cx="920" cy="222" r="6" fill="#E06D53"/>
+      <text x="920" y="198" text-anchor="middle">Erzincan Havzası</text>
+
+      <circle cx="690" cy="168" r="6" fill="#E06D53"/>
+      <text x="690" y="144" text-anchor="middle">İsmetpaşa (Asismik Krip: ~9 mm/yıl)</text>
+
+      <circle cx="430" cy="165" r="6" fill="#E06D53"/>
+      <text x="430" y="141" text-anchor="middle">İzmit–Düzce Kırığı</text>
+
+      <circle cx="235" cy="192" r="7" fill="#E4B363" stroke="#182830" stroke-width="2"/>
+      <text x="235" y="162" fill="#E4B363" text-anchor="middle">Marmara Sismik Boşluğu</text>
+    </g>
+
+    <!-- GNSS Velocity Arrows in Anatolian Block -->
+    <g stroke="#5BC0BE" stroke-width="3" fill="#5BC0BE">
+      <line x1="880" y1="340" x2="800" y2="325"/>
+      <polygon points="792,323 804,319 802,331"/>
+
+      <line x1="680" y1="320" x2="585" y2="320"/>
+      <polygon points="577,320 589,314 589,326"/>
+
+      <line x1="480" y1="330" x2="375" y2="355"/>
+      <polygon points="367,357 377,348 380,360"/>
+
+      <line x1="290" y1="355" x2="180" y2="405"/>
+      <polygon points="172,409 181,398 186,409"/>
+    </g>
+
+    <g font-family="Inter, sans-serif" font-size="12" fill="#A7E8BD">
+      <text x="840" y="365" text-anchor="middle">18.4 mm/yıl</text>
+      <text x="632" y="350" text-anchor="middle">22.1 mm/yıl</text>
+      <text x="428" y="382" text-anchor="middle">24.6 mm/yıl</text>
+      <text x="245" y="425" text-anchor="middle">26.8 mm/yıl (Ege Açılma Rejimi)</text>
+    </g>
+
+    <text x="540" y="455" font-family="Georgia, serif" font-size="18" fill="#F4F6F7" text-anchor="middle">Anadolu Bloku Saat Yönünün Tersine Rotasyonel Hız Alanı (GNSS / InSAR Birleşik Çözümü)</text>
+  </g>
+
+  <text x="60" y="685" font-family="Inter, sans-serif" font-size="12" fill="#89A7B0">ÖZGÜN SCIENTIFICRADAR ŞEMASI · DEMO ARŞİVİ FIG-SR-2026-03 · LİSANS: CC0 / KAMU MALI ÖRNEKLEME</text>
+</svg>

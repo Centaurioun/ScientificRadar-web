@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="1200" height="750" role="img" aria-labelledby="battery-title battery-desc">
+  <title id="battery-title">Solid-State Sulfide Electrolyte Interphase and Lithium Dendrite Suppression</title>
+  <desc id="battery-desc">Cross-sectional electrochemistry schematic showing Li6PS5Cl argyrodite solid electrolyte, silver-carbon interlayer, and uniform lithium plating.</desc>
+  <rect width="1200" height="750" fill="#131922"/>
+  <g font-family="Inter, system-ui, sans-serif">
+    <text x="60" y="54" font-size="12" font-weight="600" fill="#F4A261" letter-spacing="1.5">SOLID-STATE ELECTROCHEMISTRY · INTERFACIAL MECHANICS</text>
+    <text x="60" y="88" font-family="Georgia, serif" font-size="24" font-weight="700" fill="#F8F9FA">Chemo-Mechanical Stress Regulation Across Argyrodite Li₆PS₅Cl Grain Boundaries</text>
+    <line x1="60" y1="108" x2="1140" y2="108" stroke="#263142" stroke-width="1"/>
+  </g>
+  <g transform="translate(80, 155)">
+    <rect x="0" y="0" width="240" height="450" rx="6" fill="#2B3442" stroke="#8D99AE"/>
+    <text x="120" y="45" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#E2E8F0" text-anchor="middle">ANODE CURRENT COLLECTOR</text>
+    <text x="120" y="80" font-family="Georgia, serif" font-size="18" fill="#FFFFFF" text-anchor="middle">Dense Lithium Metal</text>
+
+    <rect x="255" y="0" width="150" height="450" rx="6" fill="#3D342B" stroke="#F4A261" stroke-width="2"/>
+    <text x="330" y="45" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#F4A261" text-anchor="middle">Ag–C INTERLAYER</text>
+    <text x="330" y="80" font-family="Georgia, serif" font-size="16" fill="#FFFFFF" text-anchor="middle">Lithiophilic Alloy</text>
+
+    <rect x="420" y="0" width="360" height="450" rx="6" fill="#1A323E" stroke="#48CAE4" stroke-width="2"/>
+    <text x="600" y="45" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#48CAE4" text-anchor="middle">SOLID ELECTROLYTE CERAMIC</text>
+    <text x="600" y="80" font-family="Georgia, serif" font-size="18" fill="#FFFFFF" text-anchor="middle">Li₆PS₅Cl Argyrodite Lattice</text>
+    <text x="600" y="220" font-family="Inter, sans-serif" font-size="15" fill="#90E0EF" text-anchor="middle">Ionic conductivity σᵢ ≈ 12 mS·cm⁻¹</text>
+
+    <rect x="795" y="0" width="245" height="450" rx="6" fill="#2A2438" stroke="#B794F4"/>
+    <text x="917" y="45" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#D6BCFA" text-anchor="middle">HIGH-NICKEL CATHODE</text>
+    <text x="917" y="80" font-family="Georgia, serif" font-size="18" fill="#FFFFFF" text-anchor="middle">Single-Crystal NMC811</text>
+  </g>
+  <text x="60" y="685" font-family="Inter, sans-serif" font-size="12" fill="#89A7B0">ORIGINAL SCIENTIFICRADAR ILLUSTRATION · DEMO ARCHIVE FIG-SR-2026-10 · LICENSE: CC0 / PUBLIC DOMAIN ILLUSTRATIVE DEMO</text>
+</svg>

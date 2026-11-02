@@ -1,0 +1,135 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="1200" height="750" role="img" aria-labelledby="silk-title silk-desc">
+  <title id="silk-title">Hierarchical Protein Architecture of Dragline Spider Silk</title>
+  <desc id="silk-desc">Scientific diagram illustrating spidroin micelle assembly, shear-induced beta-sheet nanocrystal alignment inside the tapering spinning duct, and macroscopic fiber mechanics.</desc>
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F1E26"/>
+      <stop offset="55%" stop-color="#142C35"/>
+      <stop offset="100%" stop-color="#1B3B44"/>
+    </linearGradient>
+    <linearGradient id="ductGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1E4E58" stop-opacity="0.7"/>
+      <stop offset="50%" stop-color="#29737D" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#48A9A6" stop-opacity="0.85"/>
+    </linearGradient>
+    <linearGradient id="crystalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E4B363"/>
+      <stop offset="100%" stop-color="#D17B49"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#ffffff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="750" fill="url(#bgGrad)"/>
+  <rect width="1200" height="750" fill="url(#grid)"/>
+
+  <!-- Header Annotation -->
+  <g font-family="Inter, system-ui, sans-serif" fill="#A5C4CB" font-size="13" letter-spacing="1.5">
+    <text x="60" y="54" font-weight="600">HIERARCHICAL BIOPOLYMER SELF-ASSEMBLY · SPIDROIN PHASE TRANSITION</text>
+    <line x1="60" y1="68" x2="1140" y2="68" stroke="#2D5A65" stroke-width="1"/>
+  </g>
+
+  <!-- Stage 1: Ampullate Gland Dope (Left) -->
+  <g transform="translate(60, 110)">
+    <rect x="0" y="0" width="310" height="490" rx="8" fill="#10252E" stroke="#2C5863" stroke-width="1.5"/>
+    <text x="24" y="36" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#68B0AB" letter-spacing="1">STAGE I · LIQUID DOPE (pH 7.6)</text>
+    <text x="24" y="62" font-family="Georgia, serif" font-size="18" fill="#F4F6F7">Globular Spidroin Micelles</text>
+    <text x="24" y="86" font-family="Inter, sans-serif" font-size="13" fill="#9BB5BC">High Na⁺ / Cl⁻ · Solvated random coils</text>
+
+    <!-- Micelle Spheres -->
+    <g transform="translate(45, 130)">
+      <circle cx="55" cy="55" r="38" fill="#1E4B56" stroke="#5BC0BE" stroke-width="2"/>
+      <path d="M35,45 Q55,20 75,45 T55,75 T35,55" fill="none" stroke="#A7E8BD" stroke-width="2"/>
+      <circle cx="155" cy="65" r="42" fill="#1E4B56" stroke="#5BC0BE" stroke-width="2"/>
+      <path d="M135,50 Q160,30 175,60 T145,85 T135,50" fill="none" stroke="#A7E8BD" stroke-width="2"/>
+      <circle cx="105" cy="155" r="45" fill="#1E4B56" stroke="#5BC0BE" stroke-width="2"/>
+      <path d="M80,145 Q110,120 130,155 T95,180 T80,145" fill="none" stroke="#E4B363" stroke-width="2.2"/>
+      <circle cx="50" cy="245" r="34" fill="#1E4B56" stroke="#5BC0BE" stroke-width="2"/>
+      <path d="M32,240 Q50,220 68,245 T48,265" fill="none" stroke="#A7E8BD" stroke-width="2"/>
+      <circle cx="165" cy="255" r="39" fill="#1E4B56" stroke="#5BC0BE" stroke-width="2"/>
+      <path d="M145,245 Q170,225 185,255 T155,275" fill="none" stroke="#E4B363" stroke-width="2"/>
+    </g>
+
+    <text x="24" y="445" font-family="Inter, sans-serif" font-size="12" fill="#89A7B0">Concentration: ~30–50% w/v protein</text>
+    <text x="24" y="467" font-family="Inter, sans-serif" font-size="12" fill="#89A7B0">Prevented from premature aggregation</text>
+  </g>
+
+  <!-- Stage 2: Tapering Spinning Duct & Acidification (Center) -->
+  <g transform="translate(405, 110)">
+    <rect x="0" y="0" width="390" height="490" rx="8" fill="#10252E" stroke="#2C5863" stroke-width="1.5"/>
+    <text x="24" y="36" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#E4B363" letter-spacing="1">STAGE II · SHEAR &amp; ION EXCHANGE (pH 5.7)</text>
+    <text x="24" y="62" font-family="Georgia, serif" font-size="18" fill="#F4F6F7">Hyperbolic Tapering Duct</text>
+    <text x="24" y="86" font-family="Inter, sans-serif" font-size="13" fill="#9BB5BC">K⁺ / PO₄³⁻ influx · Water extraction · Elongational flow</text>
+
+    <!-- Tapering Funnel Geometry -->
+    <path d="M 30 135 C 150 140, 240 195, 360 220 L 360 310 C 240 335, 150 390, 30 395 Z" fill="url(#ductGrad)" stroke="#68B0AB" stroke-width="2"/>
+
+    <!-- Flow Streamlines & Aligning Chains -->
+    <path d="M 45 175 C 150 180, 240 220, 350 240" fill="none" stroke="#A7E8BD" stroke-width="2" stroke-dasharray="6 4"/>
+    <path d="M 45 265 L 350 265" fill="none" stroke="#F4F6F7" stroke-width="2.5"/>
+    <path d="M 45 355 C 150 350, 240 310, 350 290" fill="none" stroke="#A7E8BD" stroke-width="2" stroke-dasharray="6 4"/>
+
+    <!-- Emerging Beta-Sheet Blocks inside Duct -->
+    <rect x="195" y="232" width="38" height="16" rx="2" fill="url(#crystalGrad)"/>
+    <rect x="255" y="242" width="44" height="16" rx="2" fill="url(#crystalGrad)"/>
+    <rect x="255" y="272" width="44" height="16" rx="2" fill="url(#crystalGrad)"/>
+    <rect x="312" y="252" width="40" height="26" rx="2" fill="url(#crystalGrad)"/>
+
+    <!-- Proton / Ion Arrows -->
+    <g stroke="#E4B363" stroke-width="1.5" fill="#E4B363">
+      <line x1="140" y1="125" x2="140" y2="155"/>
+      <polygon points="140,160 136,152 144,152"/>
+      <line x1="230" y1="150" x2="230" y2="180"/>
+      <polygon points="230,185 226,177 234,177"/>
+      <line x1="140" y1="405" x2="140" y2="375"/>
+      <polygon points="140,370 136,378 144,378"/>
+      <line x1="230" y1="380" x2="230" y2="350"/>
+      <polygon points="230,345 226,353 234,353"/>
+    </g>
+    <text x="115" y="118" font-family="Inter, sans-serif" font-size="11" fill="#E4B363">+H⁺ Proton Pump</text>
+    <text x="115" y="424" font-family="Inter, sans-serif" font-size="11" fill="#68B0AB">−H₂O Reabsorption</text>
+
+    <text x="24" y="445" font-family="Inter, sans-serif" font-size="12" fill="#89A7B0">CT-domain dimerization locks chain alignment</text>
+    <text x="24" y="467" font-family="Inter, sans-serif" font-size="12" fill="#89A7B0">Poly-alanine tracts zip into antiparallel β-sheets</text>
+  </g>
+
+  <!-- Stage 3: Solid Nanocomposite Fiber (Right) -->
+  <g transform="translate(830, 110)">
+    <rect x="0" y="0" width="310" height="490" rx="8" fill="#10252E" stroke="#2C5863" stroke-width="1.5"/>
+    <text x="24" y="36" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#A7E8BD" letter-spacing="1">STAGE III · SOLID FIBER (pH 5.0)</text>
+    <text x="24" y="62" font-family="Georgia, serif" font-size="18" fill="#F4F6F7">Semi-Crystalline Network</text>
+    <text x="24" y="86" font-family="Inter, sans-serif" font-size="13" fill="#9BB5BC">β-sheet nanocrystals in glycine-rich matrix</text>
+
+    <!-- Fiber Cylinder & Nanocrystals -->
+    <g transform="translate(30, 135)">
+      <rect x="0" y="25" width="250" height="210" rx="14" fill="#173742" stroke="#68B0AB" stroke-width="2"/>
+      <!-- Amorphous Matrix Wavy Lines -->
+      <path d="M 15 65 Q 50 45, 85 65 T 155 65 T 235 65" fill="none" stroke="#5BC0BE" stroke-width="2"/>
+      <path d="M 15 130 Q 50 110, 85 130 T 155 130 T 235 130" fill="none" stroke="#5BC0BE" stroke-width="2"/>
+      <path d="M 15 195 Q 50 175, 85 195 T 155 195 T 235 195" fill="none" stroke="#5BC0BE" stroke-width="2"/>
+
+      <!-- Beta-sheet nanocrystal blocks -->
+      <rect x="35" y="48" width="54" height="32" rx="3" fill="url(#crystalGrad)" stroke="#FFF" stroke-opacity="0.4"/>
+      <rect x="145" y="48" width="54" height="32" rx="3" fill="url(#crystalGrad)" stroke="#FFF" stroke-opacity="0.4"/>
+      <rect x="88" y="114" width="60" height="32" rx="3" fill="url(#crystalGrad)" stroke="#FFF" stroke-opacity="0.4"/>
+      <rect x="35" y="178" width="54" height="32" rx="3" fill="url(#crystalGrad)" stroke="#FFF" stroke-opacity="0.4"/>
+      <rect x="150" y="178" width="54" height="32" rx="3" fill="url(#crystalGrad)" stroke="#FFF" stroke-opacity="0.4"/>
+
+      <!-- Legend inside Stage 3 -->
+      <rect x="10" y="260" width="16" height="12" rx="2" fill="url(#crystalGrad)"/>
+      <text x="34" y="270" font-family="Inter, sans-serif" font-size="12" fill="#DCE6E9">Poly(Ala) β-sheet crystal (2–5 nm)</text>
+      <line x1="10" y1="290" x2="26" y2="290" stroke="#5BC0BE" stroke-width="2.5"/>
+      <text x="34" y="294" font-family="Inter, sans-serif" font-size="12" fill="#DCE6E9">3₁-helical glycine-rich elastic network</text>
+    </g>
+
+    <text x="24" y="445" font-family="Inter, sans-serif" font-size="12" fill="#89A7B0">Toughness: ~160–180 MJ·m⁻³</text>
+    <text x="24" y="467" font-family="Inter, sans-serif" font-size="12" fill="#89A7B0">Tensile strength: 1.1–1.4 GPa</text>
+  </g>
+
+  <!-- Footer Metadata -->
+  <g font-family="Inter, system-ui, sans-serif" fill="#89A7B0" font-size="12">
+    <text x="60" y="655">ORIGINAL SCIENTIFICRADAR ILLUSTRATION · DEMO ARCHIVE FIG-SR-2026-01 · LICENSE: CC0 / PUBLIC DOMAIN ILLUSTRATIVE DEMO</text>
+    <text x="60" y="680" fill="#68B0AB">Scale progression: Micelle (~100–200 nm) → Tapering duct shear zone (mm scale) → Nanocrystal lattice (2–5 nm domains in 4 μm fiber)</text>
+  </g>
+</svg>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="1200" height="750" role="img" aria-labelledby="aero-title aero-desc">
+  <title id="aero-title">Stratospheric Sulfate Aerosol Scattering and Polar Ice-Core Isotopic Stratigraphy</title>
+  <desc id="aero-desc">Diagram of stratospheric aerosol optical depth and bipolar ice-core sulfate deposition layers used to reconstruct historical radiative forcing.</desc>
+  <rect width="1200" height="750" fill="#13222B"/>
+  <g font-family="Inter, system-ui, sans-serif">
+    <text x="60" y="54" font-size="12" font-weight="600" fill="#90E0EF" letter-spacing="1.5">PALEOCLIMATOLOGY &amp; ATMOSPHERIC PHYSICS · RADIATIVE FORCING</text>
+    <text x="60" y="88" font-family="Georgia, serif" font-size="24" font-weight="700" fill="#F4F6F7">Stratospheric Sulfate Veil Optical Depth and Ice-Core δ¹⁸O / Δ³³S Signatures</text>
+    <line x1="60" y1="108" x2="1140" y2="108" stroke="#294352" stroke-width="1"/>
+  </g>
+
+  <g transform="translate(80, 145)">
+    <rect width="1040" height="140" rx="8" fill="#1B3442" stroke="#48CAE4"/>
+    <text x="40" y="46" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#48CAE4">STRATOSPHERIC OVERWORLD (18–26 km ALTITUDE)</text>
+    <text x="40" y="78" font-family="Georgia, serif" font-size="18" fill="#FFFFFF">SO₂ Photolysis → H₂SO₄–H₂O Sub-Micron Aerosol Droplets (r_eff ≈ 0.35 μm)</text>
+    <text x="40" y="108" font-family="Inter, sans-serif" font-size="13" fill="#ADE8F4">Shortwave solar backscattering ΔF ≈ −2.5 to −4.0 W·m⁻² · Mass-independent sulfur isotope anomaly (Δ³³S ≠ 0)</text>
+
+    <rect y="185" width="1040" height="280" rx="8" fill="#182B36" stroke="#68B0AB"/>
+    <text x="40" y="230" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#A7E8BD">BIPOLAR ICE-CORE STRATIGRAPHIC ARCHIVE (GREENLAND &amp; ANTARCTICA)</text>
+    <path d="M 40 360 L 180 355 L 220 260 L 255 358 L 460 355 L 510 245 L 550 360 L 760 356 L 810 280 L 850 358 L 990 356" fill="none" stroke="#E4B363" stroke-width="3.5"/>
+    <text x="220" y="246" font-family="Inter, sans-serif" font-size="12" fill="#E4B363" text-anchor="middle">Bipolar Sulfate Spike I</text>
+    <text x="510" y="230" font-family="Inter, sans-serif" font-size="12" fill="#E4B363" text-anchor="middle">Stratospheric Injection Event II</text>
+    <text x="810" y="266" font-family="Inter, sans-serif" font-size="12" fill="#E4B363" text-anchor="middle">Tropospheric Baseline</text>
+  </g>
+  <text x="60" y="685" font-family="Inter, sans-serif" font-size="12" fill="#89A7B0">ORIGINAL SCIENTIFICRADAR ILLUSTRATION · DEMO ARCHIVE FIG-SR-2026-07 · LICENSE: CC0 / PUBLIC DOMAIN ILLUSTRATIVE DEMO</text>
+</svg>

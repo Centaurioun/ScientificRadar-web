@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="1200" height="750" role="img" aria-labelledby="blood-title blood-desc">
+  <title id="blood-title">Comparative Bioinorganic Chemistry of Animal Respiratory Pigments</title>
+  <desc id="blood-desc">Four-panel molecular comparison of Red Hemoglobin (Iron-Porphyrin), Blue Hemocyanin (Dicopper-Histidine), Green Chlorocruorin (Formyl-Porphyrin), and Violet Hemerythrin (Diiron-Oxo Bridge).</desc>
+  <rect width="1200" height="750" fill="#14181D"/>
+
+  <!-- Top Header -->
+  <g font-family="Inter, system-ui, sans-serif">
+    <text x="60" y="54" font-size="12" font-weight="600" fill="#70C1B3" letter-spacing="1.6">COMPARATIVE BIOINORGANIC METALLOPROTEINS · OXYGEN TRANSPORT EVOLUTION</text>
+    <line x1="60" y1="70" x2="1140" y2="70" stroke="#2B333C" stroke-width="1"/>
+  </g>
+
+  <!-- Panel 1: Hemoglobin (Crimson) -->
+  <g transform="translate(60, 100)">
+    <rect width="252" height="530" rx="8" fill="#1C2229" stroke="#5E2BFF" stroke-opacity="0.15"/>
+    <rect x="0" y="0" width="252" height="6" rx="3" fill="#D64045"/>
+    <text x="22" y="42" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#F28482" letter-spacing="1.2">HEME IRON · PORPHYRIN RING</text>
+    <text x="22" y="72" font-family="Georgia, serif" font-size="22" font-weight="700" fill="#FFFFFF">Hemoglobin</text>
+    <text x="22" y="96" font-family="Inter, sans-serif" font-size="13" fill="#ADB5BD">Oxygenated state: Scarlet Red</text>
+
+    <!-- Molecular Diagram -->
+    <g transform="translate(126, 235)">
+      <polygon points="0,-75 75,0 0,75 -75,0" fill="none" stroke="#D64045" stroke-width="2.5"/>
+      <circle cx="0" cy="0" r="62" fill="#D64045" fill-opacity="0.12" stroke="#F28482" stroke-width="1.5" stroke-dasharray="4 4"/>
+      <circle cx="0" cy="-48" r="10" fill="#2B2D42" stroke="#8D99AE" stroke-width="2"/>
+      <circle cx="48" cy="0" r="10" fill="#2B2D42" stroke="#8D99AE" stroke-width="2"/>
+      <circle cx="0" cy="48" r="10" fill="#2B2D42" stroke="#8D99AE" stroke-width="2"/>
+      <circle cx="-48" cy="0" r="10" fill="#2B2D42" stroke="#8D99AE" stroke-width="2"/>
+      <line x1="0" y1="-38" x2="0" y2="-18" stroke="#F28482" stroke-width="2"/>
+      <line x1="38" y1="0" x2="18" y2="0" stroke="#F28482" stroke-width="2"/>
+      <line x1="0" y1="38" x2="0" y2="18" stroke="#F28482" stroke-width="2"/>
+      <line x1="-38" y1="0" x2="-18" y2="0" stroke="#F28482" stroke-width="2"/>
+      <circle cx="0" cy="0" r="20" fill="#D64045"/>
+      <text x="0" y="5" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#FFF" text-anchor="middle">Fe²⁺</text>
+    </g>
+
+    <g font-family="Inter, sans-serif" font-size="12" fill="#CED4DA">
+      <text x="22" y="365" font-weight="600" fill="#F28482">Active Site Stoichiometry</text>
+      <text x="22" y="387">1 Fe²⁺ per heme · Tetramer binds 4 O₂</text>
+      <text x="22" y="425" font-weight="600" fill="#F28482">Lineages</text>
+      <text x="22" y="447">Vertebrates, annelids, mollusks</text>
+      <text x="22" y="485" font-weight="600" fill="#F28482">Absorption Peak (Soret)</text>
+      <text x="22" y="507">λ ≈ 415 nm (Oxy) · 541 / 577 nm</text>
+    </g>
+  </g>
+
+  <!-- Panel 2: Hemocyanin (Cyan-Blue) -->
+  <g transform="translate(336, 100)">
+    <rect width="252" height="530" rx="8" fill="#1C2229"/>
+    <rect x="0" y="0" width="252" height="6" rx="3" fill="#2EC4B6"/>
+    <text x="22" y="42" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#64DFDF" letter-spacing="1.2">DICOPPER · TYPE-3 HISTIDINE</text>
+    <text x="22" y="72" font-family="Georgia, serif" font-size="22" font-weight="700" fill="#FFFFFF">Hemocyanin</text>
+    <text x="22" y="96" font-family="Inter, sans-serif" font-size="13" fill="#ADB5BD">Oxygenated state: Deep Azure Blue</text>
+
+    <!-- Molecular Diagram -->
+    <g transform="translate(126, 235)">
+      <circle cx="0" cy="0" r="68" fill="#2EC4B6" fill-opacity="0.1" stroke="#2EC4B6" stroke-width="1.5"/>
+      <circle cx="-34" cy="0" r="19" fill="#0096C7"/>
+      <text x="-34" y="5" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#FFF" text-anchor="middle">CuA</text>
+      <circle cx="34" cy="0" r="19" fill="#0096C7"/>
+      <text x="34" y="5" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#FFF" text-anchor="middle">CuB</text>
+      <!-- Peroxide bridge -->
+      <ellipse cx="0" cy="-14" rx="14" ry="8" fill="#90E0EF" fill-opacity="0.8"/>
+      <ellipse cx="0" cy="14" rx="14" ry="8" fill="#90E0EF" fill-opacity="0.8"/>
+      <text x="0" y="4" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#03045E" text-anchor="middle">O₂²⁻</text>
+    </g>
+
+    <g font-family="Inter, sans-serif" font-size="12" fill="#CED4DA">
+      <text x="22" y="365" font-weight="600" fill="#64DFDF">Active Site Stoichiometry</text>
+      <text x="22" y="387">2 Cu⁺ → Cu²⁺–O₂²⁻–Cu²⁺ per O₂</text>
+      <text x="22" y="425" font-weight="600" fill="#64DFDF">Lineages</text>
+      <text x="22" y="447">Cephalopods, horseshoe crabs, spiders</text>
+      <text x="22" y="485" font-weight="600" fill="#64DFDF">Extracellular Assembly</text>
+      <text x="22" y="507">Free-floating MDa multimers in hemolymph</text>
+    </g>
+  </g>
+
+  <!-- Panel 3: Chlorocruorin (Emerald Green) -->
+  <g transform="translate(612, 100)">
+    <rect width="252" height="530" rx="8" fill="#1C2229"/>
+    <rect x="0" y="0" width="252" height="6" rx="3" fill="#52B788"/>
+    <text x="22" y="42" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#74C69D" letter-spacing="1.2">FORMYL-HEME · SPIROGRAPHIS</text>
+    <text x="22" y="72" font-family="Georgia, serif" font-size="22" font-weight="700" fill="#FFFFFF">Chlorocruorin</text>
+    <text x="22" y="96" font-family="Inter, sans-serif" font-size="13" fill="#ADB5BD">Oxygenated state: Dichroic Green</text>
+
+    <!-- Molecular Diagram -->
+    <g transform="translate(126, 235)">
+      <polygon points="0,-72 72,0 0,72 -72,0" fill="#52B788" fill-opacity="0.12" stroke="#52B788" stroke-width="2.5"/>
+      <circle cx="0" cy="0" r="20" fill="#40916C"/>
+      <text x="0" y="5" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#FFF" text-anchor="middle">Fe²⁺</text>
+      <!-- Formyl (-CHO) group highlight -->
+      <rect x="34" y="-62" width="48" height="22" rx="4" fill="#D8F3DC"/>
+      <text x="58" y="-47" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#1B4332" text-anchor="middle">−CHO</text>
+      <line x1="25" y1="-25" x2="42" y2="-40" stroke="#74C69D" stroke-width="2"/>
+    </g>
+
+    <g font-family="Inter, sans-serif" font-size="12" fill="#CED4DA">
+      <text x="22" y="365" font-weight="600" fill="#74C69D">Chemical Modification</text>
+      <text x="22" y="387">C3 vinyl replaced by formyl (−CHO)</text>
+      <text x="22" y="425" font-weight="600" fill="#74C69D">Lineages</text>
+      <text x="22" y="447">Marine polychaete tubeworms (Sabellidae)</text>
+      <text x="22" y="485" font-weight="600" fill="#74C69D">Giant Bilayer Complex</text>
+      <text x="22" y="507">~3.6 MDa hexagonal erythrocruorin complex</text>
+    </g>
+  </g>
+
+  <!-- Panel 4: Hemerythrin (Violet-Pink) -->
+  <g transform="translate(888, 100)">
+    <rect width="252" height="530" rx="8" fill="#1C2229"/>
+    <rect x="0" y="0" width="252" height="6" rx="3" fill="#B56576"/>
+    <text x="22" y="42" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#E5989B" letter-spacing="1.2">NON-HEME DIIRON · OXO BRIDGE</text>
+    <text x="22" y="72" font-family="Georgia, serif" font-size="22" font-weight="700" fill="#FFFFFF">Hemerythrin</text>
+    <text x="22" y="96" font-family="Inter, sans-serif" font-size="13" fill="#ADB5BD">Oxygenated state: Violet-Rose</text>
+
+    <!-- Molecular Diagram -->
+    <g transform="translate(126, 235)">
+      <rect x="-66" y="-54" width="132" height="108" rx="18" fill="#B56576" fill-opacity="0.12" stroke="#E5989B" stroke-width="1.5"/>
+      <circle cx="-32" cy="8" r="18" fill="#9D4EDD"/>
+      <text x="-32" y="13" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#FFF" text-anchor="middle">Fe1</text>
+      <circle cx="32" cy="8" r="18" fill="#9D4EDD"/>
+      <text x="32" y="13" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#FFF" text-anchor="middle">Fe2</text>
+      <line x1="-14" y1="8" x2="14" y2="8" stroke="#FFB5A7" stroke-width="3"/>
+      <text x="0" y="-4" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#FFB5A7" text-anchor="middle">μ-oxo</text>
+      <text x="34" y="-22" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#FCD5CE" text-anchor="middle">−OOH</text>
+    </g>
+
+    <g font-family="Inter, sans-serif" font-size="12" fill="#CED4DA">
+      <text x="22" y="365" font-weight="600" fill="#E5989B">Active Site Stoichiometry</text>
+      <text x="22" y="387">2 Fe²⁺ bound directly to α-helix bundle</text>
+      <text x="22" y="425" font-weight="600" fill="#E5989B">Lineages</text>
+      <text x="22" y="447">Brachiopods, sipunculids, priapulids</text>
+      <text x="22" y="485" font-weight="600" fill="#E5989B">Mechanism</text>
+      <text x="22" y="507">Proton-coupled electron transfer to hydroperoxo</text>
+    </g>
+  </g>
+
+  <!-- Footer -->
+  <text x="60" y="685" font-family="Inter, sans-serif" font-size="12" fill="#8D99AE">ORIGINAL SCIENTIFICRADAR ILLUSTRATION · DEMO ARCHIVE FIG-SR-2026-02 · LICENSE: CC0 / PUBLIC DOMAIN ILLUSTRATIVE DEMO</text>
+</svg>

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="1200" height="750" role="img" aria-labelledby="quantum-title quantum-desc">
+  <title id="quantum-title">Topological Braiding of Non-Abelian Majorana Zero Modes</title>
+  <desc id="quantum-desc">Spacetime worldline braiding trajectories of non-Abelian quasiparticles on a superconducting nanowire T-junction lattice.</desc>
+  <rect width="1200" height="750" fill="#0D131A"/>
+  <g font-family="Inter, system-ui, sans-serif">
+    <text x="60" y="54" font-size="12" font-weight="600" fill="#64DFDF" letter-spacing="1.5">QUANTUM CONDENSED MATTER · TOPOLOGICAL BRAID GROUP REPRESENTATION</text>
+    <text x="60" y="88" font-family="Georgia, serif" font-size="24" font-weight="700" fill="#F8F9FA">Worldline Exchange Operations γ₁, γ₂, γ₃, γ₄ Protected by Superconducting Gap Δ</text>
+    <line x1="60" y1="108" x2="1140" y2="108" stroke="#22303F" stroke-width="1"/>
+  </g>
+
+  <g transform="translate(120, 150)">
+    <!-- Bottom Plane Lattice -->
+    <polygon points="80,450 880,450 960,370 160,370" fill="#16222F" stroke="#2E4760" stroke-width="2"/>
+    <!-- Top Plane Lattice -->
+    <polygon points="80,90 880,90 960,10 160,10" fill="#16222F" fill-opacity="0.7" stroke="#2E4760" stroke-width="2"/>
+
+    <!-- Worldline 1 (Cyan) -->
+    <path d="M 220 410 C 220 270, 420 230, 420 50" fill="none" stroke="#48CAE4" stroke-width="6" stroke-linecap="round"/>
+    <!-- Worldline 2 (Gold - passing under/over) -->
+    <path d="M 420 410 C 420 310, 340 270, 320 230 C 300 190, 220 150, 220 50" fill="none" stroke="#F4A261" stroke-width="6" stroke-linecap="round"/>
+    <!-- Worldline 3 (Violet) -->
+    <path d="M 620 410 C 620 260, 780 210, 780 50" fill="none" stroke="#B5838D" stroke-width="6" stroke-linecap="round"/>
+    <!-- Worldline 4 (Mint) -->
+    <path d="M 780 410 C 780 260, 620 210, 620 50" fill="none" stroke="#52B788" stroke-width="6" stroke-linecap="round"/>
+
+    <!-- Quasiparticle Nodes -->
+    <circle cx="220" cy="410" r="11" fill="#48CAE4"/>
+    <circle cx="420" cy="410" r="11" fill="#F4A261"/>
+    <circle cx="620" cy="410" r="11" fill="#B5838D"/>
+    <circle cx="780" cy="410" r="11" fill="#52B788"/>
+
+    <circle cx="220" cy="50" r="11" fill="#F4A261"/>
+    <circle cx="420" cy="50" r="11" fill="#48CAE4"/>
+    <circle cx="620" cy="50" r="11" fill="#52B788"/>
+    <circle cx="780" cy="50" r="11" fill="#B5838D"/>
+
+    <g font-family="Georgia, serif" font-size="18" fill="#FFFFFF" text-anchor="middle">
+      <text x="220" y="442">γ₁</text>
+      <text x="420" y="442">γ₂</text>
+      <text x="620" y="442">γ₃</text>
+      <text x="780" y="442">γ₄</text>
+    </g>
+    <text x="-45" y="240" transform="rotate(-90, -45, 240)" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#89A7B0" text-anchor="middle">Adiabatic Evolution Time (t)</text>
+  </g>
+  <text x="60" y="685" font-family="Inter, sans-serif" font-size="12" fill="#89A7B0">ORIGINAL SCIENTIFICRADAR ILLUSTRATION · DEMO ARCHIVE FIG-SR-2026-04 · LICENSE: CC0 / PUBLIC DOMAIN ILLUSTRATIVE DEMO</text>
+</svg>

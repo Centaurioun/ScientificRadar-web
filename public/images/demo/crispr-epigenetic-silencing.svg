@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="1200" height="750" role="img" aria-labelledby="crispr-title crispr-desc">
+  <title id="crispr-title">Programmable Epigenome Editing via Catalytically Inactive dCas9</title>
+  <desc id="crispr-desc">Schematic showing dCas9-DNMT3A/KRAB fusion recruiting chromatin remodelers to silence target enhancers without double-strand DNA cleavage.</desc>
+  <rect width="1200" height="750" fill="#171923"/>
+  <g font-family="Inter, system-ui, sans-serif">
+    <text x="60" y="54" font-size="12" font-weight="600" fill="#9F7AEA" letter-spacing="1.5">MOLECULAR GENETICS · NON-CLEAVING EPIGENETIC MEMORY</text>
+    <text x="60" y="88" font-family="Georgia, serif" font-size="24" font-weight="700" fill="#F7FAFC">Targeted CpG Methylation and Histone H3K9me3 Deposition Without DNA Breaks</text>
+    <line x1="60" y1="108" x2="1140" y2="108" stroke="#2D3748" stroke-width="1"/>
+  </g>
+
+  <g transform="translate(80, 160)">
+    <!-- DNA Strand -->
+    <path d="M 40 260 Q 260 220, 520 260 T 1000 260" fill="none" stroke="#63B3ED" stroke-width="6"/>
+    <path d="M 40 290 Q 260 330, 520 290 T 1000 290" fill="none" stroke="#4FD1C5" stroke-width="6"/>
+
+    <!-- dCas9 Protein Complex -->
+    <ellipse cx="480" cy="255" rx="135" ry="88" fill="#553C9A" fill-opacity="0.85" stroke="#B794F4" stroke-width="2.5"/>
+    <text x="480" y="248" font-family="Georgia, serif" font-size="22" font-weight="700" fill="#FFFFFF" text-anchor="middle">dCas9 (D10A / H840A)</text>
+    <text x="480" y="274" font-family="Inter, sans-serif" font-size="13" fill="#E9D8FD" text-anchor="middle">sgRNA-Guided Binding · Zero Endonuclease Activity</text>
+
+    <!-- Effector Domains -->
+    <circle cx="655" cy="175" r="56" fill="#2C7A7B" stroke="#81E6D9" stroke-width="2"/>
+    <text x="655" y="172" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle">DNMT3A/3L</text>
+    <text x="655" y="192" font-family="Inter, sans-serif" font-size="11" fill="#B2F5EA" text-anchor="middle">5mC Methylation</text>
+
+    <circle cx="310" cy="175" r="52" fill="#9C4221" stroke="#FBD38D" stroke-width="2"/>
+    <text x="310" y="172" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle">KRAB</text>
+    <text x="310" y="192" font-family="Inter, sans-serif" font-size="11" fill="#FEEBC8" text-anchor="middle">H3K9me3</text>
+
+    <!-- CpG Methylation Lollipops -->
+    <g fill="#F6AD55" stroke="#F6AD55" stroke-width="2">
+      <line x1="680" y1="262" x2="680" y2="230"/><circle cx="680" cy="224" r="6"/>
+      <line x1="730" y1="265" x2="730" y2="233"/><circle cx="730" cy="227" r="6"/>
+      <line x1="780" y1="268" x2="780" y2="236"/><circle cx="780" cy="230" r="6"/>
+    </g>
+    <text x="520" y="425" font-family="Inter, sans-serif" font-size="14" fill="#CBD5E0" text-anchor="middle">Heritable transcriptional silencing maintained across mitotic cell divisions without genomic indels</text>
+  </g>
+  <text x="60" y="685" font-family="Inter, sans-serif" font-size="12" fill="#A0AEC0">ORIGINAL SCIENTIFICRADAR ILLUSTRATION · DEMO ARCHIVE FIG-SR-2026-06 · LICENSE: CC0 / PUBLIC DOMAIN ILLUSTRATIVE DEMO</text>
+</svg>
