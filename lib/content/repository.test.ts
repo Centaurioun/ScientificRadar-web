@@ -89,7 +89,7 @@ test("canonical HTML sanitizer strips scripts, event handlers, and demotes neste
   assert.ok(!clean.includes("<script"), "Should strip script tags");
   assert.ok(!clean.includes("onclick="), "Should strip inline event handlers");
   assert.ok(!clean.includes("<h1"), "Should demote inner h1 to h2");
-  assert.ok(clean.includes('<h2 class="inner">Bad H1</h2>'));
+  assert.ok(clean.includes("<h2>Bad H1</h2>"), "Unknown user CSS classes should not survive published HTML");
   assert.ok(clean.includes('data-citation-source-id="src-1"'));
 });
 
