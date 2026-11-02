@@ -5,7 +5,7 @@ No final architecture is approved. Record decision owner, evidence, alternatives
 | Decision | Options to evaluate | Current evidence / constraint | Tracking |
 |---|---|---|---|
 | Web hosting and runtime | Existing host, managed Next.js platform, Cloudflare-backed deployment, VPS/other | No target production platform verified in Web repo | M5 issue |
-| Publishing transport and storage | Authenticated API, versioned export/import, shared content service, other | Web reads in-memory fixtures; Studio–Web production link unverified | M1 issue |
+| Publishing transport and storage | Authenticated API, versioned export/import, shared content service, other | Web reads in-memory fixtures. Studio `main` at `b160accd89c8d24b9e5b726e70158d73cc2176d1` has a local IndexedDB prototype but no verified public API, external production storage, or Studio–Web link | M1 issue |
 | Public article revision model | Immutable published snapshots, revisions with rollback, scheduled releases | Web schema includes `updatedAt`; no live revision transport verified | M1 issue |
 | Authentication and authorization | Server-to-server credentials, delegated identity, scoped publishing roles | No publishing endpoint verified | M1 issue |
 | Legacy URL handling | Explicit redirect map, route compatibility, staged retirement | Historical Search Console issue categories require fresh exports | M3 issue |
