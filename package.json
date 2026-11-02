@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "clean": "next clean",
-    "test:unit": "tsx --test lib/content/*.test.ts",
+    "test:unit": "tsx --test lib/content/*.test.ts lib/design/*.test.ts",
     "typecheck": "tsc --noEmit",
     "check": "npm run lint && npm run typecheck && npm run test:unit && npm run build"
   },
