@@ -93,6 +93,7 @@ Homepage dört yönlü karşılaştırmada **EXPECTED CHANGE**: yalnızca homepa
 - Candidate production spider silk ve respiratory pigments sayfalarında en az bir `.katex` ve `.katex-mathml` node’u gözlendi. MathML çıktı mevcut, KaTeX CSS yükleniyor; browser console’da hydration hatası görülmedi.
 - Unit testler kesir, Greek sembolü/superscript ve invalid/oversized TeX fallback’ini içeriyor; 3 test geçti.
 - Article fixture’ında equation card, açıklama alanı ve mevcut callout sınıfları render oldu. Ekran görüntülerinde denklem card görünümü korundu.
+- **Development runtime:** Candidate `next dev` üzerinde `390×844` spider silk article HTTP 200 verdi; 1 `.katex`, 1 `.katex-mathml`, tek H1 ve `scrollWidth=innerWidth=390` observed. `pageerror`/hydration error yoktu. Console’da bir generic 404 resource message geldi; URL capture edilmedi, production candidate pageerrors’ta math-related error görülmedi. Screenshot: `/tmp/scirad-pr1-evidence/article-dev-pr.png`.
 - Güvenli synthetic probe’da TeX `\\href{javascript:...}` için `trust:false` kontrol edildi; KaTeX render çıktısında URL benzeri annotation metni bulunabilse de etkin bir link elementinin oluştuğu doğrulanmadı. `trust` seçeneği kapalıdır.
 - Browser’da integral, nested expression, invalid TeX, 4000+ karakter girdi ve çok uzun dar ekran denklem senaryoları tek tek çalıştırılmadı. Mathematical meaning’in tüm fixture’larda öncesi/sonrası içerik uzmanı karşılaştırması da tamamlanmadı.
 
@@ -209,6 +210,7 @@ Bu payload denemeleri browser DOM içine enjekte edilmedi; XSS değerlendirmesi 
 - Browser XSS injection yerine sanitizer boundary Node testleri uygulandı; CSP/real hosting/edge middleware incelenmedi.
 - Browser math testi mevcut fixture denklemlerini doğruladı; invalid/nested/oversized TeX browser runtime’da test edilmedi.
 - Görseller, caption ve alt metinler kontrol edildi; yoğun Figure 1 etiketlerinin her cihazda metin çakışması/okunabilirliği uzman görsel denetimiyle tek tek işaretlenmedi.
+- İlk homepage browser kaydında baseline Standard ve candidate Standard için bir generic `Failed to load resource: 404` console mesajı görülmüştü; istek URL’si kaydedilmedi ve nedeni kesinleştirilmedi. Stable 25 hücrelik matrix bu resource mesajını ayrı event olarak toplamadı; pageerror sayısı sıfırdı. Candidate dev article probe’unda da bir URL’si kaydedilmemiş 404 console mesajı vardı.
 - Screenshot evidence local geçici dizinde; GitHub PR ek dosyası veya artifact linki yok. Report source linkleri güncel exact HEAD SHA’ya bağlıdır.
 - Testler sadece bir Node/Brave sürüm çiftinde, dar kapsamlı fixture içerikleriyle yapıldı. WCAG 2.2 AA, gerçek scientific source accuracy veya real mobile device davranışı iddia edilmiyor.
 
