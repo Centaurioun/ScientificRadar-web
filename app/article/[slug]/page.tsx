@@ -12,7 +12,7 @@ import { ReadingMeasureOption } from "@/lib/design/tokens";
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ measure?: string }>;
+  searchParams: Promise<{ measure?: string; designReview?: string }>;
 }
 
 export async function generateStaticParams() {
@@ -59,6 +59,7 @@ export default async function ArticlePage({
 }: ArticlePageProps) {
   const { slug } = await params;
   const resolvedSearchParams = await searchParams;
+  const showReviewControls = resolvedSearchParams?.designReview === "1";
 
   const article = await contentRepository.getPublicArticle(slug);
   if (!article) {
@@ -94,6 +95,7 @@ export default async function ArticlePage({
             article={article}
             authors={authors}
             initialMeasure={initialMeasure}
+            showReviewControls={showReviewControls}
           />
         </article>
 

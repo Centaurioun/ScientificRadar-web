@@ -21,6 +21,7 @@ interface ArticleReaderProps {
   article: PublicArticle;
   authors: PublicAuthor[];
   initialMeasure?: ReadingMeasureOption;
+  showReviewControls?: boolean;
 }
 
 interface ResponsiveArticleTocProps {
@@ -135,6 +136,7 @@ export default function ArticleReader({
   article,
   authors,
   initialMeasure = "700",
+  showReviewControls = false,
 }: ArticleReaderProps) {
   const [measure, setMeasure] = useState<ReadingMeasureOption>(initialMeasure);
 
@@ -165,42 +167,44 @@ export default function ArticleReader({
       }
       className="site-container pb-12"
     >
-      {/* Reading Measure Comparator Control Bar (For Owner 600px vs 700px Evaluation) */}
-      <div className="max-w-[var(--sr-reading-max)] mx-auto mb-8 p-3 rounded-sm bg-[var(--sr-surface)] border border-[var(--sr-rule)] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-        <div className="text-xs text-[var(--sr-ink-secondary)]">
-          <span className="font-semibold text-[var(--sr-ink)]">
-            Reading Column Width:
-          </span>{" "}
-          <span data-testid="active-reading-measure-label">
-            {activePreset.label}
-          </span>
-        </div>
+      {/* Reading Measure Comparator Control Bar (Revealed only in ?designReview=1 mode) */}
+      {showReviewControls && (
+        <div className="max-w-[var(--sr-reading-max)] mx-auto mb-8 p-3 rounded-sm bg-[var(--sr-surface)] border border-[var(--sr-rule)] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div className="text-xs text-[var(--sr-ink-secondary)]">
+            <span className="font-semibold text-[var(--sr-ink)]">
+              Reading Column Width:
+            </span>{" "}
+            <span data-testid="active-reading-measure-label">
+              {activePreset.label}
+            </span>
+          </div>
 
-        <div
-          role="group"
-          aria-label="Select article reading column width"
-          className="inline-flex items-center gap-1 bg-white p-1 rounded-sm border border-[var(--sr-rule)] self-start sm:self-auto"
-        >
-          {(["700", "600", "560"] as ReadingMeasureOption[]).map((opt) => {
-            const isSelected = measure === opt;
-            return (
-              <button
-                key={opt}
-                type="button"
-                onClick={() => handleMeasureChange(opt)}
-                aria-pressed={isSelected}
-                className={`px-2.5 py-1 text-xs font-medium rounded-sm transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                  isSelected
-                    ? "bg-[var(--sr-accent)] text-white font-semibold"
-                    : "text-[var(--sr-muted)] hover:text-[var(--sr-ink)]"
-                }`}
-              >
-                {opt}px
-              </button>
-            );
-          })}
+          <div
+            role="group"
+            aria-label="Select article reading column width"
+            className="inline-flex items-center gap-1 bg-white p-1 rounded-sm border border-[var(--sr-rule)] self-start sm:self-auto"
+          >
+            {(["700", "600", "560"] as ReadingMeasureOption[]).map((opt) => {
+              const isSelected = measure === opt;
+              return (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => handleMeasureChange(opt)}
+                  aria-pressed={isSelected}
+                  className={`px-2.5 py-1 text-xs font-medium rounded-sm transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    isSelected
+                      ? "bg-[var(--sr-accent)] text-white font-semibold"
+                      : "text-[var(--sr-muted)] hover:text-[var(--sr-ink)]"
+                  }`}
+                >
+                  {opt}px
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Quanta/Knowable-inspired Layout: Optional Desktop Left Rail OUTSIDE Reading Column */}
       <div className="relative xl:grid xl:grid-cols-[220px_minmax(0,1fr)_220px] xl:gap-8 items-start">
