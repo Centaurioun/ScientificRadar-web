@@ -1,0 +1,23 @@
+name: ScientificRadar Web Quality
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26.13.0'
+      - name: Install dependencies (lockfile gate still pending)
+        run: npm install --no-audit --no-fund
+      - name: ESLint + TypeScript + unit tests + Next build
+        run: npm run check
