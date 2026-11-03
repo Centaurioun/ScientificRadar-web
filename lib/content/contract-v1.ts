@@ -24,6 +24,7 @@ export interface SnapshotValidationIssue {
     | "WITHDRAWN_ARTICLE"
     | "UNSAFE_MEDIA_URL"
     | "INCOMPLETE_MEDIA_METADATA"
+    | "UNVERIFIED_MEDIA_RIGHTS"
     | "SYNTHETIC_DEMO_DOI_FORBIDDEN"
     | "INVALID_DOI_FORMAT"
     | "BROKEN_CITATION_REFERENCE"
@@ -113,7 +114,8 @@ function validateMediaRecord(
   media: PublicMedia,
   fieldPrefix: string,
   trustedMediaOrigins: ReadonlySet<string>,
-  issues: SnapshotValidationIssue[]
+  issues: SnapshotValidationIssue[],
+  requiresVerifiedRights: boolean
 ): void {
   if (!isSafePublishedMediaUrl(media.src, trustedMediaOrigins)) {
     issues.push({
@@ -144,6 +146,16 @@ function validateMediaRecord(
       code: "INCOMPLETE_MEDIA_METADATA",
       field: `${fieldPrefix}.credit`,
       message: "Scientific figure/media requires explicit credit and license provenance.",
+    });
+  }
+
+  // Published snapshots must be rejected if usage rights have not been
+  // explicitly verified upstream. Attribution text is NOT rights evidence.
+  if (requiresVerifiedRights && media.rightsVerified !== true) {
+    issues.push({
+      code: "UNVERIFIED_MEDIA_RIGHTS",
+      field: `${fieldPrefix}.rightsVerified`,
+      message: "Publicly published media requires explicit verified usage rights; credit and license text alone are insufficient.",
     });
   }
 
@@ -250,7 +262,7 @@ export function validatePublicationSnapshotV1(
   }
 
   if (snapshot.hero) {
-    validateMediaRecord(snapshot.hero, "hero", trustedOrigins, issues);
+    validateMediaRecord(snapshot.hero, "hero", trustedOrigins, issues, snapshot.status === "published");
   }
 
   const sourceIds = new Set<string>();
@@ -280,7 +292,8 @@ export function validatePublicationSnapshotV1(
         block.media,
         `blocks[${idx}].media`,
         trustedOrigins,
-        issues
+        issues,
+        snapshot.status === "published"
       );
     }
     if (block.type === "paragraph" && block.citations) {
