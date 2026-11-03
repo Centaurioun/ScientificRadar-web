@@ -77,6 +77,36 @@ test("draft, scheduled, in_review, archived, and withdrawn snapshots are rejecte
   }
 });
 
+test("published snapshots reject unverified hero and figure rights even with filled attribution", () => {
+  const base = adaptPublicArticleToSnapshotV1(DEMO_ARTICLES[0]);
+  const published = {
+    ...base,
+    status: "published" as const,
+    hero: base.hero ? { ...base.hero, rightsVerified: false } : undefined,
+    blocks: base.blocks.map((block) =>
+      block.type === "figure"
+        ? { ...block, media: { ...block.media, rightsVerified: false } }
+        : block
+    ),
+  };
+  assert.ok(published.hero, "A test hero is required");
+  assert.ok(published.blocks.some((block) => block.type === "figure"), "A test figure is required");
+  const result = validatePublicationSnapshotV1(published);
+  assert.equal(result.valid, false);
+  assert.equal(result.isPubliclyRenderable, false);
+  assert.equal(result.isIndexableCandidate, false);
+  assert.ok(result.issues.some((issue) => issue.code === "UNVERIFIED_MEDIA_RIGHTS" && issue.field === "hero.rightsVerified"));
+  assert.ok(result.issues.some((issue) => issue.code === "UNVERIFIED_MEDIA_RIGHTS" && issue.field.endsWith(".media.rightsVerified")));
+
+  const verified = {
+    ...published,
+    hero: { ...published.hero!, rightsVerified: true },
+    blocks: base.blocks,
+  };
+  const ok = validatePublicationSnapshotV1(verified);
+  assert.equal(ok.valid, true, JSON.stringify(ok.issues));
+});
+
 test("media validator rejects blob:, data:, javascript:, and untrusted external image origins", () => {
   assert.equal(isSafePublishedMediaUrl("/images/demo/spider-silk.svg"), true);
   assert.equal(
