@@ -91,7 +91,7 @@ test("equation inspector opens, closes on Escape and returns focus", async ({ pa
   await trigger.click();
   const inspector = page.getByRole("dialog", { name: /equation.*inspector/i });
   await expect(inspector).toBeVisible();
-  await expect(inspector.getByRole("math")).toBeVisible();
+  await expect(inspector.getByRole("math").first()).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(inspector).toHaveCount(0);
   await expect(trigger).toBeFocused();
