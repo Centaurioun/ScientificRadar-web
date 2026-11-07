@@ -95,7 +95,7 @@ Framer Preview içinde 1200, 810, 390 ve 320 CSS px genişlikleri kullanıldı. 
 
 PR #51’in son C04 düzeltme yorumu, güncellenmiş Citation V3 ve Integrated Reader V2 prototiplerinde önceki `scrollX/scrollY` değerini saklayıp geri yükleme ve odağı aynı citation düğmesine verme davranışını tanımlıyor. Aşağıdaki testler kimliği doğrulanmış Brave oturumunda, gerçek Framer Preview iframe’inde, iframe içi `innerWidth`, `scrollX/scrollY`, citation bounding box’ı ve `document.activeElement` okunarak yürütüldü. Her dönüşten sonra 0.9–1.1 saniye beklenerek animasyon sonu ölçüldü.
 
-Önceki rapordaki C04 **FAIL** (390 px, başlangıç `scrollY=0`, dönüş `251`; doğru citation odaklı) tarihsel sonuç olarak korunmuştur. Bu yeni regresyon turu da **FAIL**: odak test edilen durumların hepsinde doğru citation düğmesine döndü, fakat konum her seferinde 2 px sınırını aştı.
+Önceki rapordaki C04 **FAIL** (390 px, başlangıç `scrollY=0`, dönüş `251`; doğru citation odaklı) tarihsel sonuç olarak korunmuştur. Son inceleme yorumu, `locator.click()` öncesi Playwright görünürlük/scroll hazırlığının tıklama anındaki baseline'ı değiştirmiş olabileceğini belirtti. Aşağıdaki eski takip tablosundaki locator tıklamasıyla elde edilen sapmalar bu nedenle şüpheli ölçümlerdir; tıklama anı baseline'ı yakalamadıkları için artık C04 FAIL kanıtı olarak kullanılmıyorlar.
 
 | Prototip / node | Genişlik | Citation | Başlangıç `(x,y)` | Bibliyografyaya gidiş `(x,y)` | Dönüş `(x,y)` | `Δy` | Odak | Sonuç |
 |---|---:|---:|---:|---:|---:|---:|---|---|
@@ -112,7 +112,21 @@ PR #51’in son C04 düzeltme yorumu, güncellenmiş Citation V3 ve Integrated R
 
 Integrated Reader 390 px’te Figure (`⤢ Inspect figure`) ve Equation panelleri açılıp kapatıldı; ikisinde de dialog kapandı ve odak ilgili açıcı düğmeye döndü. Citation testleri bu etkileşimlerden sonra aynı sayfa oturumunda yapıldı. 320 px’te bu regresyon turunda panel aç/kapat adımları tamamlanmadı; dolayısıyla 320 px panel-sonrası alt kapsamı **doğrulanmadı**. Başlangıçta sıfır konumla ölçülen citation regresyonları Citation V3 [1] ve Integrated Reader [1] (390 px) idi. Reader 320 px’in iki citation ölçümü panel-sonrası sıfır olmayan başlangıçlardan alındı; sıfır başlangıç koşulu için PASS/FAIL kanıtı sayılmamalıdır.
 
-Bu tablo sınırlı regresyon örneklerini gösterir, C04 kabul kriterini PASS yapmaz. Özellikle sıfır başlangıçtan sonra odak iadesi sayfayı sıfırdan uzağa taşıyor; nonzero durumlarda da V3 [2] ve Integrated Reader örneklerinde dönüş sapması tekrarlanıyor. Preview içindeki iframe `window` scroll değerleri ölçüldü; gerçek cihaz touch/hover/drag veya erişilebilirlik kapsamı bu testte sınanmadı. Genel dağılım ve diğer 21 BLOCKED sınıflandırması değiştirilmedi.
+Bu tablo bir önceki locator-click turunun ham ölçüm kaydı olarak kalır; bu ölçümlerin hatayı kanıtladığı sonucuna varılmamalıdır. Aşağıdaki kontrollü gerçek-fare turu, locator öncesi otomatik kaydırma hipotezini sınar. Genel 36 kriter dağılımı ve diğer 21 BLOCKED sınıflandırması değiştirilmedi.
+
+### Playwright otomatik kaydırma hipotezi — kontrollü gerçek-fare kontrolü
+
+Iframe içindeki `evaluate` köprüsü salt okunur olduğundan sayfaya capture-phase olay dinleyicisi enjekte edilip pointerdown/click callback'inde `scrollY` loglanamadı. Bu nedenle [1] citation düğmesinin zaten tamamen görünür olduğu durumda Playwright locator click'i kullanılmadı: iframe ve düğme bounding box'larından dış pencere koordinatı hesaplanıp gerçek fare tıklaması gönderildi. Citation'ın ekranda görünür olduğu ve tıklama öncesi iframe `scrollY=0` olduğu doğrulandı; click'ten hemen sonraki ilk DOM ölçümü `scrollY=0.5` idi. Bu, uygulamanın click handler'ının saklayacağı konuma yakın olay-sonrası anlık ölçümdür; capture event içinden alınmış log değildir.
+
+| Prototip / node | Genişlik | Citation | Tıklama öncesi; görünür rect | Gerçek fare click sonrası ilk okuma | Bibliyografya | Back sonrası | Focus | Kontrollü sonuç |
+|---|---:|---:|---|---:|---:|---:|---|---|
+| Citation Interaction Lab V3 / `sHFu4J1jX` | 390 | [1] | `y=0`; rect `top=777.28`, `bottom=798.68` | `y=0.5` | `y=1076.5` | `y=0` | Aynı [1] | PASS (`|Δy|=0.5`) |
+| Citation Interaction Lab V3 / `sHFu4J1jX` | 320 | [1] | `y=0`; rect `top=891.27`, `bottom=912.67` | `y=0.5` | `y=1263` | `y=0` | Aynı [1] | PASS (`|Δy|=0.5`) |
+| Integrated Article Reader Lab V2 / `L0EEZeigV` | 390 | [1] | `y=0`; rect `top=784.40`, `bottom=803.80` | `y=0.5` | `y=2535.5` | `y=0` | Aynı [1] | PASS (`|Δy|=0.5`) |
+
+Bu üç kontrollü örnekte locator-click turundaki `0 → 244.5`, `0 → 367` ve Integrated `0 → 253` sapmaları tekrarlanmadı. Gerçek fare click öncesinde citation görünür olduğundan Playwright'ın locator görünürlük için otomatik scroll yapması gerekmiyordu; Back, gerçek tıklama anına yakın ölçülen `0.5` değerini 0'a geri getirdi ve tolerans içinde kaldı. Bu, önceki sıfır-baseline [1] FAIL gözlemlerinin test-order/locator scroll kaynaklı sahte FAIL olabileceğini güçlü biçimde destekler; o veriler artık uygulamanın scroll-restore hatasının kanıtı değildir.
+
+**Yeni C04 kararı: BLOCKED (tam doğrulama eksik).** Kontrollü [1] sıfır başlangıç durumları yukarıda PASS'tır; fakat capture-phase pointerdown/click event-time logu köprüdeki read-only kısıtı nedeniyle elde edilemedi. Ayrıca [2]/[3], nonzero başlangıçlar ve Integrated Reader panel-sonrası tam varyant matrisi aynı gerçek-fare kontrollü yöntemle bu turda tamamlanmadı. Bu nedenle hipotez kontrollü [1] koşullarında desteklendi, ancak tüm C04 kabul kriteri için PASS veya FAIL kararı vermek için kanıt yetersizdir. Özgün tarihsel FAIL kaydı silinmedi; yeni kontrollü sonucu ve yeni genel karar ayrı tutuldu. Diğer 21 BLOCKED sonucu ve canvas uyarısı değişmedi.
 
 ## Framer canvas uyarısı — bağımsız bulgu
 
