@@ -17,7 +17,6 @@ interface Preview {
 }
 
 export default function CitationInteractions({ sources, children }: CitationInteractionsProps) {
-  const [mounted, setMounted] = useState(false);
   const [preview, setPreview] = useState<Preview | null>(null);
   const saved = useRef<{
     x: number;
@@ -26,8 +25,6 @@ export default function CitationInteractions({ sources, children }: CitationInte
     anchor: HTMLAnchorElement;
   } | null>(null);
   const sourceMap = new Map(sources.map((source) => [source.id, source]));
-
-  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     if (!preview) return;
@@ -121,7 +118,7 @@ export default function CitationInteractions({ sources, children }: CitationInte
       onClickCapture={handleClick}
     >
       {children}
-      {mounted && preview && createPortal(
+      {preview && typeof document !== "undefined" && createPortal(
         <div
           role="tooltip"
           data-testid="citation-hover-preview"
