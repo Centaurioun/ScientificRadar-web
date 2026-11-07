@@ -210,6 +210,7 @@ test.describe("responsive scientific article content", () => {
             imageStates,
             figures,
             tableContainers,
+            rowFocusCount: document.querySelectorAll('[data-testid="table-row-focus-view"]').length,
             relatedCards,
             mathCount: document.querySelectorAll(".katex").length,
             mathMlCount: document.querySelectorAll(".katex-mathml").length,
@@ -246,12 +247,17 @@ test.describe("responsive scientific article content", () => {
           expect(figure.captionVisible).toBe(true);
           expect(figure.background).toBe("rgb(16, 32, 40)");
         }
-        expect(scan.tableContainers.length).toBeGreaterThan(0);
-        for (const table of scan.tableContainers) {
-          expect(table.right).toBeLessThanOrEqual(viewport.width + 1);
-          expect(table.scrollWidth).toBeGreaterThan(table.clientWidth);
-          expect(table.maxScrollLeft).toBeGreaterThan(0);
-          expect(table.overflowX).toBe("auto");
+        if (viewport.width < 700) {
+          // The approved Framer prototype defaults to accessible row-focus on narrow screens.
+          expect(scan.rowFocusCount).toBeGreaterThan(0);
+        } else {
+          expect(scan.tableContainers.length).toBeGreaterThan(0);
+          for (const table of scan.tableContainers) {
+            expect(table.right).toBeLessThanOrEqual(viewport.width + 1);
+            expect(table.scrollWidth).toBeGreaterThan(table.clientWidth);
+            expect(table.maxScrollLeft).toBeGreaterThan(0);
+            expect(table.overflowX).toBe("auto");
+          }
         }
         expect(scan.relatedCards.length).toBeGreaterThan(0);
         expect(
