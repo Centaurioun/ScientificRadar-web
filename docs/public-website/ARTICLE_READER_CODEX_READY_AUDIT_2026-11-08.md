@@ -95,6 +95,7 @@ Owner authorization at this moment covers **Framer design and documentation QA o
 ## 7. PR and visual references
 
 - Web docs draft PR: https://github.com/Centaurioun/ScientificRadar-web/pull/54
+- Studio CMS docs draft PR: https://github.com/Centaurioun/scientificradar-studio/pull/28
 - Current Framer reader: https://framer.com/projects/Scientific-Radar--boKLyC3EXgf7Nhs9yoC7-3fySI?node=t6PbsTds_&view=preview
 - Current Framer CMS UX mock: https://framer.com/projects/Scientific-Radar--boKLyC3EXgf7Nhs9yoC7-3fySI?node=Kr4RQUn1q&view=preview
 - Canonical design: `ARTICLE_READER_DESIGN_SYSTEM.md`
