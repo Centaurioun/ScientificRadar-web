@@ -91,6 +91,29 @@ Framer Preview içinde 1200, 810, 390 ve 320 CSS px genişlikleri kullanıldı. 
 
 **Dağılım:** 14 PASS, 1 FAIL, 21 BLOCKED. Buradaki PASS sayısı PR #51’in önceki 24 PASS’inden düşük; özgün kriter kapsamı ve inceleme yorumundaki ID eşlemesi esas alındı. Kısmi alt gözlemler ilgili kriteri PASS yapmak için kullanılmadı.
 
+## C04 hedefli regresyon — eski FAIL ve yeni sonuç
+
+PR #51’in son C04 düzeltme yorumu, güncellenmiş Citation V3 ve Integrated Reader V2 prototiplerinde önceki `scrollX/scrollY` değerini saklayıp geri yükleme ve odağı aynı citation düğmesine verme davranışını tanımlıyor. Aşağıdaki testler kimliği doğrulanmış Brave oturumunda, gerçek Framer Preview iframe’inde, iframe içi `innerWidth`, `scrollX/scrollY`, citation bounding box’ı ve `document.activeElement` okunarak yürütüldü. Her dönüşten sonra 0.9–1.1 saniye beklenerek animasyon sonu ölçüldü.
+
+Önceki rapordaki C04 **FAIL** (390 px, başlangıç `scrollY=0`, dönüş `251`; doğru citation odaklı) tarihsel sonuç olarak korunmuştur. Bu yeni regresyon turu da **FAIL**: odak test edilen durumların hepsinde doğru citation düğmesine döndü, fakat konum her seferinde 2 px sınırını aştı.
+
+| Prototip / node | Genişlik | Citation | Başlangıç `(x,y)` | Bibliyografyaya gidiş `(x,y)` | Dönüş `(x,y)` | `Δy` | Odak | Sonuç |
+|---|---:|---:|---:|---:|---:|---:|---|---|
+| Citation Interaction Lab V3 / `sHFu4J1jX` | 390 | [1] | `(0,0)` | `(0,1076.5)` | `(0,244.5)` | `+244.5` | Aynı [1] düğmesi | FAIL |
+| Citation Interaction Lab V3 / `sHFu4J1jX` | 320 | [1] | `(0,0)` | `(0,1281)` | `(0,367)` | `+367` | Aynı [1] düğmesi | FAIL |
+| Citation Interaction Lab V3 / `sHFu4J1jX` | 390 | [2] | `(0,550)` | `(0,1163)` | `(0,505)` | `−45` | Aynı [2] düğmesi | FAIL |
+| Citation Interaction Lab V3 / `sHFu4J1jX` | 390 | [3] | `(0,505)` | kaynak listesine | `(0,505)` | `0` | Aynı [3] düğmesi | PASS (bu durum) |
+| Citation Interaction Lab V3 / `sHFu4J1jX` | 320 | [2] | `(0,652)` | kaynak listesine | `(0,652)` | `0` | Aynı [2] düğmesi | PASS (bu durum) |
+| Citation Interaction Lab V3 / `sHFu4J1jX` | 320 | [3] | `(0,652)` | kaynak listesine | `(0,652)` | `0` | Aynı [3] düğmesi | PASS (bu durum) |
+| Integrated Article Reader Lab V2 / `L0EEZeigV` | 390 | [1], Figure ve Equation aç/kapatıldıktan sonra; temiz üst konum | `(0,0)` | `(0,2657)` | `(0,253)` | `+253` | Aynı [1] düğmesi | FAIL |
+| Integrated Article Reader Lab V2 / `L0EEZeigV` | 390 | [3], panellerden sonra; başlangıç 253 | `(0,253)` | `(0,2735)` | `(0,422)` | `+169` | Aynı [3] düğmesi | FAIL |
+| Integrated Article Reader Lab V2 / `L0EEZeigV` | 320 | [1], başlangıç 461 | `(0,461)` | `(0,3214)` | `(0,362)` | `−99` | Aynı [1] düğmesi | FAIL |
+| Integrated Article Reader Lab V2 / `L0EEZeigV` | 320 | [3], başlangıç 362 | `(0,362)` | `(0,3365)` | `(0,559)` | `+197` | Aynı [3] düğmesi | FAIL |
+
+Integrated Reader 390 px’te Figure (`⤢ Inspect figure`) ve Equation panelleri açılıp kapatıldı; ikisinde de dialog kapandı ve odak ilgili açıcı düğmeye döndü. Citation testleri bu etkileşimlerden sonra aynı sayfa oturumunda yapıldı. 320 px’te bu regresyon turunda panel aç/kapat adımları tamamlanmadı; dolayısıyla 320 px panel-sonrası alt kapsamı **doğrulanmadı**. Başlangıçta sıfır konumla ölçülen citation regresyonları Citation V3 [1] ve Integrated Reader [1] (390 px) idi. Reader 320 px’in iki citation ölçümü panel-sonrası sıfır olmayan başlangıçlardan alındı; sıfır başlangıç koşulu için PASS/FAIL kanıtı sayılmamalıdır.
+
+Bu tablo sınırlı regresyon örneklerini gösterir, C04 kabul kriterini PASS yapmaz. Özellikle sıfır başlangıçtan sonra odak iadesi sayfayı sıfırdan uzağa taşıyor; nonzero durumlarda da V3 [2] ve Integrated Reader örneklerinde dönüş sapması tekrarlanıyor. Preview içindeki iframe `window` scroll değerleri ölçüldü; gerçek cihaz touch/hover/drag veya erişilebilirlik kapsamı bu testte sınanmadı. Genel dağılım ve diğer 21 BLOCKED sınıflandırması değiştirilmedi.
+
 ## Framer canvas uyarısı — bağımsız bulgu
 
 Doğru proje/node URL’lerinde her dört lab’ın Preview başlık ve içeriği yüklendi. Aynı Framer editor DOM snapshot’ında canvas/sandbox ağaçlarında ayrıca `Error in local-module:<component>:default` ve `Component file does not exist.` metinleri tekrarlandı. Bu turdaki snapshot örnekleri:
