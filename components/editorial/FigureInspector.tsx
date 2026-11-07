@@ -13,7 +13,6 @@ interface FigureInspectorProps {
 const STOPS = [0.18, 0.5, 0.82];
 
 export default function FigureInspector({ media, figureNumber }: FigureInspectorProps) {
-  const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const [zoom, setZoom] = useState(100);
   const [region, setRegion] = useState<number | null>(null);
@@ -30,11 +29,10 @@ export default function FigureInspector({ media, figureNumber }: FigureInspector
     ? ["I · Micelles", "II · Duct", "III · Fibre"]
     : ["I · Left", "II · Centre", "III · Right"];
 
-  useEffect(() => setMounted(true), []);
-
   useEffect(() => {
     if (!open) return;
     const formerOverflow = document.body.style.overflow;
+    const returnFocus = trigger.current;
     document.body.style.overflow = "hidden";
     close.current?.focus();
 
@@ -71,7 +69,7 @@ export default function FigureInspector({ media, figureNumber }: FigureInspector
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = formerOverflow;
-      trigger.current?.focus({ preventScroll: true });
+      returnFocus?.focus({ preventScroll: true });
     };
   }, [open]);
 
@@ -111,7 +109,7 @@ export default function FigureInspector({ media, figureNumber }: FigureInspector
         ⤢ &nbsp; Expand &amp; inspect
       </button>
 
-      {open && mounted && createPortal(
+      {open && typeof document !== "undefined" && createPortal(
         <div className="fixed inset-0 z-[1000] bg-[#0d181e] text-white">
           <div
             ref={dialog}
