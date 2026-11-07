@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { PublicMedia } from "@/lib/content/types";
+import FigureInspector from "./FigureInspector";
 
 interface ScientificFigureProps {
   media?: PublicMedia;
@@ -51,6 +52,9 @@ export default function ScientificFigure({
           className="w-full h-auto block"
           referrerPolicy="no-referrer"
         />
+      </div>
+      <div className="flex justify-end pt-1">
+        <FigureInspector media={media} figureNumber={figureNumber} />
       </div>
       <figcaption className="mt-3 text-xs sm:text-[13px] text-[var(--sr-ink-secondary)] leading-relaxed space-y-1">
         <div>
