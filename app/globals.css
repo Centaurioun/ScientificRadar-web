@@ -59,6 +59,20 @@ body {
   height: auto;
 }
 
+/* Native citation fragments remain the canonical navigation mechanism. */
+[id^="ref-"]:target {
+  outline: 2px solid var(--sr-accent);
+  outline-offset: 2px;
+  background: var(--sr-surface);
+  scroll-margin-top: 5rem;
+}
+
+.sr-figure-inspector button:focus-visible,
+.sr-figure-inspector input:focus-visible {
+  outline: 3px solid #80d6de;
+  outline-offset: 3px;
+}
+
 .article-prose :where(pre, table) {
   max-width: 100%;
   overflow-x: auto;
