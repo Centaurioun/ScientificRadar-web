@@ -108,7 +108,7 @@ export default function ScientificEquation({ tex, label, explanation, variables 
             ref={dialog}
             role="dialog"
             aria-modal="true"
-            aria-label={label + " inspector"}
+            aria-label={"Equation " + label + " inspector"}
             className="flex max-h-[88dvh] w-full flex-col overflow-hidden rounded-t-xl bg-white shadow-xl sm:max-h-[85dvh] sm:max-w-2xl sm:rounded-md"
           >
             <header className="flex shrink-0 items-center justify-between gap-3 border-b border-[var(--sr-rule)] px-4 py-3 sm:px-7">
