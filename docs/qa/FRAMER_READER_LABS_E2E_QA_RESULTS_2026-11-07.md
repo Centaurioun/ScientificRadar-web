@@ -1,91 +1,111 @@
-# Framer Reader Labs E2E QA Results — 2026-11-07
+# Framer Reader Labs — bağımsız E2E QA sonuçları
 
-## Scope and method
+**Tarih:** 2026-11-07
+**Durum:** Kısmi doğrulama; genel E2E kabulü verilmedi.
+**Kapsam:** PR #50’deki özgün 36 kabul kriterini aynı ID ve anlamla eşleştirir.
+**Ortam:** Kimliği doğrulanmış Brave oturumu; Framer’ın kendi Preview iframe’i; Playwright locator/klavye etkileşimleri ve DOM ölçümleri.
 
-This report completes the browser-verifiable portion of the follow-up mission for the four unpublished Framer Reader Labs prototypes. The tests ran in the authenticated Brave browser against Framer Preview, using Playwright locators and measurements inside Framer's `iframe[data-testid="preview-iframe"]`. The preview's inner width was explicitly set to 1200, 810, 390, and 320 CSS pixels. These are observations of the live prototype preview, not a CI run or a production deployment.
+## Test edilen doğru Framer hedefleri
 
-| Lab | Framer node | Preview URL |
+Orijinal mission’daki proje kimliği `boKLyC3EXgf7Nhs9yoC7` ve proje yolu `Scientific-Radar--boKLyC3EXgf7Nhs9yoC7-3fySI` olarak doğrulandı. Canlı sekmede bu tam proje yolu ve aşağıdaki dört node görüldü. Preview iframe belge/alan adı `project-boklyc3exgf7nhs9yoc7.framercanvas.com`; bu ad kanonik proje ID’sinin küçük harfle normalize edilmiş tabanıyla eşleşiyor. Bu, farklı bir projeye gidildiğine dair kanıt değil.
+
+| Laboratuvar | Node ID | Doğru preview URL |
 |---|---|---|
-| Scientific Figure | `OFNHTB3Jx` | `https://framer.com/projects/ScientificRadar--bokly6P8O8uMQLPqRMSv-4IZ?node=OFNHTB3Jx&view=preview` |
-| Citation Interaction | `sHFu4J1jX` | `https://framer.com/projects/ScientificRadar--bokly6P8O8uMQLPqRMSv-4IZ?node=sHFu4J1jX&view=preview` |
-| Mobile Reading Stress | `EOyWe1e9E` | `https://framer.com/projects/ScientificRadar--bokly6P8O8uMQLPqRMSv-4IZ?node=EOyWe1e9E&view=preview` |
-| Integrated Article Reader | `L0EEZeigV` | `https://framer.com/projects/ScientificRadar--bokly6P8O8uMQLPqRMSv-4IZ?node=L0EEZeigV&view=preview` |
+| Scientific Figure Lab V6 | `OFNHTB3Jx` | `https://framer.com/projects/Scientific-Radar--boKLyC3EXgf7Nhs9yoC7-3fySI?node=OFNHTB3Jx&view=preview` |
+| Citation Interaction Lab V2 | `sHFu4J1jX` | `https://framer.com/projects/Scientific-Radar--boKLyC3EXgf7Nhs9yoC7-3fySI?node=sHFu4J1jX&view=preview` |
+| Mobile Reading Stress Lab V2 | `EOyWe1e9E` | `https://framer.com/projects/Scientific-Radar--boKLyC3EXgf7Nhs9yoC7-3fySI?node=EOyWe1e9E&view=preview` |
+| Integrated Article Reader Lab V1 | `L0EEZeigV` | `https://framer.com/projects/Scientific-Radar--boKLyC3EXgf7Nhs9yoC7-3fySI?node=L0EEZeigV&view=preview` |
 
-Evidence below records observed Playwright locator results, DOM state, viewport measurements, and dialog/scroll behavior. A screenshot was viewed in the live browser session, but this browser integration did not expose a durable screenshot/trace export path; therefore no screenshot or Playwright trace file is attached. Cases needing pointer movement, hover, drag, touch, or durable visual artifact export are marked BLOCKED instead of inferred PASS. No application source code, Framer project state, publication setting, DNS, or production resource was changed.
+**Önceki rapor düzeltmesi:** PR #51’in ilk sürümünde URL’lerde yanlış `ScientificRadar--bokly6P8O8uMQLPqRMSv-4IZ` yolu yazılmıştı. Bu rapor doğru kanonik yolu kullanır. Doğru Framer sekmesinde her dört node’un testi yapıldı; URL yazım hatası rapor metnindeydi. Her prototipin iframe belge URL’sini ayrı ayrı yeniden kaydetmiş bir artefakt yoktur; proje/host eşleşmesi gözlenen canlı sekme ve önceki salt okunur Framer katalog/ağaç incelemesine dayanır.
 
-Status vocabulary: **PASS** = the stated behavior was directly exercised and met; **FAIL** = a reproducible defect was observed; **BLOCKED** = required interaction/evidence could not be completed with the available browser interface. A partial observation is described under BLOCKED.
+## Kanıt ve durum ölçütü
 
-## Case results
+- **PASS:** Özgün kriterin tamamı doğrudan test edildi ve karşılandı.
+- **FAIL:** Özgün kriterin karşılanmadığı, yeniden üretilebilir bir test gözlemi var.
+- **BLOCKED:** Kriterin bir bölümü çalıştırıldıysa da kabul kapsamının tamamı için yeterli kanıt yok.
 
-### Scientific Figure Lab — `OFNHTB3Jx`
+Framer Preview içinde 1200, 810, 390 ve 320 CSS px genişlikleri kullanıldı. Ölçümler iframe’in `innerWidth` / `documentElement.clientWidth` değerlerinden alındı; dış tarayıcı genişliğiyle karıştırılmadı. Aşağıdaki kayıtlar gerçek etkileşim/DOM ölçümleridir; CI testi değildir. Ekran görüntüsü canlı oturumda görüntülendi, ancak bu tarayıcı köprüsü yerel screenshot veya Playwright trace dışa aktarmadı. `:hover`/pointer hareketi için BetterTouchTool fare taşıma denemeleri iframe’de gerçek `:hover` durumu oluşturmadı; touch emülasyonu ve Playwright pointer/drag API’si bulunmadığından bu kontroller çalıştırılamadı. DOM’a sentetik olay gönderilmedi.
 
-| Case | Status | Viewport(s) | Observation / evidence |
-|---|---|---|---|
-| F01 — preview and figure render | PASS | 1200 | Preview loaded with title “Look closer. Understand more.”, figure image, caption/provenance, and `Expand & inspect` control. Initial inspector count was zero. |
-| F02 — open/close inspector | PASS | 320 | Opened one accessible dialog; Escape and Close each dismissed it. Body overflow changed to hidden while open and restored on close; focus returned to `Expand & inspect`. |
-| F03 — zoom controls | PASS | 320 | Zoom input exposed min 75, max 300, step 25. Home set 75%, End set 300%, Reset restored 100%; Zoom in changed 100→125 and Zoom out returned 125→100. |
-| F04 — region selection/recentering | PASS | 320, 390 | Regions I/II/III changed selected detail text. At 320, stage `scrollLeft` was 0/210/420; at 390 it was 0/185/370. These are measured centering offsets in the local figure stage. |
-| F05 — pointer pan/drag | BLOCKED | 320 | Drag/pan could not be exercised: the available Playwright bridge exposes locator click/fill/press and read-only evaluation, but no pointer move/drag API. |
-| F06 — image alternative text and source details | PASS | 1200 | Figure image had meaningful alternative text; caption and attribution/source text were present in the initial preview. |
-| F07 — keyboard and dark-theme legibility | BLOCKED | 320 | Tab cycled among 11 controls within the inspector; Escape closed it and focus returned to the trigger. Dark-theme contrast/legibility was not objectively evaluated. |
-| F08 — responsive layout/overflow | PASS | 1200, 810, 390, 320 | For each viewport, document `scrollWidth` equaled `clientWidth` and the body width matched; no page-level horizontal overflow was measured. |
+## Özgün 36 kabul kriteriyle bire bir sonuçlar
 
-### Citation Interaction Lab — `sHFu4J1jX`
+### F — Scientific Figure Lab
 
-| Case | Status | Viewport(s) | Observation / evidence |
-|---|---|---|---|
-| C01 — hover citation tooltip | BLOCKED | 1200 | Hover and mouseleave could not be emitted through the available Playwright bridge. |
-| C02 — citation jump to reference | PASS | 320 | Clicking [1], [2], [3] brought `#sr-lab-reference-0..2` into view. Each target had a visible outline and teal/light background; measured target top positions were 540, 554, and 725 px during the interaction sequence. |
-| C03 — illustrative reference integrity | PASS | 320 | Page explicitly labels references illustrative; DOI text says “DOI not recorded”. No DOI was invented and no external anchor links were present in the inspected DOM. |
-| C04 — return to citation | BLOCKED | 320 | “Back to article citation” was available and click returned focus to [1]; after return, scrollY was 476.5 and citation positions were 415/906. The exact pre-jump position was not captured, so exact restoration remains unverified. |
-| C05 — tooltip placement near viewport edge | BLOCKED | 320 | Requires hover/mouse positioning, unavailable in the browser bridge. |
-| C06 — citation control activation | PASS | 320 | Citation buttons activated through Playwright click and navigated to the corresponding in-page reference targets without opening another dialog. |
-| C07 — keyboard tooltip behavior | BLOCKED | 320 | Keyboard-focused tooltip behavior could not be established with durable, unambiguous evidence in this run; no hover equivalent was available. |
+| ID ve özgün kapsam | Durum | Viewport | Kanıt / eksik doğrulama |
+|---|---|---:|---|
+| **F01 / P0** — Figure Lab ilk açılışta görünür; kullanıcı isteyene kadar inspector kapalı | **PASS** | 1200 | Doğru Figure node’unda sayfa ve figür render oldu; başlangıçta inspector/dialog sayısı 0, `Expand & inspect` kontrolü bulundu. |
+| **F02 / P0** — Bir erişilebilir modal açılır; arka plan kaymaz; Close ve Escape kapatır; odak tetikleyiciye döner | **PASS** | 320 | Bir `role=dialog` açıldı; `body` overflow kilidi gözlendi; Close ve Escape ile kapandı; kapandıktan sonra odak `Expand & inspect` düğmesine döndü. Tab sıralaması dialog içinde kaldı. |
+| **F03 / P0** — Slider, +, −, Reset 75–300% sınırlarında; görünen değer eşleşir; Reset 100% | **PASS** | 320 | Slider `min=75`, `max=300`, `step=25`; Home=75%, End=300%, Reset=100%; + ile 100→125%, − ile 125→100% gözlendi. |
+| **F04 / P0** — I/II/III veya 1/2/3 seçimi 390/320’de doğru durumu/metni seçer ve bölgeyi stage içinde gerçekten ortalar | **BLOCKED** | 390, 320 | I/II/III düğmeleri ilgili metni değiştirdi ve stage `scrollLeft` değerleri önceki ölçümde 390’da 0/185/370, 320’de 0/210/420 idi. Ancak seçili görsel alt bölgenin stage merkezine göre hedef geometrisi ölçülmedi; her bölge için ekran görüntüsü/merkez farkı ve 1/2/3 klavye kısayolu kanıtı yok. Kaydırma ofseti tek başına merkezlenmeyi kanıtlamaz. |
+| **F05 / P1** — Zoom sonrası fare drag pan; touch scroll; sürükleme ardından aynı bölge seçilince yeniden merkezleme | **BLOCKED** | 320, 390 | Pointer move/drag ve gerçek touch girdisi mevcut köprüyle üretilemedi. Bu nedenle pan, touch scroll ve sürükleme sonrası yeniden merkezleme sınanmadı. |
+| **F06 / P1** — Caption toggle attribution/provenance’i korur; image alt ve illustrative-asset uyarısı bulunur | **BLOCKED** | 390 | Açık metinde `FIG-SR-2026-01`, “Original ScientificRadar illustrative demo”, “CC0-labelled asset” ve yayın öncesi bilimsel doğrulama uyarısı görüldü; anlamlı image alt metni vardı. Caption düğmesi kapatılıp açıldı; ancak kapalı/açık iki durumda caption ve attribution alanlarının birlikte görünürlük koşulu için yeterince hedefli assert/artefakt alınmadı. |
+| **F07 / P1** — Tab/Shift+Tab odak modal dışına çıkmaz; dark theme’de görünür odak; desktop ve mobile | **BLOCKED** | 320, 1200 | 320’de Tab ile dialog içindeki 11 kontrol arasında döngü, Escape ve odak iadesi gözlendi. Citation [1] keyboard odağındayken 3 px `rgb(18,104,112)` outline ölçüldü. Shift+Tab sınırı, modalda desktop/mobile tam dolaşım ve dark-theme kontrast/legibility tamamlanmadı. |
+| **F08 / P1** — Dört genişlikte sayfa taşması/üst üste binme yok; izinli pan yalnızca figürde | **BLOCKED** | 1200, 810, 390, 320 | Sayfa `scrollWidth=clientWidth` ve body genişliği eşit ölçüldü. Kontrol çakışması bütün breakpoint’lerde ölçülmedi; figür içi pan ve sayfa scroll’undan ayrımı F05’in engeli nedeniyle doğrulanmadı. |
 
-### Mobile Reading Stress Lab — `EOyWe1e9E`
+### C — Citation Interaction Lab
 
-| Case | Status | Viewport(s) | Observation / evidence |
-|---|---|---|---|
-| T01 — row focus and material values | PASS | 320 | Selected each of five materials and read all five displayed definitions. Dragline silk: `1.31 g·cm⁻³ / 10.5 GPa / 1.25 GPa / 28.0% / 165 MJ·m⁻³`; flagelliform: `1.30 / 0.003 / 0.50 / 240.0% / 150`; Bombyx: `1.34 / 7.0 / 0.60 / 18.5% / 70`; Kevlar: `1.44 / 130.0 / 3.60 / 2.7% / 50`; carbon steel: `7.85 / 200.0 / 1.50 / 1.8% / 12` (same units/order). |
-| T02 — matrix narrow-screen behavior | PASS | 320, 390, 810, 1200 | Matrix view was selectable. At 320, document width remained 320 while matrix scroller measured 284 px viewport / 980 px content; the first column header used sticky positioning. No page-level horizontal overflow at the four measured widths. |
-| T03 — matrix headers/data alignment | PASS | 320 | First column remained sticky and the next numeric header was visible at x=174–301 px in the 320 px preview; row/column labels and units were rendered. |
-| T04 — responsive view selection and values | BLOCKED | 320, 390, 810, 1200 | Fresh loads selected Row focus at 320/390 and Matrix at 810. All five row values were checked at 320, but complete value retention across each view and desktop width was not established. |
-| T05 — equation inspector | PASS | 320 | One dialog opened with full expression, variables, and demonstrative-value caveat. Escape closed it and returned focus to `Inspect equation`; body overflow was locked while open. |
-| T06 — keyboard operation | BLOCKED | 320 | Dialog focus return/Escape were exercised, but complete keyboard-only traversal of all controls and matrix navigation was not completed. |
-| T07 — equation meaning and caveat | PASS | 320 | Expression, variable explanations, and warning that the example value is demonstrative were visible. Displayed metric units matched the row data. |
-| T08 — equation overflow/large text | BLOCKED | 320 | At default text size, equation content had a local width of 256 px versus a 254 px client width; document width stayed 320. Large-text/zoom behavior was not tested. |
+| ID ve özgün kapsam | Durum | Viewport | Kanıt / eksik doğrulama |
+|---|---|---:|---|
+| **C01 / P0** — Desktop hover [1]/[2]/[3] ilgili kaynak kartını açar; mouseleave kapatır; focus çalmaz | **BLOCKED** | 1200 | Hover/mouseleave girdisi üretilemedi; kartın içeriği, kapanışı ve focus etkisi test edilmedi. |
+| **C02 / P0** — Click numaralı citation’ı eşleşen kayda götürür/vurgular; click tooltip/modal açmaz | **PASS** | 320 | [1]/[2]/[3] tıklamaları `#sr-lab-reference-0..2` hedeflerine götürdü; hedeflerde outline ve teal/light arka plan vardı; tıklama dialog açmadı. |
+| **C03 / P0** — Touch/mobile tap hover gerektirmeden bibliography’ye gider | **BLOCKED** | 320, 390 | Playwright click ile mobil genişlikte citation jump görüldü; bu gerçek touch/tap girdisi değildir. Touch davranışı ayrıca kanıtlanmadı. |
+| **C04 / P1** — “Back to article citation” doğru önceki okuma noktasına döner; focus öngörülebilir | **FAIL** | 390 | Tekrar üretim: Citation preview 390 px’te başlangıç `scrollY=0`; [1] tıklaması bibliography’ye götürdü; “Back to article citation” sonrasında aktif element doğru [1] düğmesi ve görünür 3 px outline oldu, fakat sayfa `scrollY=251` ölçüldü. Odak hedefi doğru, önceki viewport konumu aynı değil; önceki okuma konumunun tam iadesi karşılanmadı. |
+| **C05 / P1** — Hover üst/alt/sol/sağ kenarda kırpılmaz/taşmaz; Escape tooltip’i kapatır | **BLOCKED** | 320, 390, 1200 | Hover/mouse konumu ve tooltip Escape senaryosu çalıştırılamadı. |
+| **C06 / P0** — Demo uyarısı açık; DOI/iddia uydurma yok; generic portal alıntılanan çalışma gibi sunulmaz | **PASS** | 320 | Prototype notu referansların illustrative demo fixture olduğunu ve DOI uydurulmadığını belirtiyor; kayıtlar “DOI not recorded” gösterdi; incelenen DOM’da dış bağlantı bulunmadı. |
+| **C07 / P1** — Citation keyboard focus kaynak bilgisini gösterir; blur tooltip’i kapatır, klavyeyi kilitlemez | **BLOCKED** | 390 | Citation [1] gerçek klavye odağı aldı; görünür outline ölçüldü; `role=tooltip` sayısı 0 idi. Hover koşulu test edilemediğinden focus/blur tooltip davranışının kabulü tamamlanmadı. |
 
-### Integrated Article Reader Lab — `L0EEZeigV`
+### T — Mobile Reading Stress Lab
 
-| Case | Status | Viewport(s) | Observation / evidence |
-|---|---|---|---|
-| I01 — responsive page width | PASS | 1200, 810, 390, 320 | Document/body widths matched the preview at all four sizes; no page-level horizontal overflow was measured. Fresh mobile previews selected Row focus; wider 810 px preview selected Matrix. |
-| I02 — inspectors and modal isolation | PASS | 320, 1200 | Figure and equation inspectors each opened as a single dialog. Attempting the second while the first was open left one dialog; after dismissal the other could open. Escape closed and body overflow restored. |
-| I03 — citation workflow | BLOCKED | 320 | Clicking reference 1 moved to `#integrated-ref-0`, whose background became light teal. Hover interaction and full return workflow were not verified. |
-| I04 — integrated material values | PASS | 320 | Row focus was selected on fresh mobile preview and Matrix remained selectable. Sampled row values matched the stress-lab values above; exhaustive cross-view value parity was not completed. |
-| I05 — figure region interaction | PASS | 320 | Selecting region III changed detail text and moved local figure stage to `scrollLeft` 424 (content width 744); region offsets were 0/212/424. Escape dismissed the inspector. |
-| I06 — equation interaction | PASS | 320 | Equation inspector displayed the expression; Escape dismissed it. The dialog opened after the figure inspector had been closed. |
-| I07 — sequential workflow/focus accessibility | BLOCKED | 320 | Figure, equation, and citation actions were exercised sequentially without a trapped dialog or page overflow. Complete focus order and focus-hidden state were not verified. |
-| I08 — source/illustrative disclosures | PASS | 320 | Reader displayed demonstrative-data caveats and “DOI not recorded”; no reference destination outside the page was observed. |
+| ID ve özgün kapsam | Durum | Viewport | Kanıt / eksik doğrulama |
+|---|---|---:|---|
+| **T01 / P0** — 390 ve 320’de Row focus varsayılan; beş malzeme × beş fixture değeri ve tam birimler | **PASS** | 390, 320 | İki genişlikte varsayılan görünüm Row focus idi. Her malzeme için beş definition okundu. Sıra: yoğunluk, Young modülü, ultimate stress, fracture strain, toughness. Dragline: `1.31 g·cm⁻³, 10.5 GPa, 1.25 GPa, 28.0 %, 165 MJ·m⁻³`; Flagelliform: `1.30, 0.003, 0.50, 240.0 %, 150`; Bombyx: `1.34, 7.0, 0.60, 18.5 %, 70`; Kevlar: `1.44, 130.0, 3.60, 2.7 %, 50`; Carbon Steel: `7.85, 200.0, 1.50, 1.8 %, 12` (her satırdaki birimler aynı sütun sırasına göre). Her iki genişlikte seçici üzerinden beş malzeme sırayla seçildi. |
+| **T02 / P0** — Tüm viewport’larda matrix erişilebilir; yatay scroll matrix içinde; ad sütunu sticky; body taşmaz | **BLOCKED** | 1200, 810, 390, 320 | 320’de matrix scroller 284 px viewport / 980 px content; ilk sütun başlığı sticky idi ve belge genişliği 320 kaldı. Dört genişlikte belge taşması görülmedi; ancak matrix’in kendi kaydırması/sticky davranışı her genişlikte doğrudan test edilmedi. |
+| **T03 / P0** — 320’de ilk sütun adları sıkı biçimde sarılır; numeric sütun görünür; tablo semantiği ilişkileri doğru | **BLOCKED** | 320 | İlk başlık sticky, sonraki numeric başlık x=174–301 px aralığında görünür ve başlık/satır hücreleri semantik table/columnheader/row olarak okunur. Ad hücrelerinin dar genişlikte gerçekten wrap ettiği ayrı ölçülmedi. |
+| **T04 / P1** — Desktop iki görünümü çalıştırır; geçiş veri uydurmaz/kaybettirmez | **BLOCKED** | 810, 1200 | 810 px’te Matrix, 390/320’de Row focus varsayılanı görüldü ve her iki görünüm seçilebilir. Desktop’ta iki görünüm arasında tüm verilerin değişmeden kaldığını karşılaştıran tam assert yapılmadı. |
+| **T05 / P0** — Equation tek modal açar; değişkenler/formül 320/390’de okunur; Escape/Close çalışır; odak tetikleyiciye döner | **BLOCKED** | 320, 390 | 320’de tek dialog, tam ifade, değişken açıklaması ve örnek değer uyarısı; Escape sonrası `Inspect equation` odak iadesi gözlendi. 390 px’te modal okunurluğu ile Close düğmesi davranışı ayrıca doğrulanmadı. |
+| **T06 / P1** — Klavye table switch, selector, scrollable table ve equation inspector’ı çalıştırır | **BLOCKED** | 320 | Modal Escape/odak iadesi görüldü; switch, selector, tablo içi yatay kaydırma ve equation tetikleyicisinin yalnız klavyeyle uçtan uca dolaşımı tamamlanmadı. |
+| **T07 / P0** — Sayılar illustrative, deneysel sonuç gibi sunulmaz; birimler sessizce değişmez | **PASS** | 320, 390 | “Illustrative benchmarks”, development fixture ve ölçülmüş/verified dataset olmadığı açıklaması görünür. T01’de ölçülen sayılar ve birimler 320/390’de aynı fixture ile eşleşti. |
+| **T08 / P1** — Uzun adlar, math yatay kayması, 320 px, büyütülmüş/large text | **BLOCKED** | 320 | 320’de denklem yerel genişliği 256 px / client 254 px; document width 320 idi. Uzun material adı kırılımı ve zoom/large-text ayarı denenmedi. |
 
-### Cross-lab evidence and reporting — X01–X05
+### I — Integrated Article Reader Lab
 
-| Case | Status | Viewport(s) | Observation / evidence |
-|---|---|---|---|
-| X01 — exact prototype identity | PASS | all | Each run used its exact Framer node ID and preview URL listed above. |
-| X02 — viewport coverage | PASS | 1200, 810, 390, 320 | All four exact preview widths were set and checked for page-level width/overflow in the labs. |
-| X03 — screenshots/trace attached | BLOCKED | all | A live screenshot was viewed in the browser UI, but the browser integration did not expose a durable local screenshot or Playwright trace export. No artifact is claimed as attached. |
-| X04 — reproducible evidence | PASS | all | Case observations record the specific node, width, action, and measured DOM/scroll/dialog result where applicable. Hover/drag limitations are explicitly marked BLOCKED. |
-| X05 — QA-only scope | PASS | n/a | No app code, Framer project tree/file, publish setting, DNS, production deployment, or PR merge was changed. The report is the only intended repository change. |
+| ID ve özgün kapsam | Durum | Viewport | Kanıt / eksik doğrulama |
+|---|---|---:|---|
+| **I01 / P0** — Citation, figure ve table/equation aileleri birlikte; 1200/810/390/320 makale genişliği bozulmaz | **PASS** | 1200, 810, 390, 320 | Dört genişlikte integrated sayfa yüklendi; sayfa/body genişliği viewport’a eşitti, yatay document overflow ölçülmedi. Üç etkileşim ailesi preview DOM’unda mevcuttu. |
+| **I02 / P0** — Figure/equation tek overlay durumu; aynı anda iki modal yok; body scroll kilidi/iadesi | **PASS** | 320 | Figure açıkken equation tetikleme ikinci dialog oluşturmadı; figure kapandıktan sonra equation tek dialog olarak açıldı. Modal açık/kapalı body overflow `hidden`/`visible` olarak gözlendi. |
+| **I03 / P0** — Başka inspector aç/kapa sonrası desktop hover ve tüm cihazlarda click-to-reference | **BLOCKED** | 320, 1200 | Citation click bibliography hedefini vurguladı; ancak başka inspector sonrası hover ve tüm cihazlarda tekrarlı click akışı doğrulanmadı. |
+| **I04 / P0** — Mobile Row focus varsayılan; Matrix isteğe bağlı; sayısal kaynak değer/birimleri aynı | **BLOCKED** | 320, 390 | Mobile Row focus varsayılanı, Matrix seçilebilirliği ve örnek satır değerleri görüldü; tüm beş malzemenin entegre okuyucuda her iki görünümde parity assert’i yapılmadı. |
+| **I05 / P0** — Viewport değişince stage içinde doğru region merkezlenir; her modal Escape ve focus restore | **BLOCKED** | 1200→320 | Figure dialog 1200’de açıldı; region III seçildi; açık modal 320 px’e yeniden boyutlandırıldı; Escape sonrası dialog kapandı, body overflow normale döndü, odak `Inspect figure` tetikleyicisine geldi. Equation dialog 320 px’te açılıp Close ile kapatıldı; odak `Inspect equation` tetikleyicisine döndü. Fakat resize sonrası seçili görsel bölgenin geometrik merkezlendiği ispatlanmadı; bu nedenle tam kriter PASS değil. |
+| **I06 / P1** — Her modal kapanınca klavye/pointer focus kendi tetikleyicisine döner | **PASS** | 320 | Figure Escape sonrası aktif düğme `Inspect figure`; equation Close sonrası aktif düğme `Inspect equation` olarak DOM’dan ölçüldü. |
+| **I07 / P1** — 320’de gizli/hapsolmuş aksiyon kontrolü ve body yatay scroll’u yok | **BLOCKED** | 320 | Body/document genişliği 320 idi ve sıra ile figure/equation/citation kullanıldı. Gizli aksiyon kontrolleri ile tam keyboard order/touch erişimi incelenmedi. |
+| **I08 / P0** — Provenance, DOI uydurmama, istenmeyen dış link yok, demo ile bilimsel doğrulama ayrımı | **PASS** | 320 | Figure alt/provenance metni illustrative demo ve yayın öncesi doğrulama uyarısını içerdi; citation demo uyarısı ve “DOI not recorded” bulundu; incelenen preview DOM’unda istenmeyen dış referans bağlantısı yoktu. |
 
-## Independent investigation: Framer canvas diagnostic
+### X — Cross-cutting
 
-The editor DOM displayed the fallback diagnostic `Error in local-module:codeFile/aSqGzef:default` / `Component file does not exist.` twice, including after editor reload. The preview iframe itself rendered the Figure Lab, and the live editor screenshot showed desktop and tablet canvas frames rendered. Thus the diagnostic was reproduced in the editor DOM, but it did not establish that the preview component was absent or visibly broken.
+| ID ve özgün kapsam | Durum | Viewport | Kanıt / eksik doğrulama |
+|---|---|---:|---|
+| **X01 / P0** — Framer Preview’de doğru prototip; generic Denzel/başka hedefse INVALID | **PASS** | tümü | Dört node ID, özgün missiyondaki `Scientific-Radar--boKLyC3EXgf7Nhs9yoC7-3fySI` proje yolu altında açıldı. Citation iframe belgesi `project-boklyc3exgf7nhs9yoc7.framercanvas.com` idi ve içerik Citation Lab idi; generic yayınlanmış Denzel sayfası değildi. Önceki rapordaki URL metin hatası yukarıda düzeltildi. |
+| **X02 / P0** — Erişilebilirlik: adlandırılmış semantic buttons, görünür focus, Escape, trap/restore, hedef boyutu, modal stacking | **BLOCKED** | 320, 390, 1200 | Birçok düğme erişilebilir ada sahip; modal kapanışları/odak dönüşü ve citation focus outline gözlendi. Bununla birlikte tüm lab/breakpoint’lerde hedef boyutu, Shift+Tab/focus trap ve dark-theme kontrolü tamamlanmadı; touch da test edilemedi. |
+| **X03 / P1** — Anahtar durum ekran görüntüleri ve hata trace/video; log ve gerçek viewport ölçüleri | **BLOCKED** | tümü | Viewport ve DOM ölçümleri kaydedildi. Canlı screenshot görüntülendi; kalıcı screenshot, trace/video ve başarısız koşul trace’i dışa aktarılamadığından PR’ye artefakt eklenmedi. |
+| **X04 / P0** — DNS/domain, Framer publish, app migration, ücretli servis ve auth dosyası yok | **PASS** | uygulanamaz | Framer/API kontrolleri salt okunurdu; app kodu, DNS, yayın, bağımlılık/ücret ve auth dosyalarına değişiklik yok. PR rapor amaçlıdır ve hiçbir PR birleştirilmedi. |
+| **X05 / P1** — Mevcut `ArticleReader.tsx` ve `ScientificFigure.tsx` ile prototip kıyaslaması; entegrasyon ayrı onaya tabi | **PASS** | salt okunur kaynak kıyası | Mevcut `ArticleReader.tsx` citation’ları içerik kimliğine bağlı `#cite-${srcId}` → `#ref-${srcId}` içi anchor’larla kurar; `CitationList.tsx` kontrollü kaynak/illustrative kayıtlarını ve yalnız varsa portal bağlantısını gösterir. `ScientificFigure.tsx` Next Image alt metni, caption, credit ve lisansı render eder; prototype’a özgü yakınlaştırma/region inspector’ı yoktur. Framer Figure ve Citation prototipleri bu etkileşimleri deneysel olarak ekler; bu gözlem taşımayı veya uygulama parity’sini onaylamaz. Kaynak kıyası salt okuma yapıldı. |
 
-Read-only Framer project API inspection independently checked component catalog, tree references, and code file contents. The catalog contained `codeFile/aSqGzef:default` and the other three expected code component paths. The tree linked the matching component instances to the expected code IDs and lab pages: Figure `vUv8dh1KM` on `OlQyxTyxG`; Citation `ECqnR2aW8` on `aYMuzhqNs`; Stress `W1EtvXZUF` on `Mq0iRVpEq`; Integrated `Ex_EXdPAt` on `iAJneml6h`. All four component source files were present and nonempty (19,348; 13,276; 17,992; and 31,181 characters respectively); imports were limited to React, react-dom, and Framer. The read-only inspection reported no tree changes (`changedNodeCount: 0`).
+**Dağılım:** 14 PASS, 1 FAIL, 21 BLOCKED. Buradaki PASS sayısı PR #51’in önceki 24 PASS’inden düşük; özgün kriter kapsamı ve inceleme yorumundaki ID eşlemesi esas alındı. Kısmi alt gözlemler ilgili kriteri PASS yapmak için kullanılmadı.
 
-The browser console did not show an error specifically identifying `aSqGzef`; an unrelated FeedSpring image-grid request returned HTTP 404 and is not attributed to the canvas diagnostic. Available evidence therefore **contradicts a literal missing-file condition in the current project catalog**, while the editor fallback warning itself remains reproducible. Root cause is unresolved; possible editor registry/cache or editor-state behavior remains only a hypothesis. No component was deleted/recreated and no Framer mutation was attempted.
+## Framer canvas uyarısı — bağımsız bulgu
 
-## Overall disposition
+Doğru proje/node URL’lerinde her dört lab’ın Preview başlık ve içeriği yüklendi. Aynı Framer editor DOM snapshot’ında canvas/sandbox ağaçlarında ayrıca `Error in local-module:<component>:default` ve `Component file does not exist.` metinleri tekrarlandı. Bu turdaki snapshot örnekleri:
 
-The four preview pages loaded and their core click-driven inspector, citation, responsive, and equation paths were exercised. No reproducible application failure was established in the tested paths. This is **not a complete sign-off**: pointer pan, hover tooltips, dark-theme contrast, some full keyboard workflows, and durable screenshot/trace evidence remain blocked or incomplete. Keep the canvas warning open for Framer-side investigation; do not label it a missing source file based on the evidence gathered here.
+| Node | Canvas fallback’ında geçen code component ID | Snapshot’taki fallback metin sayısı |
+|---|---|---:|
+| Figure `OFNHTB3Jx` | `codeFile/aSqGzef:default` | 3 |
+| Citation `sHFu4J1jX` | `codeFile/QJHlUlg:default` | 1 |
+| Stress `EOyWe1e9E` | `codeFile/JAsq_aM:default` | 4 |
+| Integrated `L0EEZeigV` | `codeFile/FdV5_zr:default` | 4 |
+
+Bu sayılar erişilebilir snapshot’taki tekrar eden canvas/iframe metinleridir; ayrı kullanıcı uyarısı veya dört ayrı arıza sayımı olarak yorumlanmamalıdır. Citation’da hata satırı 1.2 saniyelik bekleme sonrası görünür oldu; dolayısıyla ilk hızlı örneklerdeki yokluk, hatanın kalıcı yokluğunu göstermiyordu. Preview içerikleri render olurken gizli canvas/sandbox fallback’ının görünmesi, sorunu yalnızca Figure/Stress’e özgü olmaktan çıkarıp dört code component’in Framer editor canvas temsiline yayıyor.
+
+Önceki salt okunur Framer API kontrolünde dört component yolu katalogda kayıtlıydı; sayfa instance referansları doğru ID’lerdeydi ve kaynak dosyaları mevcut/non-empty idi: Figure `vUv8dh1KM` → `codeFile/aSqGzef` (`OlQyxTyxG`), Citation `ECqnR2aW8` → `codeFile/QJHlUlg` (`aYMuzhqNs`), Stress `W1EtvXZUF` → `codeFile/JAsq_aM` (`Mq0iRVpEq`), Integrated `Ex_EXdPAt` → `codeFile/FdV5_zr` (`iAJneml6h`). Ağaç değişikliği sayısı `changedNodeCount: 0` idi. Bu bulgular literal proje dosyası yokluğu iddiasını çürütür, fakat Framer canvas fallback hatasını çözmez. Kök neden ve kullanıcıya etkisi açık kalır; cache/registry/editor-state yalnız hipotezdir. Dosya silme/yeniden yaratma veya tasarım değişikliği yapılmadı.
+
+## Sonuç ve sınır
+
+Doğru Framer projesinde çekirdek click tabanlı etkileşimlerin bir kısmı ve responsive genişlikler gözlendi. Citation dönüşü C04’te test kapsamındaki önceki scroll konumuna dönmediği için bir FAIL kaydedildi. Hover/touch/drag, tüm accessibility kapıları, F04/I05 gerçek geometrik merkezleme ve kalıcı screenshot/trace kanıtları hâlâ tamamlanmadı. Sonuç **kısmi QA**’dır; Web’e taşıma veya yayın kararı değildir.
