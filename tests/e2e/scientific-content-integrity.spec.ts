@@ -89,25 +89,30 @@ test.describe("Group D: Scientific Content Integrity & Mathematical Rendering", 
             await expect(imageFrame).toBeVisible();
           }
 
-          // 3. Scientific tables scrollable container verification
-          const tableContainers = page.locator(
-            "article div.overflow-x-auto:has(> table)",
-          );
-          expect(await tableContainers.count()).toBeGreaterThan(0);
-
-          for (let i = 0; i < (await tableContainers.count()); i++) {
-            const container = tableContainers.nth(i);
-            const containerBox = await container.boundingBox();
-            expect(containerBox).not.toBeNull();
-            expect(containerBox!.width).toBeLessThanOrEqual(viewport.width);
-
-            const table = container.locator("table");
-            await expect(table).toBeVisible();
-
-            const overflowX = await container.evaluate(
-              (el) => window.getComputedStyle(el).overflowX,
+          // 3. Preserve scientific table integrity in both approved presentations.
+          if (viewport.width < 700) {
+            const rowViews = page.getByTestId("table-row-focus-view");
+            expect(await rowViews.count()).toBeGreaterThan(0);
+            for (let i = 0; i < (await rowViews.count()); i++) {
+              const rowView = rowViews.nth(i);
+              await expect(rowView).toBeVisible();
+              expect(await rowView.locator("dt").count()).toBeGreaterThan(0);
+            }
+          } else {
+            const tableContainers = page.locator(
+              "article div.overflow-x-auto:has(> table)",
             );
-            expect(overflowX).toBe("auto");
+            expect(await tableContainers.count()).toBeGreaterThan(0);
+            for (let i = 0; i < (await tableContainers.count()); i++) {
+              const container = tableContainers.nth(i);
+              const containerBox = await container.boundingBox();
+              expect(containerBox).not.toBeNull();
+              expect(containerBox!.width).toBeLessThanOrEqual(viewport.width);
+              await expect(container.locator("table")).toBeVisible();
+              expect(
+                await container.evaluate((el) => window.getComputedStyle(el).overflowX),
+              ).toBe("auto");
+            }
           }
 
           // 4. Citation and bibliography anchors verification
