@@ -12,17 +12,16 @@ interface ScientificEquationProps {
 }
 
 export default function ScientificEquation({ tex, label, explanation, variables = [] }: ScientificEquationProps) {
-  const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
   const close = useRef<HTMLButtonElement>(null);
   const dialog = useRef<HTMLDivElement>(null);
   const rendered = renderScientificMath(tex);
 
-  useEffect(() => setMounted(true), []);
   useEffect(() => {
     if (!open) return;
     const previous = document.body.style.overflow;
+    const returnFocus = trigger.current;
     document.body.style.overflow = "hidden";
     close.current?.focus();
 
@@ -49,7 +48,7 @@ export default function ScientificEquation({ tex, label, explanation, variables 
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = previous;
-      trigger.current?.focus({ preventScroll: true });
+      returnFocus?.focus({ preventScroll: true });
     };
   }, [open]);
 
@@ -100,7 +99,7 @@ export default function ScientificEquation({ tex, label, explanation, variables 
         </dl>
       )}
 
-      {open && mounted && createPortal(
+      {open && typeof document !== "undefined" && createPortal(
         <div
           className="fixed inset-0 z-[1000] flex items-end justify-center bg-[#0d181ed9] text-[#181c21] sm:items-center sm:p-6"
           onMouseDown={(event) => { if (event.target === event.currentTarget) setOpen(false); }}
