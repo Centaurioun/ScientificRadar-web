@@ -35,6 +35,7 @@ export default function CitationList({ sources }: CitationListProps) {
           >
             <a
               href={`#cite-${source.id}`}
+              data-back-to-citation="true"
               aria-label={`Back to citation ${source.label} in article text`}
               className="font-mono font-semibold text-[var(--sr-accent)] hover:underline shrink-0"
             >
