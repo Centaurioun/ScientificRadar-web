@@ -9,7 +9,7 @@
 ## 1. Principles and boundaries
 1. **One reader template, many articles.** Article editors select text, taxonomy, references, media, concepts and related stories; they do not design a new layout, set arbitrary CSS, or write React for every article.
 2. **Scientific truth above visual polish.** Clearly separate editorial article vs original peer-reviewed source; observations vs scientific inferences; published evidence vs illustrative demo assets; sample-specific quantitative data vs broad assertions.
-3. **Progressive disclosure.** Show a concise `At a Glance`, collapsed source-status panel, optional one Key Concept, and numbered `Sources`; don't duplicate the same editorial summary in multiple sidebars.
+3. **Progressive disclosure.** Show a concise `At a Glance`, collapsed source-status panel, optional section-linked Key Concepts, and numbered `Sources`; don't duplicate the same editorial summary in multiple sidebars.
 4. **Responsive by default.** Scientific measurements, error bars, legends and labels must not be cropped to fit; a 320px device must not force the entire page into horizontal scrolling.
 5. **No pretend interactions or publishing.** Only show category/topic or article links when verified destinations exist and are publicly visible. Omit optional features with insufficient approved content.
 6. **No AI required for ordinary publishing.** Editor fields and defaults drive every reader module; AI may suggest wording or links, but editorial review and safe publishing are explicit gates.
@@ -27,7 +27,7 @@
 | Main prose | ~680px preferred reading measure | Up to ~700px | Width minus safe gutters | **Yes:** body |
 | At a Glance | One editorial-summary box | In flow | In flow | **Yes:** existing summary + reviewed takeaways |
 | What underpins this story? | Collapsed disclosure, truthfully composed | Same | Same | **Partly:** verified source metadata + editorial caveat |
-| Key Concept | **One optional card** in right rail, concept image, definition, *concept-specific* Why it matters and Key points | In flow near relevant paragraph | In flow near relevant paragraph | **Yes:** approved selected concept record |
+| Key Concept | Optional **contextual sequence**, typically 1–3 short text-only definitions; desktop right rail emphasizes the concept linked to the current H2 and dims previous/next, then disappears outside relevant sections | Inline adjacent to each linked section; no sticky concept rail | Inline adjacent to each linked section | **Yes:** approved ordered concepts + H2 anchors; **no** per-story styling |
 | Knowledge preview | Trigger-anchored popup within viewport; Wikipedia/internal | Same | Tap/focus, constrained popup | **Yes:** reviewed links, **No:** positioning |
 | Supporting figure/table | Embedded near related prose, numbered caption/credit and table footnotes | Fluid and accessible | Table region scrolls *inside itself* only | **Yes:** media/table blocks |
 | Sources | Compact `Sources` H2, numbered mint badges aligned with source title, full DOI | Same | Long bibliography wraps; no fake DOI | **Yes:** source records |
@@ -46,7 +46,7 @@ Adopt the existing ScientificRadar brand system; reconcile with the existing Web
 - Headings: one H1 in article header; semantic H2/H3 in editor; TOC outline derives IDs. Do not use fabricated H2 headings for card visual appearance.
 - Links and focus: consistent teal hyperlinks, distinct focus ring, >=44px interactive touch target where feasible. Category pills visually distinguish interactive (valid route) from neutral metadata.
 - Icons: use a consistent small icon vocabulary only when helpful; **no decorative icon** preceding `At a Glance` or `Sources` in the approved design.
-- Right Key Concept: consistent component width and border/radius, thumbnail and text in a compact row, a softly tinted "Why it matters" stripe, three concise Key points with matched check symbols, optional licensed contextual imagery at its base.
+- Right Key Concept: compact **text-only** definitions, no thumbnail, illustration, background image, Why it matters or Key points. The desktop card rail appears only during relevant H2 sections; currently relevant concept is fully opaque, previous and upcoming entries subdued. The next concept takes emphasis on scroll; after the final concept’s section the rail disappears. The left TOC stays independent. Mobile cards appear inline exactly at their respective editorial section.
 - Scientific figures: `object-fit:contain` and meaningful accessible alt; enlargements display complete figure, not cropped. Photo-based decorative art must never be mislabeled as the experimental figure.
 - Relative asset paths must be resolved through the publishing media contract. External URL reliance in Framer is not final Web hosting policy.
 
@@ -58,7 +58,7 @@ Adopt the existing ScientificRadar brand system; reconcile with the existing Web
 5. Hero image and full scientific caption/credit.
 6. Single `At a Glance` summary; no duplicate Summary/Why it matters/Key points elsewhere.
 7. Collapsible `What underpins this story?` derived from reviewed evidence.
-8. Text with in-flow H2/H3, citations, figures, tables, math and optional inline Knowledge Links. Desktop left TOC stays visible with its **heading**, right Key Concept only when chosen; narrow screens show in-flow concept.
+8. Text with in-flow H2/H3, citations, figures, tables, math and optional inline Knowledge Links. Desktop left TOC stays visible with its **heading**, right contextual Key Concepts only while their corresponding sections are current; narrow screens show individual concept descriptions in flow.
 9. `Sources` bibliography with verified DOI and correction entries.
 10. `Related Reading`, collection identity displayed only where applicable; omit entirely with no suitable public article destinations.
 
@@ -101,12 +101,21 @@ Adopt the existing ScientificRadar brand system; reconcile with the existing Web
 | Article title, taxonomy, prose, responsive typography | Yes | Every public article |
 | At a Glance | Default when reviewed summary exists | Don't synthesize unreviewed bullet points |
 | Hero | Preferred | Only verified licensed asset; omit if none |
-| Key Concept | Optional, maximum one editorial selection by default | A meaningful concept with reviewed definition, image (optional), one why and 2–4 concept-specific points |
+| Key Concept | Optional, typically 1–3 unique section-linked definitions | Short, editor-reviewed term and definition with a stable H2 section anchor; **no** concept imagery, Why it matters or Key points; hide the desktop rail outside mapped sections |
 | Knowledge Links | Optional, sparse | ReviewStatus approved, valid locale and target |
 | What underpins this story? | Yes for sourced scientific journalism; may collapse | Source ledger and metadata provide grounded explanation |
 | Additional figure/table | As needed | Only meaningful evidence, caption and rights/units |
 | Related Reading | Conditional | Only approved public destination articles |
 | Decorative footer/side image | Optional | Relevant asset with verified license; avoid harming contrast/reading |
+
+### Section-linked contextual Key Concepts (owner-approved refinement, 2026-11-08)
+- A scientific article may contain **zero, one, two, or three** curated Key Concepts by default. Do not fabricate or automatically fill slots. Keep each concept to a concise name plus a short, scientifically reviewed definition.
+- Every selected concept must have a stable, unique and contextually appropriate H2 anchor in the canonical article body. The examples are `Isotope ratio` at `bennu-isotopes` and `Petrography` at `bennu-alteration`; the latter is explanatory context, not an additional claimed finding from the study.
+- **Desktop:** the concept rail is absent before the first mapped section; when the first mapped section becomes current, it shows the active concept prominently and a subdued preview of the next. Upon transition the previous fades and the second becomes prominent. Once the page reaches an unmapped later section, the entire rail fades and becomes non-interactive/non-announced. The rail must not stay pinned for the whole article.
+- **Tablet and mobile:** no floating, sticky or animated right rail. Each concept definition is inserted once adjacent to its relevant H2/paragraph. Do not duplicate the same content visibly or to assistive technology.
+- Visual transitions use opacity only, avoid layout shifts, and honor `prefers-reduced-motion`. Ensure inactive/hidden concept cards do not capture pointer or keyboard focus.
+- Studio's future editable article concept list stores `{id, title, definition, afterHeadingId}` per item. It must not add per-article animation, styling, image, Why it matters, or Key points fields to this feature. Knowledge Links (Wikipedia vs internal hover previews) remain an independent feature and are not themselves Key Concept cards.
+- The published serializer validates stable H2 IDs and unique anchor mapping and preserves article order. If an anchor is deleted, the editor should flag it for repair rather than silently reassign a concept. Real-browser scrollspy/fade tests are required before production approval.
 
 ## 7. Governance and acceptance
 - Every visual/interaction change should go through one template component and token-level review, never article-specific random styling.
