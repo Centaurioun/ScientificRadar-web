@@ -13,9 +13,11 @@ import {
   ReadingMeasureOption,
 } from "@/lib/design/tokens";
 import { prepareCanonicalBodyHtml } from "@/lib/content/sanitizer";
-import { renderScientificMath } from "@/lib/content/math";
 import ScientificFigure from "./ScientificFigure";
 import CitationList from "./CitationList";
+import CitationInteractions from "./CitationInteractions";
+import ScientificEquation from "./ScientificEquation";
+import ScientificTable from "./ScientificTable";
 import AuthorProfile from "./AuthorProfile";
 
 interface ArticleReaderProps {
@@ -264,8 +266,8 @@ export default function ArticleReader({
           </div>
         </aside>
 
-        {/* Central Article Body Column */}
-        <div className="min-w-0">
+        {/* Central Article Body Column — unified Framer-tested reader interactions */}
+        <CitationInteractions sources={article.sources}>
           <ResponsiveArticleToc
             headings={headings}
             sourceCount={article.sources.length}
@@ -383,45 +385,14 @@ export default function ArticleReader({
                   }
 
                   case "math": {
-                    const renderedMath = renderScientificMath(block.tex);
                     return (
-                      <div
+                      <ScientificEquation
                         key={block.id}
-                        data-tex={block.tex}
-                        className="article-prose my-8 p-5 rounded-sm bg-[var(--sr-surface)] border border-[var(--sr-rule)]"
-                      >
-                        <div className="text-xs font-sans font-semibold uppercase tracking-wider text-[var(--sr-muted)] mb-2">
-                          {block.label}
-                        </div>
-                        <div
-                          role="math"
-                          aria-label={block.tex}
-                          className="font-math text-base sm:text-lg text-[var(--sr-ink)] py-3 px-2 overflow-x-auto whitespace-nowrap"
-                        >
-                          {renderedMath ? (
-                            <span dangerouslySetInnerHTML={{ __html: renderedMath }} />
-                          ) : (
-                            <code className="whitespace-pre-wrap break-words">{block.tex}</code>
-                          )}
-                        </div>
-                        <p className="mt-2 text-xs sm:text-[13px] font-sans text-[var(--sr-ink-secondary)] leading-relaxed">
-                          {block.explanation}
-                        </p>
-                        {block.variables && block.variables.length > 0 && (
-                          <dl className="mt-3 pt-2.5 border-t border-[var(--sr-rule)] grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-xs font-sans">
-                            {block.variables.map((v) => (
-                              <div key={v.symbol} className="flex gap-1.5">
-                                <dt className="font-math font-semibold text-[var(--sr-ink)] shrink-0">
-                                  {v.symbol}:
-                                </dt>
-                                <dd className="text-[var(--sr-muted)]">
-                                  {v.meaning}
-                                </dd>
-                              </div>
-                            ))}
-                          </dl>
-                        )}
-                      </div>
+                        tex={block.tex}
+                        label={block.label}
+                        explanation={block.explanation}
+                        variables={block.variables}
+                      />
                     );
                   }
 
@@ -437,59 +408,7 @@ export default function ArticleReader({
                   }
 
                   case "table": {
-                    return (
-                      <div
-                        key={block.id}
-                        className="my-10 w-full max-w-[var(--sr-figure-max)] mx-auto"
-                      >
-                        <div className="overflow-x-auto border border-[var(--sr-rule)] rounded-sm bg-white">
-                          <table className="w-full text-left border-collapse font-sans text-xs sm:text-sm tabular-nums">
-                            <caption className="p-4 text-left font-semibold text-[var(--sr-ink)] bg-[var(--sr-surface)] border-b border-[var(--sr-rule)]">
-                              {block.table.caption}
-                            </caption>
-                            <thead>
-                              <tr className="border-b border-[var(--sr-rule)] bg-[var(--sr-paper)]">
-                                {block.table.headers.map((header, hIdx) => (
-                                  <th
-                                    key={hIdx}
-                                    scope="col"
-                                    className="py-3 px-4 font-semibold text-[var(--sr-ink)] whitespace-nowrap"
-                                  >
-                                    {header}
-                                  </th>
-                                ))}
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-[var(--sr-rule-subtle)]">
-                              {block.table.rows.map((row, rIdx) => (
-                                <tr
-                                  key={rIdx}
-                                  className="hover:bg-[var(--sr-surface)]/50"
-                                >
-                                  {row.map((cell, cIdx) => (
-                                    <td
-                                      key={cIdx}
-                                      className={`py-2.5 px-4 ${
-                                        cIdx === 0
-                                          ? "font-medium text-[var(--sr-ink)] whitespace-nowrap"
-                                          : "text-[var(--sr-ink-secondary)] whitespace-nowrap"
-                                      }`}
-                                    >
-                                      {cell}
-                                    </td>
-                                  ))}
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                        {block.table.footnote && (
-                          <p className="mt-2 text-xs text-[var(--sr-muted)] leading-relaxed">
-                            {block.table.footnote}
-                          </p>
-                        )}
-                      </div>
-                    );
+                    return <ScientificTable key={block.id} table={block.table} />;
                   }
                 }
               })}
@@ -501,7 +420,7 @@ export default function ArticleReader({
 
           {/* Author Box & Topics */}
           <AuthorProfile authors={authors} tags={article.tagSlugs} />
-        </div>
+        </CitationInteractions>
 
         {/* Right Symmetry Rail Spacer on Desktop >=1280px */}
         <div className="hidden xl:block" aria-hidden="true" />
