@@ -107,7 +107,7 @@ Her döngü belgeyle PASS/FAIL/BLOCKED kaydedilir. Framer preview testleri ile r
 - [x] **M0 — Roadmap**: scope, accepted choices, contracts and test gates documented (2026-11-07).
 - [x] **M1 — Framer Basic Reading (source/static prototype)**: Article type, summary, A−/A/A+, scrollspy TOC; four screenshots and source checks; **live Brave interaction QA pending**. M1 report archived.
 - [x] **M2 — Framer Scientific Explanation (source/static prototype)**: Knowledge previews, truthful demo source disclosure and selected concept box on the same page; four responsive screenshot renders and source checks; **live Brave interaction QA pending**. M2 report archived.
-- [ ] **M3 — Framer Editorial Reading Path**: opt-in ordered related article route, integrated layout; report and owner return.
+- [x] **M3 — Framer Editorial Reading Path (source/static prototype)**: 3-step ordered illustrative path with verified demo slugs/types, accessible expandable rationale, combined M1+M2+M3 reader, 320/390/810/1200 static screenshots; **real Brave interaction QA pending**. M3 report archived.
 - [ ] **M4 — Codex + ChatGPT review**: real Brave independently tested across phases + integrated page; six-cycle critique, targeted retouch; owner final review.
 - [ ] **M5 — Web adaptation decision**: separate, later code branch/PR only after owner permission.
 ### Explicit handoff rule
