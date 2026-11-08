@@ -1,16 +1,33 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import React from "react";
+import { createHash } from "node:crypto";
 import { renderToStaticMarkup } from "react-dom/server";
 import { DEMO_ARTICLES, DEMO_AUTHORS } from "./fixtures";
 import {
   adaptPublicArticleToSnapshotV1,
   adaptSnapshotV1ToPublicArticle,
   isSafePublishedMediaUrl,
+  isSafeKnowledgeLinkDestination,
   validatePublicationSnapshotV1,
 } from "./contract-v1";
 import { prepareCanonicalBodyHtml, resolveArticleHeadings } from "./sanitizer";
 import ArticleReader from "../../components/editorial/ArticleReader";
+
+function withTestRights<T extends { id: string; src: string; license: string; rightsVerified: boolean }>(media: T, label: string) {
+  const assetRevisionId = createHash("sha256").update(`synthetic-test-asset:${label}:${media.id}`).digest("hex");
+  return {
+    ...media,
+    src: `/api/public/media/${assetRevisionId}`,
+    rightsVerified: true,
+    rightsEvidence: {
+      evidenceId: `test-only-evidence-${label}`,
+      mediaId: media.id,
+      assetRevisionId,
+      license: media.license,
+    },
+  };
+}
 
 test("all existing Stage A demo fixtures pass PublicationSnapshotV1 validation", () => {
   for (const article of DEMO_ARTICLES) {
@@ -38,6 +55,12 @@ test("PublicationSnapshotV1 supports both English (en) and Turkish (tr) locales 
     status: "published" as const,
     title: "Kuzey Anadolu Fay Zonu'nda Asismik Kayma ve Jeodezik Gerinim",
     dek: "InSAR ve GNSS dizileri İsmetpaşa segmentindeki yüzey kaymasını milimetre hassasiyetle çözümlüyor.",
+    hero: base.hero ? withTestRights(base.hero, "tr-hero") : undefined,
+    blocks: base.blocks.map((block) =>
+      block.type === "figure"
+        ? { ...block, media: withTestRights(block.media, `tr-${block.media.id}`) }
+        : block
+    ),
   };
 
   const result = validatePublicationSnapshotV1(trSnapshot);
@@ -100,11 +123,130 @@ test("published snapshots reject unverified hero and figure rights even with fil
 
   const verified = {
     ...published,
-    hero: { ...published.hero!, rightsVerified: true },
-    blocks: base.blocks,
+    hero: withTestRights(published.hero!, "verified-hero"),
+    blocks: base.blocks.map((block) =>
+      block.type === "figure"
+        ? { ...block, media: withTestRights(block.media, `verified-${block.media.id}`) }
+        : block
+    ),
   };
   const ok = validatePublicationSnapshotV1(verified);
   assert.equal(ok.valid, true, JSON.stringify(ok.issues));
+});
+
+test("published media rights evidence must bind the evidence record to the exact media ID and license", () => {
+  const base = adaptPublicArticleToSnapshotV1(DEMO_ARTICLES[0]);
+  const published = {
+    ...base,
+    status: "published" as const,
+    hero: {
+      ...withTestRights(base.hero!, "mismatched-hero"),
+      rightsEvidence: {
+        ...withTestRights(base.hero!, "mismatched-hero").rightsEvidence,
+        mediaId: "different-media-id",
+      },
+    },
+    blocks: base.blocks,
+  };
+  const result = validatePublicationSnapshotV1(published);
+  assert.equal(result.valid, false);
+  assert.ok(result.issues.some((issue) => issue.code === "UNBOUND_MEDIA_RIGHTS_EVIDENCE" && issue.field === "hero.rightsEvidence"));
+});
+
+test("runtime validator rejects malformed JSON envelopes without throwing", () => {
+  for (const input of [
+    null,
+    [],
+    { contractVersion: "1.0.0", blocks: null },
+    { ...adaptPublicArticleToSnapshotV1(DEMO_ARTICLES[0]), blocks: [null] },
+    { ...adaptPublicArticleToSnapshotV1(DEMO_ARTICLES[0]), blocks: [{ type: "figure", media: null }] },
+  ]) {
+    const result = validatePublicationSnapshotV1(input);
+    assert.equal(result.valid, false);
+    assert.equal(result.isPubliclyRenderable, false);
+    assert.ok(result.issues.length > 0);
+  }
+});
+
+test("source IDs must be unique and included author records must match declared attribution IDs", () => {
+  const base = adaptPublicArticleToSnapshotV1(DEMO_ARTICLES[0], DEMO_AUTHORS);
+  const result = validatePublicationSnapshotV1({
+    ...base,
+    sources: [base.sources[0], { ...base.sources[0] }],
+    authorIds: ["missing-author-id"],
+  });
+  assert.ok(result.issues.some((issue) => issue.code === "DUPLICATE_IDENTIFIER"));
+  assert.ok(result.issues.some((issue) => issue.code === "AUTHORSHIP_MISMATCH"));
+});
+
+test("v1-compatible series and approved Knowledge Links retain their Studio relation metadata", () => {
+  const base = adaptPublicArticleToSnapshotV1(DEMO_ARTICLES[0]);
+  const snapshot = {
+    ...base,
+    seriesId: "series-test-record-01",
+    knowledgeLinks: [
+      {
+        id: "knowledge-link-test-01",
+        targetType: "internal" as const,
+        targetUrl: "/article/spider-silk-hierarchical-protein-mechanics",
+        targetArticleId: "article-test-target-01",
+        locale: "en" as const,
+        previewTitle: "Silk protein assembly",
+        previewExcerpt: "A reviewed link to a related public explanation.",
+        sourceAttribution: "Reviewed editor link",
+        reviewStatus: "approved" as const,
+        isSampleDemoData: false,
+      },
+    ],
+  };
+  const result = validatePublicationSnapshotV1(snapshot);
+  assert.equal(result.valid, true, JSON.stringify(result.issues));
+  const adapted = adaptSnapshotV1ToPublicArticle(snapshot);
+  assert.equal(adapted.seriesId, snapshot.seriesId);
+  assert.deepEqual(adapted.knowledgeLinks, snapshot.knowledgeLinks);
+  assert.equal(isSafeKnowledgeLinkDestination(snapshot.knowledgeLinks[0]), true);
+});
+
+test("Knowledge Links reject unreviewed/demo and unsafe destinations", () => {
+  const base = adaptPublicArticleToSnapshotV1(DEMO_ARTICLES[0]);
+  const link = {
+    id: "knowledge-link-test-02",
+    targetType: "wikipedia" as const,
+    targetUrl: "javascript:alert(1)",
+    locale: "en" as const,
+    previewTitle: "Unsafe destination",
+    previewExcerpt: "Must be rejected.",
+    sourceAttribution: "Test data only",
+    reviewStatus: "suggested" as const,
+    isSampleDemoData: true,
+  };
+  assert.equal(isSafeKnowledgeLinkDestination(link), false);
+  const result = validatePublicationSnapshotV1({ ...base, knowledgeLinks: [link] });
+  assert.ok(result.issues.some((issue) => issue.code === "UNREVIEWED_KNOWLEDGE_LINK"));
+  assert.ok(result.issues.some((issue) => issue.code === "UNSAFE_KNOWLEDGE_DESTINATION"));
+});
+
+test("published HTML figures must bind the image URL to a rights-verified structured media record", () => {
+  const base = adaptPublicArticleToSnapshotV1(DEMO_ARTICLES[0]);
+  const figure = base.blocks.find((block) => block.type === "figure");
+  assert.ok(figure && figure.type === "figure");
+  const media = withTestRights(figure.media, "inline-figure");
+  const valid = {
+    ...base,
+    status: "published" as const,
+    hero: base.hero ? withTestRights(base.hero, "inline-hero") : undefined,
+    blocks: base.blocks.map((block) => block.type === "figure" ? { ...block, media } : block),
+    bodyHtml: `<figure data-media-id="${media.id}"><img src="${media.src}" alt="${media.alt}" /></figure>`,
+  };
+  const validResult = validatePublicationSnapshotV1(valid);
+  assert.equal(validResult.valid, true, JSON.stringify(validResult.issues));
+
+  const unbound = {
+    ...valid,
+    bodyHtml: `<figure data-media-id="unknown-media"><img src="${media.src}" alt="${media.alt}" /></figure>`,
+  };
+  const result = validatePublicationSnapshotV1(unbound);
+  assert.ok(result.issues.some((issue) => issue.code === "UNBOUND_BODY_MEDIA"));
 });
 
 test("media validator rejects blob:, data:, javascript:, and untrusted external image origins", () => {

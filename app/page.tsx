@@ -16,6 +16,8 @@ import { resolveHeroVariant } from "@/lib/design/tokens";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = buildPageMetadata({
   routeType: "home",
   pathname: "/",

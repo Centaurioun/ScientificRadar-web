@@ -18,6 +18,7 @@ export interface WebEnvironmentValidationResult {
   valid: boolean;
   mode: RuntimeOperatingMode;
   adapter: ContentAdapterMode;
+  studioPublishingUrl: string | null;
   issues: WebEnvironmentValidationIssue[];
 }
 
@@ -49,6 +50,15 @@ export function validateWebEnvironment(
     rawAdapter === "published-snapshots"
       ? "published-snapshots"
       : "demo-fixtures";
+  if (rawAdapter !== "demo-fixtures" && rawAdapter !== "published-snapshots") {
+    issues.push({
+      severity: "blocker",
+      variable: "SCIRAD_CONTENT_ADAPTER",
+      message: "SCIRAD_CONTENT_ADAPTER must be exactly \"demo-fixtures\" or \"published-snapshots\".",
+    });
+  }
+
+  const studioPublishingUrl = resolveStudioPublishingUrl(env, mode, adapter, issues);
 
   const siteUrl = (env.NEXT_PUBLIC_SITE_URL ?? env.APP_URL ?? "").trim();
   const enableIndexing = env.NEXT_PUBLIC_ENABLE_PRODUCTION_INDEXING === "true";
@@ -137,6 +147,45 @@ export function validateWebEnvironment(
     valid: !hasBlockers,
     mode,
     adapter,
+    studioPublishingUrl,
     issues,
   };
+}
+
+function resolveStudioPublishingUrl(
+  env: Record<string, string | undefined>,
+  mode: RuntimeOperatingMode,
+  adapter: ContentAdapterMode,
+  issues: WebEnvironmentValidationIssue[]
+): string | null {
+  const raw = (env.SCIENTIFICRADAR_STUDIO_PUBLISHING_URL ?? "").trim();
+  if (adapter !== "published-snapshots") return null;
+  if (!raw) {
+    issues.push({
+      severity: "blocker",
+      variable: "SCIENTIFICRADAR_STUDIO_PUBLISHING_URL",
+      message: "Published snapshot mode requires the public Studio API origin.",
+    });
+    return null;
+  }
+
+  try {
+    const parsed = new URL(raw);
+    const isLoopback = ["localhost", "127.0.0.1", "::1"].includes(parsed.hostname);
+    const production = mode === "stage-c-production" || env.NEXT_PUBLIC_ENABLE_PRODUCTION_INDEXING === "true";
+    if (
+      (parsed.protocol !== "https:" && !(parsed.protocol === "http:" && isLoopback && !production)) ||
+      parsed.username || parsed.password || parsed.pathname !== "/" || parsed.search || parsed.hash
+    ) {
+      throw new Error("invalid public origin");
+    }
+    return parsed.origin;
+  } catch {
+    issues.push({
+      severity: "blocker",
+      variable: "SCIENTIFICRADAR_STUDIO_PUBLISHING_URL",
+      message: "Studio public URL must be an HTTPS origin (or a loopback HTTP origin in non-production mode) with no path, credentials, query, or fragment.",
+    });
+    return null;
+  }
 }

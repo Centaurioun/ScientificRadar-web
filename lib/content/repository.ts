@@ -4,6 +4,11 @@ import {
   DEMO_CATEGORIES,
 } from "./fixtures";
 import { normalizeSearchText } from "./sanitizer";
+import { validateWebEnvironment } from "../config/env";
+import {
+  PublishedSnapshotContentRepository,
+  UnavailablePublishedContentRepository,
+} from "./published-snapshot-repository";
 import {
   EditorialType,
   PublicArticle,
@@ -32,9 +37,18 @@ export function filterArticles(
     editorialType?: EditorialType;
     locale?: SupportedLocale;
     limit?: number;
+  },
+  context?: {
+    categories?: PublicCategory[];
+    authors?: PublicAuthor[];
+    allowDemoStatus?: boolean;
   }
 ): PublicArticle[] {
-  let result = articles.filter(isPubliclyVisibleArticle);
+  let result = articles.filter((article) =>
+    article.status === "published" || (context?.allowDemoStatus !== false && article.status === "demo")
+  );
+  const categories = context?.categories ?? DEMO_CATEGORIES;
+  const authors = context?.authors ?? DEMO_AUTHORS;
 
   if (options?.categorySlug) {
     result = result.filter((a) => a.categorySlug === options.categorySlug);
@@ -63,10 +77,10 @@ export function filterArticles(
     const tokens = normalizedQuery.split(/\s+/).filter(Boolean);
 
     result = result.filter((article) => {
-      const category = DEMO_CATEGORIES.find(
+      const category = categories.find(
         (c) => c.slug === article.categorySlug
       );
-      const authors = DEMO_AUTHORS.filter((au) =>
+      const articleAuthors = authors.filter((au) =>
         article.authorIds.includes(au.id)
       );
       const bodyText = article.blocks
@@ -91,7 +105,7 @@ export function filterArticles(
           category?.name ?? "",
           article.subcategorySlugs.join(" "),
           article.tagSlugs.join(" "),
-          authors.map((a) => a.name).join(" "),
+          articleAuthors.map((a) => a.name).join(" "),
           bodyText,
         ].join(" ")
       );
@@ -174,7 +188,29 @@ class InMemoryDemoContentRepository implements PublishedContentRepository {
   }
 }
 
-export const contentRepository = new InMemoryDemoContentRepository();
+export function createContentRepository(
+  env: Record<string, string | undefined> = process.env
+): PublishedContentRepository {
+  const configuredAdapter = (env.SCIRAD_CONTENT_ADAPTER ?? "demo-fixtures").trim();
+  const validation = validateWebEnvironment(env);
+  const productionRequested =
+    validation.mode === "stage-c-production" ||
+    env.NEXT_PUBLIC_ENABLE_PRODUCTION_INDEXING === "true";
+
+  if (configuredAdapter === "published-snapshots") {
+    return validation.studioPublishingUrl
+      ? new PublishedSnapshotContentRepository(validation.studioPublishingUrl)
+      : new UnavailablePublishedContentRepository();
+  }
+  if (configuredAdapter === "demo-fixtures" && !productionRequested) {
+    return new InMemoryDemoContentRepository();
+  }
+  // Invalid adapter configuration or production with the demo adapter must not
+  // silently expose fixture articles.
+  return new UnavailablePublishedContentRepository();
+}
+
+export const contentRepository = createContentRepository();
 
 export function getCategoryName(categorySlug: string): string {
   return (

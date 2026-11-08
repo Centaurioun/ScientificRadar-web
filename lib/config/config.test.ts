@@ -32,6 +32,39 @@ test("validateWebEnvironment fails closed when production indexing is enabled on
   assert.ok(vars.has("NEXT_PUBLIC_GEMINI_API_KEY"));
 });
 
+test("published snapshot adapter requires a credential-free public Studio origin", () => {
+  const missing = validateWebEnvironment({ SCIRAD_CONTENT_ADAPTER: "published-snapshots" });
+  assert.equal(missing.valid, false);
+  assert.ok(missing.issues.some((issue) => issue.variable === "SCIENTIFICRADAR_STUDIO_PUBLISHING_URL"));
+
+  const local = validateWebEnvironment({
+    SCIRAD_CONTENT_ADAPTER: "published-snapshots",
+    SCIENTIFICRADAR_STUDIO_PUBLISHING_URL: "http://127.0.0.1:4317",
+  });
+  assert.equal(local.valid, true);
+  assert.equal(local.studioPublishingUrl, "http://127.0.0.1:4317");
+
+  const productionLoopback = validateWebEnvironment({
+    SCIRAD_RUNTIME_MODE: "stage-c-production",
+    SCIRAD_CONTENT_ADAPTER: "published-snapshots",
+    SCIENTIFICRADAR_STUDIO_PUBLISHING_URL: "http://127.0.0.1:4317",
+    NEXT_PUBLIC_SITE_URL: "https://scientificradar.com",
+  });
+  assert.equal(productionLoopback.valid, false);
+
+  const pathAndCredentials = validateWebEnvironment({
+    SCIRAD_CONTENT_ADAPTER: "published-snapshots",
+    SCIENTIFICRADAR_STUDIO_PUBLISHING_URL: "https://user:password@studio.example.com/private",
+  });
+  assert.equal(pathAndCredentials.valid, false);
+});
+
+test("invalid adapter values are blockers instead of silently selecting demo fixtures", () => {
+  const result = validateWebEnvironment({ SCIRAD_CONTENT_ADAPTER: "production-ish" });
+  assert.equal(result.valid, false);
+  assert.ok(result.issues.some((issue) => issue.variable === "SCIRAD_CONTENT_ADAPTER"));
+});
+
 test("validateRevalidationPayload fails closed without secret and returns exact cache tags when authorized", () => {
   const samplePayload = {
     contractVersion: "1.0.0",

@@ -8,6 +8,8 @@ import EditorialCard from "@/components/editorial/EditorialCard";
 import { contentRepository } from "@/lib/content/repository";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
+export const dynamic = "force-dynamic";
+
 interface SearchPageProps {
   searchParams: Promise<{ q?: string }>;
 }

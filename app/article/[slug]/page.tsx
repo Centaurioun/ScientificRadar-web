@@ -12,16 +12,11 @@ import { ReadingMeasureOption } from "@/lib/design/tokens";
 
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
+export const dynamic = "force-dynamic";
+
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ measure?: string; designReview?: string }>;
-}
-
-export async function generateStaticParams() {
-  const articles = await contentRepository.listPublicArticles();
-  return articles.map((article) => ({
-    slug: article.slug,
-  }));
 }
 
 export async function generateMetadata({
