@@ -1,16 +1,33 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import React from "react";
+import { createHash } from "node:crypto";
 import { renderToStaticMarkup } from "react-dom/server";
 import { DEMO_ARTICLES, DEMO_AUTHORS } from "./fixtures";
 import {
   adaptPublicArticleToSnapshotV1,
   adaptSnapshotV1ToPublicArticle,
   isSafePublishedMediaUrl,
+  isSafeKnowledgeLinkDestination,
   validatePublicationSnapshotV1,
 } from "./contract-v1";
 import { prepareCanonicalBodyHtml, resolveArticleHeadings } from "./sanitizer";
 import ArticleReader from "../../components/editorial/ArticleReader";
+
+function withTestRights<T extends { id: string; src: string; license: string; rightsVerified: boolean }>(media: T, label: string) {
+  const assetRevisionId = createHash("sha256").update(`synthetic-test-asset:${label}:${media.id}`).digest("hex");
+  return {
+    ...media,
+    src: `/api/public/media/${assetRevisionId}`,
+    rightsVerified: true,
+    rightsEvidence: {
+      evidenceId: `test-only-evidence-${label}`,
+      mediaId: media.id,
+      assetRevisionId,
+      license: media.license,
+    },
+  };
+}
 
 test("all existing Stage A demo fixtures pass PublicationSnapshotV1 validation", () => {
   for (const article of DEMO_ARTICLES) {
@@ -27,6 +44,32 @@ test("all existing Stage A demo fixtures pass PublicationSnapshotV1 validation",
   }
 });
 
+test("v1.0.0 additive scientific metadata round-trips and rejects invalid anchors, dates, and bibliography", () => {
+  const article = DEMO_ARTICLES[0];
+  const base = adaptPublicArticleToSnapshotV1(article);
+  const heading = base.headings?.find((item) => item.level === 2);
+  assert.ok(heading, "fixture should have a stable H2 anchor");
+  const valid = {
+    ...base,
+    keyConcepts: [{ title: "Reviewed term", definition: "Definition from the reviewed article text.", headingId: heading.id }],
+    editorialNotices: [{ id: "notice-1", type: "correction" as const, title: "Correction", body: "A published correction record.", sourceUrl: "https://publisher.example/correction", recordedAt: "2026-11-08T09:00:00Z" }],
+    sources: [{ ...base.sources[0], volume: "12", issue: "3", pages: "45–52", articleNumber: "e123" }, ...base.sources.slice(1)],
+  };
+  assert.equal(validatePublicationSnapshotV1(valid).valid, true);
+  const roundTrip = adaptSnapshotV1ToPublicArticle(valid);
+  assert.deepEqual(roundTrip.keyConcepts, valid.keyConcepts);
+  assert.deepEqual(roundTrip.editorialNotices, valid.editorialNotices);
+  assert.equal(roundTrip.sources[0].pages, "45–52");
+
+  assert.equal(validatePublicationSnapshotV1({ ...valid, keyConcepts: [{ ...valid.keyConcepts[0], headingId: "removed-heading" }] }).valid, false);
+  assert.equal(validatePublicationSnapshotV1({ ...valid, keyConcepts: [valid.keyConcepts[0], valid.keyConcepts[0]] }).valid, false);
+  assert.equal(validatePublicationSnapshotV1({ ...valid, editorialNotices: [{ ...valid.editorialNotices[0], recordedAt: "not-a-date" }] }).valid, false);
+  assert.equal(validatePublicationSnapshotV1({ ...valid, sources: [{ ...valid.sources[0], pages: "<script>" }, ...valid.sources.slice(1)] }).valid, false);
+  assert.equal(validatePublicationSnapshotV1({ ...valid, relatedIds: ["duplicate", "duplicate"] }).valid, false);
+  assert.equal(validatePublicationSnapshotV1({ ...valid, relatedIds: [valid.articleId] }).valid, false);
+  assert.equal(validatePublicationSnapshotV1({ ...valid, locale: "fr" }).valid, false);
+});
+
 test("PublicationSnapshotV1 supports both English (en) and Turkish (tr) locales and round-trips cleanly", () => {
   const base = adaptPublicArticleToSnapshotV1(DEMO_ARTICLES[0]);
   const trSnapshot = {
@@ -38,6 +81,12 @@ test("PublicationSnapshotV1 supports both English (en) and Turkish (tr) locales 
     status: "published" as const,
     title: "Kuzey Anadolu Fay Zonu'nda Asismik Kayma ve Jeodezik Gerinim",
     dek: "InSAR ve GNSS dizileri İsmetpaşa segmentindeki yüzey kaymasını milimetre hassasiyetle çözümlüyor.",
+    hero: base.hero ? withTestRights(base.hero, "tr-hero") : undefined,
+    blocks: base.blocks.map((block) =>
+      block.type === "figure"
+        ? { ...block, media: withTestRights(block.media, `tr-${block.media.id}`) }
+        : block
+    ),
   };
 
   const result = validatePublicationSnapshotV1(trSnapshot);
@@ -100,11 +149,130 @@ test("published snapshots reject unverified hero and figure rights even with fil
 
   const verified = {
     ...published,
-    hero: { ...published.hero!, rightsVerified: true },
-    blocks: base.blocks,
+    hero: withTestRights(published.hero!, "verified-hero"),
+    blocks: base.blocks.map((block) =>
+      block.type === "figure"
+        ? { ...block, media: withTestRights(block.media, `verified-${block.media.id}`) }
+        : block
+    ),
   };
   const ok = validatePublicationSnapshotV1(verified);
   assert.equal(ok.valid, true, JSON.stringify(ok.issues));
+});
+
+test("published media rights evidence must bind the evidence record to the exact media ID and license", () => {
+  const base = adaptPublicArticleToSnapshotV1(DEMO_ARTICLES[0]);
+  const published = {
+    ...base,
+    status: "published" as const,
+    hero: {
+      ...withTestRights(base.hero!, "mismatched-hero"),
+      rightsEvidence: {
+        ...withTestRights(base.hero!, "mismatched-hero").rightsEvidence,
+        mediaId: "different-media-id",
+      },
+    },
+    blocks: base.blocks,
+  };
+  const result = validatePublicationSnapshotV1(published);
+  assert.equal(result.valid, false);
+  assert.ok(result.issues.some((issue) => issue.code === "UNBOUND_MEDIA_RIGHTS_EVIDENCE" && issue.field === "hero.rightsEvidence"));
+});
+
+test("runtime validator rejects malformed JSON envelopes without throwing", () => {
+  for (const input of [
+    null,
+    [],
+    { contractVersion: "1.0.0", blocks: null },
+    { ...adaptPublicArticleToSnapshotV1(DEMO_ARTICLES[0]), blocks: [null] },
+    { ...adaptPublicArticleToSnapshotV1(DEMO_ARTICLES[0]), blocks: [{ type: "figure", media: null }] },
+  ]) {
+    const result = validatePublicationSnapshotV1(input);
+    assert.equal(result.valid, false);
+    assert.equal(result.isPubliclyRenderable, false);
+    assert.ok(result.issues.length > 0);
+  }
+});
+
+test("source IDs must be unique and included author records must match declared attribution IDs", () => {
+  const base = adaptPublicArticleToSnapshotV1(DEMO_ARTICLES[0], DEMO_AUTHORS);
+  const result = validatePublicationSnapshotV1({
+    ...base,
+    sources: [base.sources[0], { ...base.sources[0] }],
+    authorIds: ["missing-author-id"],
+  });
+  assert.ok(result.issues.some((issue) => issue.code === "DUPLICATE_IDENTIFIER"));
+  assert.ok(result.issues.some((issue) => issue.code === "AUTHORSHIP_MISMATCH"));
+});
+
+test("v1-compatible series and approved Knowledge Links retain their Studio relation metadata", () => {
+  const base = adaptPublicArticleToSnapshotV1(DEMO_ARTICLES[0]);
+  const snapshot = {
+    ...base,
+    seriesId: "series-test-record-01",
+    knowledgeLinks: [
+      {
+        id: "knowledge-link-test-01",
+        targetType: "internal" as const,
+        targetUrl: "/article/spider-silk-hierarchical-protein-mechanics",
+        targetArticleId: "article-test-target-01",
+        locale: "en" as const,
+        previewTitle: "Silk protein assembly",
+        previewExcerpt: "A reviewed link to a related public explanation.",
+        sourceAttribution: "Reviewed editor link",
+        reviewStatus: "approved" as const,
+        isSampleDemoData: false,
+      },
+    ],
+  };
+  const result = validatePublicationSnapshotV1(snapshot);
+  assert.equal(result.valid, true, JSON.stringify(result.issues));
+  const adapted = adaptSnapshotV1ToPublicArticle(snapshot);
+  assert.equal(adapted.seriesId, snapshot.seriesId);
+  assert.deepEqual(adapted.knowledgeLinks, snapshot.knowledgeLinks);
+  assert.equal(isSafeKnowledgeLinkDestination(snapshot.knowledgeLinks[0]), true);
+});
+
+test("Knowledge Links reject unreviewed/demo and unsafe destinations", () => {
+  const base = adaptPublicArticleToSnapshotV1(DEMO_ARTICLES[0]);
+  const link = {
+    id: "knowledge-link-test-02",
+    targetType: "wikipedia" as const,
+    targetUrl: "javascript:alert(1)",
+    locale: "en" as const,
+    previewTitle: "Unsafe destination",
+    previewExcerpt: "Must be rejected.",
+    sourceAttribution: "Test data only",
+    reviewStatus: "suggested" as const,
+    isSampleDemoData: true,
+  };
+  assert.equal(isSafeKnowledgeLinkDestination(link), false);
+  const result = validatePublicationSnapshotV1({ ...base, knowledgeLinks: [link] });
+  assert.ok(result.issues.some((issue) => issue.code === "UNREVIEWED_KNOWLEDGE_LINK"));
+  assert.ok(result.issues.some((issue) => issue.code === "UNSAFE_KNOWLEDGE_DESTINATION"));
+});
+
+test("published HTML figures must bind the image URL to a rights-verified structured media record", () => {
+  const base = adaptPublicArticleToSnapshotV1(DEMO_ARTICLES[0]);
+  const figure = base.blocks.find((block) => block.type === "figure");
+  assert.ok(figure && figure.type === "figure");
+  const media = withTestRights(figure.media, "inline-figure");
+  const valid = {
+    ...base,
+    status: "published" as const,
+    hero: base.hero ? withTestRights(base.hero, "inline-hero") : undefined,
+    blocks: base.blocks.map((block) => block.type === "figure" ? { ...block, media } : block),
+    bodyHtml: `<figure data-media-id="${media.id}"><img src="${media.src}" alt="${media.alt}" /></figure>`,
+  };
+  const validResult = validatePublicationSnapshotV1(valid);
+  assert.equal(validResult.valid, true, JSON.stringify(validResult.issues));
+
+  const unbound = {
+    ...valid,
+    bodyHtml: `<figure data-media-id="unknown-media"><img src="${media.src}" alt="${media.alt}" /></figure>`,
+  };
+  const result = validatePublicationSnapshotV1(unbound);
+  assert.ok(result.issues.some((issue) => issue.code === "UNBOUND_BODY_MEDIA"));
 });
 
 test("media validator rejects blob:, data:, javascript:, and untrusted external image origins", () => {
@@ -129,6 +297,63 @@ test("media validator rejects blob:, data:, javascript:, and untrusted external 
     ),
     true
   );
+  assert.equal(
+    isSafePublishedMediaUrl(
+      "http://localhost:3000/api/public/media/abc",
+      new Set(["http://localhost:3000"]),
+      true
+    ),
+    true
+  );
+  assert.equal(
+    isSafePublishedMediaUrl(
+      "http://localhost:3000/api/public/media/abc",
+      new Set(["http://localhost:3000"])
+    ),
+    false
+  );
+  assert.equal(
+    isSafePublishedMediaUrl(
+      "http://localhost:3001/api/public/media/abc",
+      new Set(["http://localhost:3000"]),
+      true
+    ),
+    false
+  );
+  assert.equal(
+    isSafePublishedMediaUrl(
+      "http://media.example.com/api/public/media/abc",
+      new Set(["http://media.example.com"]),
+      true
+    ),
+    false
+  );
+});
+
+test("snapshot validation accepts only the configured loopback HTTP media origin when explicitly enabled", () => {
+  const base = adaptPublicArticleToSnapshotV1(DEMO_ARTICLES[0]);
+  const toLocalStudioMedia = <T extends { src: string; rightsEvidence?: { assetRevisionId: string } }>(media: T) => ({
+    ...media,
+    src: `http://localhost:3000/api/public/media/${media.rightsEvidence?.assetRevisionId}`,
+  });
+  const snapshot = {
+    ...base,
+    status: "published" as const,
+    hero: base.hero ? toLocalStudioMedia(withTestRights(base.hero, "local-hero")) : undefined,
+    blocks: base.blocks.map((block) => block.type === "figure"
+      ? { ...block, media: toLocalStudioMedia(withTestRights(block.media, `local-${block.media.id}`)) }
+      : block),
+  };
+  const options = {
+    trustedMediaOrigins: ["http://localhost:3000"],
+    allowLoopbackHttpMediaOrigin: true,
+  };
+  assert.equal(validatePublicationSnapshotV1(snapshot, options).valid, true);
+  assert.equal(validatePublicationSnapshotV1(snapshot, { trustedMediaOrigins: options.trustedMediaOrigins }).valid, false);
+  assert.equal(validatePublicationSnapshotV1(snapshot, {
+    ...options,
+    trustedMediaOrigins: ["http://localhost:3001"],
+  }).valid, false);
 });
 
 test("contract validator flags broken citation references, synthetic demo DOIs, and unsupported Studio HTML nodes", () => {
@@ -188,6 +413,8 @@ test("bodyHtml representation derives accurate TOC headings, KaTeX math, and cit
     ...DEMO_ARTICLES[0],
     blocks: [],
     bodyHtml: sampleHtml,
+    keyConcepts: [{ title: "Beta-sheet rheology", definition: "A reviewed concise definition.", headingId: "custom-rheology-id" }],
+    editorialNotices: [{ id: "notice-render", type: "correction" as const, title: "Correction notice", body: "The publisher records a correction.", sourceUrl: "https://publisher.example/record", relatedArticleId: "related-origin", recordedAt: "2026-11-08T09:00:00Z" }],
   };
   const resolvedHeadings = resolveArticleHeadings(htmlOnlyArticle);
   assert.equal(resolvedHeadings.length, 2);
@@ -196,6 +423,7 @@ test("bodyHtml representation derives accurate TOC headings, KaTeX math, and cit
     React.createElement(ArticleReader, {
       article: htmlOnlyArticle,
       authors: DEMO_AUTHORS.slice(0, 1),
+      relatedArticles: [{ ...DEMO_ARTICLES[1], id: "related-origin", slug: "original-publication", title: "Original scientific article" }],
     })
   );
   assert.ok(
@@ -206,4 +434,6 @@ test("bodyHtml representation derives accurate TOC headings, KaTeX math, and cit
     staticMarkup.includes("#custom-rheology-id"),
     "ArticleReader TOC must link to canonical bodyHtml H2 IDs"
   );
+  assert.ok(staticMarkup.includes("Beta-sheet rheology") && staticMarkup.includes("A reviewed concise definition."), "ArticleReader renders authored concepts linked to the exact H2");
+  assert.ok(staticMarkup.includes("Correction notice") && staticMarkup.includes("https://publisher.example/record") && staticMarkup.includes("/article/original-publication"), "ArticleReader renders the supplied notice, source record, and public related article");
 });

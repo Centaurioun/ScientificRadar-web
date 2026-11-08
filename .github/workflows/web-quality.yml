@@ -16,8 +16,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '26.13.0'
-      - name: Install dependencies (lockfile gate still pending)
-        run: npm install --no-audit --no-fund
+          node-version: '24.22.2'
+      - name: Install dependencies from lockfile
+        run: npm ci --no-audit --no-fund
       - name: ESLint + TypeScript + unit tests + Next build
         run: npm run check

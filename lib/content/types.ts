@@ -36,6 +36,10 @@ export interface PublicSource {
   authors?: string;
   publication?: string;
   year?: string;
+  volume?: string;
+  issue?: string;
+  pages?: string;
+  articleNumber?: string;
   href?: string;
   /**
    * Authentic DOI only when referencing a real foundational concept or explicitly null
@@ -44,6 +48,20 @@ export interface PublicSource {
   doi?: string;
   isIllustrativeDemo: boolean;
   note?: string;
+}
+
+/** Public, reviewed link derived from a Studio KnowledgeLink record. */
+export interface PublicKnowledgeLink {
+  id: string;
+  targetType: "internal" | "wikipedia";
+  targetUrl: string;
+  targetArticleId?: string;
+  locale: SupportedLocale;
+  previewTitle: string;
+  previewExcerpt: string;
+  sourceAttribution: string;
+  reviewStatus: "approved" | "suggested" | "rejected";
+  isSampleDemoData: boolean;
 }
 
 export interface PublicMedia {
@@ -56,6 +74,17 @@ export interface PublicMedia {
   credit: string;
   rightsVerified: boolean;
   license: string;
+  /**
+   * Server-resolvable evidence binding for production publication. Evidence is
+   * optional for demo and legacy parsing, but must match this exact media ID,
+   * revision, and license before a newly published snapshot is accepted.
+   */
+  rightsEvidence?: {
+    evidenceId: string;
+    mediaId: string;
+    assetRevisionId: string;
+    license: string;
+  };
 }
 
 export interface PublicAuthor {
@@ -167,7 +196,18 @@ export interface PublicArticle {
    */
   bodyHtml?: string;
   sources: PublicSource[];
+  knowledgeLinks?: PublicKnowledgeLink[];
   relatedIds: string[];
+  keyConcepts?: Array<{ title: string; definition: string; headingId: string }>;
+  editorialNotices?: Array<{
+    id: string;
+    type: "correction" | "retraction" | "updated-information";
+    title: string;
+    body: string;
+    relatedArticleId?: string;
+    sourceUrl?: string;
+    recordedAt: string;
+  }>;
   seo?: {
     title?: string;
     description?: string;
@@ -177,6 +217,7 @@ export interface PublicArticle {
   revisionId?: string;
   revisionNumber?: number;
   translationGroupId?: string;
+  seriesId?: string;
   withdrawnAt?: string;
   withdrawalReason?: string;
 }
@@ -184,6 +225,10 @@ export interface PublicArticle {
 /**
  * Versioned Studio -> Web Publication Snapshot Contract (v1.0.0).
  * Represents an immutable, reviewed, server-verifiable article snapshot.
+ * Optional `rightsEvidence`, `seriesId`, and `knowledgeLinks` extensions are
+ * additive for older records. Demo/legacy records can omit them; newly
+ * published media requires bound `rightsEvidence`, and any included Knowledge
+ * Link is validated fail-closed.
  */
 export interface PublishedSnapshotRecordV1 {
   contractVersion: typeof PUBLICATION_CONTRACT_VERSION;
@@ -193,6 +238,7 @@ export interface PublishedSnapshotRecordV1 {
   slug: string;
   locale: SupportedLocale;
   translationGroupId?: string;
+  seriesId?: string;
   editorialType: EditorialType;
   status: PublicationStatus;
   title: string;
@@ -215,7 +261,18 @@ export interface PublishedSnapshotRecordV1 {
   bodyHtml?: string;
   headings?: ArticleHeadingOutlineItem[];
   sources: PublicSource[];
+  knowledgeLinks?: PublicKnowledgeLink[];
   relatedIds: string[];
+  keyConcepts?: Array<{ title: string; definition: string; headingId: string }>;
+  editorialNotices?: Array<{
+    id: string;
+    type: "correction" | "retraction" | "updated-information";
+    title: string;
+    body: string;
+    relatedArticleId?: string;
+    sourceUrl?: string;
+    recordedAt: string;
+  }>;
   seo?: {
     title?: string;
     description?: string;

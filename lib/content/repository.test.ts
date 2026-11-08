@@ -65,6 +65,20 @@ test("search returns empty array on unmatched query without throwing", async () 
   assert.equal(empty.length, 0);
 });
 
+test("demo related reading has no arbitrary fallback and preserves locale plus editorial order", async () => {
+  const primary = { ...DEMO_ARTICLES[0], categorySlug: "no-public-category", relatedIds: [] };
+  assert.deepEqual(await contentRepository.getRelatedArticles(primary, 3), []);
+
+  const explicit = DEMO_ARTICLES.find((article) => article.id === DEMO_ARTICLES[0].relatedIds[0]);
+  if (explicit) {
+    const result = await contentRepository.getRelatedArticles(DEMO_ARTICLES[0], 3);
+    assert.equal(result[0]?.id, explicit.id);
+    assert.ok(result.every((article) => article.locale === DEMO_ARTICLES[0].locale));
+    assert.equal((await contentRepository.getRelatedArticles(DEMO_ARTICLES[0], 1)).length, 1);
+    assert.equal((await contentRepository.getRelatedArticles(DEMO_ARTICLES[0], 2)).length, 2);
+  }
+});
+
 test("no fixture source fabricates a synthetic DOI claiming to be real", () => {
   for (const article of DEMO_ARTICLES) {
     for (const src of article.sources) {

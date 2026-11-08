@@ -8,14 +8,11 @@ import EditorialCard from "@/components/editorial/EditorialCard";
 import { contentRepository } from "@/lib/content/repository";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
+export const dynamic = "force-dynamic";
+
 interface TopicSlugPageProps {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ sub?: string }>;
-}
-
-export async function generateStaticParams() {
-  const categories = await contentRepository.getCategories();
-  return categories.map((c) => ({ slug: c.slug }));
 }
 
 export async function generateMetadata({
