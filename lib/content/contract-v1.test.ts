@@ -44,6 +44,32 @@ test("all existing Stage A demo fixtures pass PublicationSnapshotV1 validation",
   }
 });
 
+test("v1.0.0 additive scientific metadata round-trips and rejects invalid anchors, dates, and bibliography", () => {
+  const article = DEMO_ARTICLES[0];
+  const base = adaptPublicArticleToSnapshotV1(article);
+  const heading = base.headings?.find((item) => item.level === 2);
+  assert.ok(heading, "fixture should have a stable H2 anchor");
+  const valid = {
+    ...base,
+    keyConcepts: [{ title: "Reviewed term", definition: "Definition from the reviewed article text.", headingId: heading.id }],
+    editorialNotices: [{ id: "notice-1", type: "correction" as const, title: "Correction", body: "A published correction record.", sourceUrl: "https://publisher.example/correction", recordedAt: "2026-11-08T09:00:00Z" }],
+    sources: [{ ...base.sources[0], volume: "12", issue: "3", pages: "45–52", articleNumber: "e123" }, ...base.sources.slice(1)],
+  };
+  assert.equal(validatePublicationSnapshotV1(valid).valid, true);
+  const roundTrip = adaptSnapshotV1ToPublicArticle(valid);
+  assert.deepEqual(roundTrip.keyConcepts, valid.keyConcepts);
+  assert.deepEqual(roundTrip.editorialNotices, valid.editorialNotices);
+  assert.equal(roundTrip.sources[0].pages, "45–52");
+
+  assert.equal(validatePublicationSnapshotV1({ ...valid, keyConcepts: [{ ...valid.keyConcepts[0], headingId: "removed-heading" }] }).valid, false);
+  assert.equal(validatePublicationSnapshotV1({ ...valid, keyConcepts: [valid.keyConcepts[0], valid.keyConcepts[0]] }).valid, false);
+  assert.equal(validatePublicationSnapshotV1({ ...valid, editorialNotices: [{ ...valid.editorialNotices[0], recordedAt: "not-a-date" }] }).valid, false);
+  assert.equal(validatePublicationSnapshotV1({ ...valid, sources: [{ ...valid.sources[0], pages: "<script>" }, ...valid.sources.slice(1)] }).valid, false);
+  assert.equal(validatePublicationSnapshotV1({ ...valid, relatedIds: ["duplicate", "duplicate"] }).valid, false);
+  assert.equal(validatePublicationSnapshotV1({ ...valid, relatedIds: [valid.articleId] }).valid, false);
+  assert.equal(validatePublicationSnapshotV1({ ...valid, locale: "fr" }).valid, false);
+});
+
 test("PublicationSnapshotV1 supports both English (en) and Turkish (tr) locales and round-trips cleanly", () => {
   const base = adaptPublicArticleToSnapshotV1(DEMO_ARTICLES[0]);
   const trSnapshot = {
@@ -387,6 +413,8 @@ test("bodyHtml representation derives accurate TOC headings, KaTeX math, and cit
     ...DEMO_ARTICLES[0],
     blocks: [],
     bodyHtml: sampleHtml,
+    keyConcepts: [{ title: "Beta-sheet rheology", definition: "A reviewed concise definition.", headingId: "custom-rheology-id" }],
+    editorialNotices: [{ id: "notice-render", type: "correction" as const, title: "Correction notice", body: "The publisher records a correction.", sourceUrl: "https://publisher.example/record", relatedArticleId: "related-origin", recordedAt: "2026-11-08T09:00:00Z" }],
   };
   const resolvedHeadings = resolveArticleHeadings(htmlOnlyArticle);
   assert.equal(resolvedHeadings.length, 2);
@@ -395,6 +423,7 @@ test("bodyHtml representation derives accurate TOC headings, KaTeX math, and cit
     React.createElement(ArticleReader, {
       article: htmlOnlyArticle,
       authors: DEMO_AUTHORS.slice(0, 1),
+      relatedArticles: [{ ...DEMO_ARTICLES[1], id: "related-origin", slug: "original-publication", title: "Original scientific article" }],
     })
   );
   assert.ok(
@@ -405,4 +434,6 @@ test("bodyHtml representation derives accurate TOC headings, KaTeX math, and cit
     staticMarkup.includes("#custom-rheology-id"),
     "ArticleReader TOC must link to canonical bodyHtml H2 IDs"
   );
+  assert.ok(staticMarkup.includes("Beta-sheet rheology") && staticMarkup.includes("A reviewed concise definition."), "ArticleReader renders authored concepts linked to the exact H2");
+  assert.ok(staticMarkup.includes("Correction notice") && staticMarkup.includes("https://publisher.example/record") && staticMarkup.includes("/article/original-publication"), "ArticleReader renders the supplied notice, source record, and public related article");
 });

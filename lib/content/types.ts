@@ -36,6 +36,10 @@ export interface PublicSource {
   authors?: string;
   publication?: string;
   year?: string;
+  volume?: string;
+  issue?: string;
+  pages?: string;
+  articleNumber?: string;
   href?: string;
   /**
    * Authentic DOI only when referencing a real foundational concept or explicitly null
@@ -194,6 +198,16 @@ export interface PublicArticle {
   sources: PublicSource[];
   knowledgeLinks?: PublicKnowledgeLink[];
   relatedIds: string[];
+  keyConcepts?: Array<{ title: string; definition: string; headingId: string }>;
+  editorialNotices?: Array<{
+    id: string;
+    type: "correction" | "retraction" | "updated-information";
+    title: string;
+    body: string;
+    relatedArticleId?: string;
+    sourceUrl?: string;
+    recordedAt: string;
+  }>;
   seo?: {
     title?: string;
     description?: string;
@@ -249,6 +263,16 @@ export interface PublishedSnapshotRecordV1 {
   sources: PublicSource[];
   knowledgeLinks?: PublicKnowledgeLink[];
   relatedIds: string[];
+  keyConcepts?: Array<{ title: string; definition: string; headingId: string }>;
+  editorialNotices?: Array<{
+    id: string;
+    type: "correction" | "retraction" | "updated-information";
+    title: string;
+    body: string;
+    relatedArticleId?: string;
+    sourceUrl?: string;
+    recordedAt: string;
+  }>;
   seo?: {
     title?: string;
     description?: string;

@@ -165,10 +165,11 @@ class InMemoryDemoContentRepository implements PublishedContentRepository {
     limit = 3
   ): Promise<PublicArticle[]> {
     const visible = DEMO_ARTICLES.filter(
-      (a) => isPubliclyVisibleArticle(a) && a.id !== article.id
+      (a) => isPubliclyVisibleArticle(a) && a.id !== article.id && a.locale === article.locale
     );
 
-    const explicit = article.relatedIds
+    const relatedIds = [...article.relatedIds, ...(article.editorialNotices ?? []).map((notice) => notice.relatedArticleId).filter((id): id is string => Boolean(id))];
+    const explicit = relatedIds
       .map((id) => visible.find((a) => a.id === id))
       .filter((a): a is PublicArticle => Boolean(a));
 
@@ -178,13 +179,12 @@ class InMemoryDemoContentRepository implements PublishedContentRepository {
         !explicit.some((e) => e.id === a.id)
     );
 
-    const fallback = visible.filter(
-      (a) =>
-        !explicit.some((e) => e.id === a.id) &&
-        !sameCategory.some((s) => s.id === a.id)
-    );
+    const sameSeries = article.seriesId
+      ? visible.filter((a) => a.seriesId === article.seriesId && !explicit.some((e) => e.id === a.id))
+      : [];
 
-    return [...explicit, ...sameCategory, ...fallback].slice(0, limit);
+    return [...explicit, ...sameSeries, ...sameCategory.filter((a) => !sameSeries.some((s) => s.id === a.id))]
+      .slice(0, Math.max(0, limit));
   }
 }
 

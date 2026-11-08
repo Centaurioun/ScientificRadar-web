@@ -13,12 +13,18 @@ function publishedSnapshot({
   status = "published",
   relatedIds = [],
   seriesId,
+  locale = "en",
+  categorySlug = DEMO_ARTICLES[0].categorySlug,
+  editorialNotices = [],
 }: {
   id: string;
   slug: string;
   status?: "published" | "draft" | "in_review";
   relatedIds?: string[];
   seriesId?: string;
+  locale?: "en" | "tr";
+  categorySlug?: string;
+  editorialNotices?: PublishedSnapshotRecordV1["editorialNotices"];
 }): PublishedSnapshotRecordV1 {
   const article = {
     ...DEMO_ARTICLES[0],
@@ -27,6 +33,9 @@ function publishedSnapshot({
     status,
     relatedIds,
     seriesId,
+    locale,
+    categorySlug,
+    editorialNotices,
     revisionId: `test-only-revision-${id}`,
   };
   const snapshot = adaptPublicArticleToSnapshotV1(article, DEMO_AUTHORS);
@@ -129,6 +138,30 @@ test("published related articles resolve only active catalog IDs and prioritize 
 
   const related = await repository.getRelatedArticles(primaryArticle, 3);
   assert.deepEqual(related.map((article) => article.id), ["explicit-id", "series-id"]);
+});
+
+test("related reading uses only same-locale approved relations and relevant category or series recommendations", async () => {
+  const primary = publishedSnapshot({ id: "primary", slug: "primary", relatedIds: ["explicit"], categorySlug: "primary-category" });
+  const explicit = publishedSnapshot({ id: "explicit", slug: "explicit", categorySlug: "other" });
+  const category = publishedSnapshot({ id: "category", slug: "category", categorySlug: "primary-category" });
+  const foreignLocale = publishedSnapshot({ id: "tr-only", slug: "tr-only", categorySlug: "other", locale: "tr" });
+  const unrelated = publishedSnapshot({ id: "unrelated", slug: "unrelated", categorySlug: "different" });
+  const repository = new PublishedSnapshotContentRepository("https://studio.example.test", mockFetch([primary, explicit, category, foreignLocale, unrelated], []));
+  const article = { ...DEMO_ARTICLES[0], id: "primary", relatedIds: ["explicit"], categorySlug: "primary-category" };
+  assert.deepEqual((await repository.getRelatedArticles(article, 4)).map(({ id }) => id), ["explicit", "category"]);
+  assert.deepEqual(await repository.getRelatedArticles({ ...article, relatedIds: [], categorySlug: "none" }, 4), []);
+  assert.deepEqual((await repository.getRelatedArticles(article, 0)), []);
+});
+
+test("notice relationships resolve only public same-locale destinations and cap ordered results at the requested maximum", async () => {
+  const primary = publishedSnapshot({ id: "notice-primary", slug: "notice-primary", editorialNotices: [{ id: "notice", type: "correction", title: "Correction", body: "Publisher record.", relatedArticleId: "notice-target", recordedAt: "2026-11-08T09:00:00Z" }] });
+  const target = publishedSnapshot({ id: "notice-target", slug: "notice-target", categorySlug: "elsewhere" });
+  const unrelated = ["a", "b", "c", "d"].map((id) => publishedSnapshot({ id, slug: id, categorySlug: "elsewhere" }));
+  const repository = new PublishedSnapshotContentRepository("https://studio.example.test", mockFetch([primary, target, ...unrelated], []));
+  const article = { ...DEMO_ARTICLES[0], id: "notice-primary", categorySlug: "none", relatedIds: [], editorialNotices: primary.editorialNotices };
+  assert.deepEqual((await repository.getRelatedArticles(article)).map(({ id }) => id), ["notice-target"]);
+  const ordered = await repository.getRelatedArticles({ ...article, relatedIds: ["c", "a", "b", "d"] }, 3);
+  assert.deepEqual(ordered.map(({ id }) => id), ["c", "a", "b"]);
 });
 
 test("internal Knowledge Links survive only when their target article is active and matches the exact route", async () => {

@@ -166,8 +166,11 @@ export class PublishedSnapshotContentRepository implements PublishedContentRepos
   }
 
   async getRelatedArticles(article: PublicArticle, limit = 3): Promise<PublicArticle[]> {
-    const visible = (await this.loadPublicArticles()).filter((candidate) => candidate.id !== article.id);
-    const explicit = article.relatedIds
+    const visible = (await this.loadPublicArticles()).filter(
+      (candidate) => candidate.id !== article.id && candidate.locale === article.locale
+    );
+    const relatedIds = [...article.relatedIds, ...(article.editorialNotices ?? []).map((notice) => notice.relatedArticleId).filter((id): id is string => Boolean(id))];
+    const explicit = relatedIds
       .map((id) => visible.find((candidate) => candidate.id === id))
       .filter((candidate): candidate is PublicArticle => Boolean(candidate));
     const selected = new Set(explicit.map((candidate) => candidate.id));
@@ -177,7 +180,7 @@ export class PublishedSnapshotContentRepository implements PublishedContentRepos
     for (const candidate of sameSeries) selected.add(candidate.id);
     const sameCategory = visible.filter((candidate) => candidate.categorySlug === article.categorySlug && !selected.has(candidate.id));
     for (const candidate of sameCategory) selected.add(candidate.id);
-    return [...explicit, ...sameSeries, ...sameCategory, ...visible.filter((candidate) => !selected.has(candidate.id))].slice(0, limit);
+    return [...explicit, ...sameSeries, ...sameCategory].slice(0, Math.max(0, limit));
   }
 }
 

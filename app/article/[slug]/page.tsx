@@ -86,6 +86,7 @@ export default async function ArticlePage({
             trustedImageOrigins={studioPublishingUrl ? [studioPublishingUrl] : []}
             initialMeasure={initialMeasure}
             showReviewControls={showReviewControls}
+            relatedArticles={relatedArticles}
           />
         </article>
 

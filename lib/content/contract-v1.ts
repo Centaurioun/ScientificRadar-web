@@ -41,6 +41,8 @@ export interface SnapshotValidationIssue {
     | "UNSAFE_SOURCE_URL"
     | "INVALID_SCIENTIFIC_METADATA"
     | "BROKEN_CITATION_REFERENCE"
+    | "INVALID_KEY_CONCEPT"
+    | "INVALID_EDITORIAL_NOTICE"
     | "UNSUPPORTED_STUDIO_NODE"
     | "EMPTY_ARTICLE_BODY";
   field: string;
@@ -310,6 +312,11 @@ export function validatePublicationSnapshotV1(
       });
     }
   }
+  for (const field of ["keyConcepts", "editorialNotices"] as const) {
+    if (input[field] !== undefined && !Array.isArray(input[field])) {
+      return emptyResult({ code: "INVALID_SNAPSHOT_SHAPE", field, message: `Optional snapshot field "${field}" must be an array when present.` });
+    }
+  }
   if (
     !(input.blocks as unknown[]).every((block) => isRecord(block) && typeof block.type === "string") ||
     !(input.sources as unknown[]).every((source) => isRecord(source) && typeof source.id === "string") ||
@@ -550,6 +557,12 @@ export function validatePublicationSnapshotV1(
         message: `Illustrative demo source "${source.id}" must not fabricate a DOI.`,
       });
     }
+    for (const field of ["volume", "issue", "pages", "articleNumber"] as const) {
+      const value = source[field];
+      if (value !== undefined && (typeof value !== "string" || !value.trim() || value.length > 80 || /[<>\u0000-\u001f]/.test(value))) {
+        issues.push({ code: "INVALID_SCIENTIFIC_METADATA", field: `sources[${idx}].${field}`, message: `Bibliographic ${field} must be concise plain text when present.` });
+      }
+    }
     if (!source.isIllustrativeDemo && typeof source.doi === "string") {
       if (!DOI_REGEX.test(source.doi.trim())) {
         issues.push({
@@ -747,18 +760,35 @@ export function validatePublicationSnapshotV1(
     }
   }
 
-  const headings =
-    snapshot.headings && snapshot.headings.length > 0
-      ? snapshot.headings
-      : hasBodyHtml && snapshot.bodyHtml
-        ? prepareCanonicalBodyHtml(snapshot.bodyHtml, {
-            sources: snapshot.sources,
-          }).headings
-        : resolveArticleHeadings({
-            blocks: snapshot.blocks ?? [],
-            bodyHtml: snapshot.bodyHtml,
-            sources: snapshot.sources ?? [],
-          });
+  // Recompute anchors from the sanitized published body. A producer-supplied
+  // outline is a navigation convenience, never authority for concept links.
+  const headings = hasBodyHtml && snapshot.bodyHtml
+    ? prepareCanonicalBodyHtml(snapshot.bodyHtml, { sources: snapshot.sources }).headings
+    : resolveArticleHeadings({ blocks: snapshot.blocks ?? [], bodyHtml: snapshot.bodyHtml, sources: snapshot.sources ?? [] });
+
+  const headingIds = new Set(headings.map((heading) => heading.id));
+  const conceptIds = new Set<string>();
+  for (const [idx, concept] of (snapshot.keyConcepts ?? []).entries()) {
+    if (!concept || typeof concept.title !== "string" || !concept.title.trim() || concept.title.length > 120 ||
+      typeof concept.definition !== "string" || !concept.definition.trim() || concept.definition.length > 500 ||
+      typeof concept.headingId !== "string" || !headingIds.has(concept.headingId) || conceptIds.has(concept.headingId)) {
+      issues.push({ code: "INVALID_KEY_CONCEPT", field: `keyConcepts[${idx}]`, message: "Key concepts require concise title and definition text and a unique existing H2 heading anchor." });
+    } else conceptIds.add(concept.headingId);
+  }
+  if ((snapshot.keyConcepts?.length ?? 0) > 3) {
+    issues.push({ code: "INVALID_KEY_CONCEPT", field: "keyConcepts", message: "At most three contextual key concepts may be published." });
+  }
+  const noticeIds = new Set<string>();
+  for (const [idx, notice] of (snapshot.editorialNotices ?? []).entries()) {
+    const validUrl = notice?.sourceUrl === undefined || (typeof notice.sourceUrl === "string" && isSafeSourceUrl(notice.sourceUrl));
+    if (!notice || typeof notice.id !== "string" || !notice.id.trim() || noticeIds.has(notice.id) ||
+      !["correction", "retraction", "updated-information"].includes(notice.type) ||
+      typeof notice.title !== "string" || !notice.title.trim() || typeof notice.body !== "string" || !notice.body.trim() ||
+      typeof notice.recordedAt !== "string" || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/.test(notice.recordedAt) || !Number.isFinite(Date.parse(notice.recordedAt)) || !validUrl ||
+      (notice.relatedArticleId !== undefined && (typeof notice.relatedArticleId !== "string" || !notice.relatedArticleId.trim()))) {
+      issues.push({ code: "INVALID_EDITORIAL_NOTICE", field: `editorialNotices[${idx}]`, message: "Editorial notices require a unique ID, supported type, reviewed title and body, valid recordedAt date, and safe optional source/relationship fields." });
+    } else noticeIds.add(notice.id);
+  }
 
   const isPublicStatus = PUBLIC_STATUSES.has(snapshot.status);
   const hasBlockingIssues = issues.length > 0;
@@ -812,6 +842,8 @@ export function adaptSnapshotV1ToPublicArticle(
     bodyHtml: snapshot.bodyHtml,
     sources: snapshot.sources,
     relatedIds: snapshot.relatedIds,
+    keyConcepts: snapshot.keyConcepts,
+    editorialNotices: snapshot.editorialNotices,
     seo: snapshot.seo,
     revisionId: snapshot.revisionId,
     revisionNumber: snapshot.revisionNumber,
@@ -862,6 +894,8 @@ export function adaptPublicArticleToSnapshotV1(
     sources: article.sources as PublicSource[],
     knowledgeLinks: article.knowledgeLinks,
     relatedIds: [...article.relatedIds],
+    keyConcepts: article.keyConcepts,
+    editorialNotices: article.editorialNotices,
     seo: article.seo,
   };
 }

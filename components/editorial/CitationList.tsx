@@ -53,6 +53,9 @@ export default function CitationList({ sources }: CitationListProps) {
                   <em className="italic">{source.publication}</em>
                 )}
                 {source.year && <span> ({source.year}).</span>}
+                {(source.volume || source.issue || source.pages || source.articleNumber) && (
+                  <span>{" "}{source.volume && `vol. ${source.volume}`}{source.issue && `, no. ${source.issue}`}{source.pages && `, pp. ${source.pages}`}{source.articleNumber && `, article ${source.articleNumber}`}</span>
+                )}
               </div>
 
               <div className="flex items-center flex-wrap gap-2 text-[11.5px] text-[var(--sr-muted)]">

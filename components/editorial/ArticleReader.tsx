@@ -26,6 +26,7 @@ interface ArticleReaderProps {
   trustedImageOrigins?: string[];
   initialMeasure?: ReadingMeasureOption;
   showReviewControls?: boolean;
+  relatedArticles?: PublicArticle[];
 }
 
 interface ResponsiveArticleTocProps {
@@ -142,6 +143,7 @@ export default function ArticleReader({
   trustedImageOrigins = [],
   initialMeasure = "700",
   showReviewControls = false,
+  relatedArticles = [],
 }: ArticleReaderProps) {
   const [measure, setMeasure] = useState<ReadingMeasureOption>(initialMeasure);
 
@@ -273,6 +275,30 @@ export default function ArticleReader({
 
         {/* Central Article Body Column — unified Framer-tested reader interactions */}
         <CitationInteractions sources={article.sources}>
+          {article.editorialNotices?.map((notice) => (
+            <aside key={notice.id} aria-label={`${notice.type} notice`} className={`mb-6 border-l-4 p-4 sm:p-5 ${notice.type === "retraction" ? "border-red-700 bg-red-50" : "border-[var(--sr-accent)] bg-[var(--sr-surface)]"}`}>
+              <p className="text-xs font-semibold uppercase tracking-wider text-[var(--sr-muted)]">
+                {notice.type === "updated-information" ? "Updated scientific information" : notice.type === "retraction" ? "Retraction notice" : "Correction notice"} · {notice.recordedAt.slice(0, 10)}
+              </p>
+              <h2 className="mt-1 font-editorial text-lg font-bold text-[var(--sr-ink)]">{notice.title}</h2>
+              <p className="mt-2 text-sm leading-relaxed text-[var(--sr-ink-secondary)]">{notice.body}</p>
+              <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm font-medium text-[var(--sr-accent)]">
+                {notice.sourceUrl && <a href={notice.sourceUrl} target={notice.sourceUrl.startsWith("/") ? undefined : "_blank"} rel={notice.sourceUrl.startsWith("/") ? undefined : "noopener noreferrer"} className="underline">View publication record</a>}
+                {notice.relatedArticleId && relatedArticles.find((related) => related.id === notice.relatedArticleId) && (() => {
+                  const related = relatedArticles.find((candidate) => candidate.id === notice.relatedArticleId)!;
+                  return <a href={`/article/${encodeURIComponent(related.slug)}`} className="underline">Related publication: {related.title}</a>;
+                })()}
+              </div>
+            </aside>
+          ))}
+          {!!article.keyConcepts?.length && (
+            <section aria-labelledby="key-concepts-heading" className="mb-8 rounded-sm border border-[var(--sr-rule)] bg-[var(--sr-surface)] p-4 sm:p-5">
+              <h2 id="key-concepts-heading" className="font-sans text-xs font-semibold uppercase tracking-wider text-[var(--sr-accent)]">Key concepts</h2>
+              <dl className="mt-3 grid gap-3 sm:grid-cols-2">
+                {article.keyConcepts.map((concept) => <div key={concept.headingId}><dt className="font-semibold text-[var(--sr-ink)]"><a className="underline decoration-[var(--sr-rule)] underline-offset-2" href={`#${concept.headingId}`}>{concept.title}</a></dt><dd className="mt-1 text-sm leading-relaxed text-[var(--sr-ink-secondary)]">{concept.definition}</dd></div>)}
+              </dl>
+            </section>
+          )}
           <ResponsiveArticleToc
             headings={headings}
             sourceCount={article.sources.length}
