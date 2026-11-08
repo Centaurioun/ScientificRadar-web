@@ -99,27 +99,76 @@ function safeHref(value: string): boolean {
   }
 }
 
-function safeSrc(value: string, trustedSources: ReadonlySet<string>): boolean {
+function isTrustedImageOrigin(value: string): string | null {
+  try {
+    const parsed = new URL(value);
+    const loopbackHosts = new Set(["localhost", "127.0.0.1", "[::1]"]);
+    const protocolAllowed = parsed.protocol === "https:" ||
+      (parsed.protocol === "http:" && loopbackHosts.has(parsed.hostname));
+    if (
+      !protocolAllowed ||
+      parsed.origin !== value ||
+      parsed.username ||
+      parsed.password ||
+      parsed.pathname !== "/" ||
+      parsed.search ||
+      parsed.hash
+    ) {
+      return null;
+    }
+    return parsed.origin;
+  } catch {
+    return null;
+  }
+}
+
+function safeSrc(
+  value: string,
+  trustedSources: ReadonlySet<string>,
+  trustedOrigins: ReadonlySet<string>
+): boolean {
   const src = value.trim();
   if (src.startsWith("/") && !src.startsWith("//") && !src.startsWith("/\\")) {
     return true;
   }
-  return trustedSources.has(src);
+  if (trustedSources.has(src)) return true;
+
+  try {
+    const parsed = new URL(src);
+    return (
+      !parsed.username &&
+      !parsed.password &&
+      (parsed.protocol === "https:" ||
+        (parsed.protocol === "http:" &&
+          ["localhost", "127.0.0.1", "[::1]"].includes(parsed.hostname))) &&
+      trustedOrigins.has(parsed.origin)
+    );
+  } catch {
+    return false;
+  }
 }
 
 /**
  * Parser-based sanitizer for article bodyHtml.
  *
  * All attributes are filtered on their specific tag, even after DOMPurify.
- * An image is limited to same-origin local paths unless it appears in an
- * explicit, separately verified list of published media asset URLs.
+ * An image is limited to same-origin local paths unless its exact URL appears
+ * in a separately verified asset list or its origin exactly matches a
+ * separately configured, validated media origin.
  * React must receive only this sanitized output, not raw draft HTML.
  */
 export function sanitizeCanonicalBodyHtml(
   rawHtml: string,
-  trustedImageSources: ReadonlySet<string> = new Set<string>()
+  trustedImageSources: ReadonlySet<string> = new Set<string>(),
+  trustedImageOrigins: ReadonlySet<string> = new Set<string>()
 ): string {
   if (!rawHtml) return "";
+
+  const normalizedTrustedOrigins = new Set(
+    [...trustedImageOrigins]
+      .map(isTrustedImageOrigin)
+      .filter((origin): origin is string => origin !== null)
+  );
 
   const fragment = DOMPurify.sanitize(rawHtml, {
     ALLOWED_TAGS,
@@ -139,7 +188,7 @@ export function sanitizeCanonicalBodyHtml(
       const valid =
         permitted &&
         (name !== "href" || safeHref(value)) &&
-        (name !== "src" || safeSrc(value, trustedImageSources)) &&
+        (name !== "src" || safeSrc(value, trustedImageSources, normalizedTrustedOrigins)) &&
         (name !== "id" || HTML_ID.test(value)) &&
         (name !== "target" || value === "_blank" || value === "_self") &&
         (name !== "data-text-align" || ["left", "center", "right", "justify"].includes(value)) &&
@@ -195,6 +244,7 @@ export function prepareCanonicalBodyHtml(
   options?: {
     sources?: PublicSource[];
     trustedImageSources?: ReadonlySet<string>;
+    trustedImageOrigins?: ReadonlySet<string>;
   }
 ): {
   html: string;
@@ -202,7 +252,8 @@ export function prepareCanonicalBodyHtml(
 } {
   const sanitized = sanitizeCanonicalBodyHtml(
     rawHtml,
-    options?.trustedImageSources
+    options?.trustedImageSources,
+    options?.trustedImageOrigins
   );
   if (!sanitized) {
     return { html: "", headings: [] };

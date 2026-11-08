@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { sanitizeCanonicalBodyHtml } from "./sanitizer";
+import { prepareCanonicalBodyHtml, sanitizeCanonicalBodyHtml } from "./sanitizer";
 
 test("encoded javascript URLs and unapproved attributes do not survive sanitization", () => {
   const dirty = [
@@ -37,4 +37,28 @@ test("trusted scientific markup, safe links and image records remain", () => {
   assert.match(result, /<table>/);
   assert.match(result, /noopener/);
   assert.match(result, /noreferrer/);
+});
+
+test("published body images are accepted only from an exact configured trusted origin", () => {
+  const source = "https://studio.example.test/media/revision-4/figure.webp";
+  const markup = `<figure><img src="${source}" alt="Verified figure"></figure>`;
+
+  const unconfigured = prepareCanonicalBodyHtml(markup);
+  assert.doesNotMatch(unconfigured.html, /studio\.example\.test/);
+
+  const configured = prepareCanonicalBodyHtml(markup, {
+    trustedImageOrigins: new Set(["https://studio.example.test"]),
+  });
+  assert.match(configured.html, /src="https:\/\/studio\.example\.test\/media\/revision-4\/figure\.webp"/);
+
+  const lookalike = prepareCanonicalBodyHtml(markup, {
+    trustedImageOrigins: new Set(["https://studio.example.test.attacker.invalid"]),
+  });
+  assert.doesNotMatch(lookalike.html, /studio\.example\.test\/media/);
+
+  const credentialed = prepareCanonicalBodyHtml(
+    '<img src="https://attacker@studio.example.test/media/figure.webp" alt="unsafe">',
+    { trustedImageOrigins: new Set(["https://studio.example.test"]) }
+  );
+  assert.doesNotMatch(credentialed.html, /src=/);
 });

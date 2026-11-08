@@ -23,6 +23,7 @@ import AuthorProfile from "./AuthorProfile";
 interface ArticleReaderProps {
   article: PublicArticle;
   authors: PublicAuthor[];
+  trustedImageOrigins?: string[];
   initialMeasure?: ReadingMeasureOption;
   showReviewControls?: boolean;
 }
@@ -138,13 +139,17 @@ export function ResponsiveArticleToc({
 export default function ArticleReader({
   article,
   authors,
+  trustedImageOrigins = [],
   initialMeasure = "700",
   showReviewControls = false,
 }: ArticleReaderProps) {
   const [measure, setMeasure] = useState<ReadingMeasureOption>(initialMeasure);
 
   const preparedHtml = article.bodyHtml
-    ? prepareCanonicalBodyHtml(article.bodyHtml, { sources: article.sources })
+    ? prepareCanonicalBodyHtml(article.bodyHtml, {
+        sources: article.sources,
+        trustedImageOrigins: new Set(trustedImageOrigins),
+      })
     : null;
 
   const blockHeadings = article.blocks.filter(
