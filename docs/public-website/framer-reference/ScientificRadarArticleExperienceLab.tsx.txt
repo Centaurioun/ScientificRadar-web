@@ -1,0 +1,296 @@
+import * as React from "react"
+import { addPropertyControls } from "framer"
+import { createPortal } from "react-dom"
+
+type Props = { style?: React.CSSProperties }
+type FontSetting = "small" | "default" | "large"
+const sections = [
+  { id: "srx-introduction", title: "Introduction", level: 2 },
+  { id: "srx-storage", title: "The Micellar Storage Paradox", level: 2 },
+  { id: "srx-duct", title: "Acidification and Shear", level: 2 },
+  { id: "srx-nanocrystals", title: "Two-Nanometer Crystals", level: 2 },
+  { id: "srx-bonds", title: "Sacrificial Hydrogen Bonds", level: 3 },
+  { id: "srx-outlook", title: "Toward Synthetic Silk", level: 2 },
+] as const
+const takeaways = [
+  "Storage stability: terminal spidroin domains help keep concentrated protein dope organized at neutral pH.",
+  "Microfluidic trigger: changes in acidity, ion composition and elongational flow promote fiber assembly.",
+  "Nanocomposite mechanics: beta-sheet nanocrystals reinforce a more flexible glycine-rich protein network.",
+]
+const image = "https://raw.githubusercontent.com/Centaurioun/ScientificRadar-web/main/public/images/demo/spider-silk-hierarchy.svg"
+
+type KnowledgeKey = "spidroin" | "beta" | "vent"
+const knowledge:Record<KnowledgeKey,{title:string;description:string;kind:"Wikipedia"|"ScientificRadar";href:string;note:string}>={
+ spidroin:{
+  title:"Spidroin",
+  description:"A family of large structural proteins produced by spiders and assembled into silk fibers. Their repetitive regions and terminal domains contribute to fiber formation.",
+  kind:"Wikipedia",
+  href:"https://en.wikipedia.org/wiki/Spidroin",
+  note:"Editor-selected short definition, not a live Wikipedia API extract."
+ },
+ beta:{
+  title:"Beta sheet",
+  description:"A recurring protein secondary-structure motif in which extended polypeptide strands are joined by inter-strand hydrogen bonds.",
+  kind:"Wikipedia",
+  href:"https://en.wikipedia.org/wiki/Beta_sheet",
+  note:"General scientific concept. Further details in the linked encyclopedia article."
+ },
+ vent:{
+  title:"Proton gradients in hydrothermal vents",
+  description:"A different scientific setting: alkaline vent and ocean-water interfaces have been studied as candidate environments for prebiotic carbon-fixation pathways.",
+  kind:"ScientificRadar",
+  href:"/article/alkaline-hydrothermal-vents-prebiotic-carbon-fixation",
+  note:"Related demo Explainer · Exact canonical Web slug · Not the same mechanism as spider silk spinning."
+ }
+}
+
+const editorialPath = [
+ {id:"art-spider-silk-01",slug:"spider-silk-hierarchical-protein-mechanics",title:"How Spiders Spin Liquid Protein Dope Into a Toughened Nanocomposite Fiber",kind:"Feature",stage:"1 · Start with natural materials",purpose:"Learn how a localized chemical environment helps assemble a natural fiber.",why:"The current article explains how pH, ionic conditions, and flow affect the organization of spidroins in silk production.",category:"Biology",current:true},
+ {id:"art-solid-state-battery-08",slug:"chemo-mechanical-dendrite-suppression-solid-state-electrolytes",title:"Stopping Lithium Filaments at Ceramic Grain Boundaries in Argyrodite Solid-State Batteries",kind:"News",stage:"2 · Compare an engineered interface",purpose:"Examine why boundaries between solids matter in an engineered material.",why:"The battery example examines lithium growth at a solid-solid interface, where current density and chemo-mechanical cracking matter. It is a comparison about interfaces—not the same mechanism as spider silk assembly.",category:"Chemistry",current:false},
+ {id:"art-prebiotic-vents-05",slug:"alkaline-hydrothermal-vents-prebiotic-carbon-fixation",title:"Proton Gradients Before Genes: How Deep-Sea Iron-Sulfide Chimneys May Have Driven Prebiotic Carbon Fixation",kind:"Explainer",stage:"3 · Explore a proposed geochemical setting",purpose:"Consider how natural mineral barriers could influence early-Earth chemistry.",why:"Alkaline vent hypotheses concern natural proton gradients across mineral interfaces and possible prebiotic pathways. They should not be read as a continuation or proof of the silk or battery mechanisms.",category:"Chemistry",current:false}
+] as const
+
+const css = [
+".srx{width:100%;min-width:0;background:#FAFAF8;color:#181c21;font:14px/1.5 Inter,Arial,sans-serif;-webkit-font-smoothing:antialiased}.srx *{box-sizing:border-box}.srx button{cursor:pointer;font:inherit}.srx button:focus-visible,.srx a:focus-visible{outline:3px solid #15747b;outline-offset:3px}.srx h1,.srx h2,.srx h3,.srx p{margin:0}",
+".srx .wrap{max-width:1180px;margin:0 auto;padding:0 25px}.srx .mast{border-bottom:1px solid #dce2e4}.srx .mast .wrap{min-height:70px;display:flex;align-items:center;justify-content:space-between;gap:12px}.srx .brand{font:800 clamp(22px,2.5vw,29px)/1 Merriweather,Georgia,serif;letter-spacing:-.05em}.srx .brand b{color:#15747b}.srx .lab{font-size:10px;color:#6a777b;text-align:right;letter-spacing:.09em;text-transform:uppercase}",
+".srx .head{max-width:810px;margin:0 auto;padding:45px 20px 28px;text-align:center}.srx .kicker{font:800 10px/1.5 Inter,Arial,sans-serif;color:#15747b;letter-spacing:.12em;text-transform:uppercase}.srx .type{display:inline-block;border:1px solid #b7d8d3;background:#e8f3ef;padding:6px 10px;border-radius:4px;letter-spacing:.06em;font-size:11px;font-weight:800;color:#0a6568}.srx h1{font:750 clamp(29px,3.5vw,43px)/1.18 Merriweather,Georgia,serif;letter-spacing:-.03em;margin:16px 0;overflow-wrap:break-word;text-wrap:balance}.srx .dek{font:400 clamp(15px,1.7vw,18px)/1.65 Merriweather,Georgia,serif;color:#41555c}.srx .meta{margin-top:22px;font-size:11px;color:#69767c}",
+".srx .hero{max-width:1040px;margin:6px auto 34px;padding:0 20px}.srx .hero img{width:100%;height:auto;display:block;max-height:510px;background:#102932;object-fit:contain;border:1px solid #dce2e4;border-radius:4px}.srx figcaption{padding-top:11px;color:#63747a;font-size:11px;line-height:1.6}",
+".srx .columns{display:grid;grid-template-columns:180px minmax(0,680px) 180px;gap:19px;justify-content:center;align-items:start}.srx .rail{position:sticky;top:24px;max-height:calc(100vh - 48px);overflow-y:auto;padding:12px 4px 10px 0}.srx .rail h2{font:800 10px Inter,Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;margin:0 0 15px}.srx .toc{list-style:none;padding:0 0 0 11px;margin:0;border-left:1px solid #ced8da}.srx .toc li{position:relative;margin:0 0 4px}.srx .toc li:before{content:'';position:absolute;width:7px;height:7px;border-radius:50%;border:1px solid #b0c3c5;background:#FAFAF8;top:15px;left:-15px}.srx .toc li.active:before{background:#15747b;border-color:#15747b;box-shadow:0 0 0 3px #e0efea}.srx .toc a{text-decoration:none;display:block;color:#66747a;font-size:11px;line-height:1.4;padding:9px 8px;border-radius:4px;overflow-wrap:anywhere}.srx .toc li.active a{background:#e5f1ee;color:#0c6269;font-weight:800}.srx .toc li.nested a{padding-left:17px;font-size:10px}",
+".srx .note{padding-top:15px;border-top:1px solid #dce2e4;margin-top:20px;color:#78858a;font-size:10px;line-height:1.6}.srx .main{min-width:0}.srx .summary{border:1px solid #c7dcd7;border-radius:7px;background:#edf4f0;padding:22px 24px;margin-bottom:22px}.srx .summary h2{font:700 22px/1.3 Merriweather,Georgia,serif;margin-bottom:10px}.srx .summary .small{font:10px Inter,Arial,sans-serif;color:#64767b}.srx .summary ul{padding-left:20px;margin:11px 0 0}.srx .summary li{margin:7px 0;color:#365057;font-size:13px;line-height:1.7}",
+".srx .tools{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border-block:1px solid #dce2e4;padding:12px 0;margin-bottom:25px}.srx .tools strong{font-size:12px;color:#43545b}.srx .size{display:flex;gap:4px;background:#fff;padding:3px;border:1px solid #d7e0e0;border-radius:5px}.srx .size button{border:0;background:transparent;border-radius:3px;min-width:45px;min-height:44px;font-weight:750;font-size:13px;color:#3a4b51}.srx .size button[aria-pressed=true]{background:#15747b;color:#fff}",
+".srx .mobile-toc{display:none;border:1px solid #dce2e4;background:#f2f1ec;border-radius:5px;margin-bottom:24px}.srx .mobile-toc>button{min-height:48px;display:flex;justify-content:space-between;width:100%;border:0;background:none;text-align:left;padding:13px 15px;font-weight:750}.srx .mobile-toc ul{margin:0;padding:12px 18px 14px 31px;border-top:1px solid #dce2e4}.srx .mobile-toc li{padding:5px 0}.srx .mobile-toc a{text-decoration:none;font-size:12px;color:#50616b}.srx .mobile-toc li.active a{font-weight:800;color:#0b6870}",
+".srx .prose{font-family:Merriweather,Georgia,serif;font-size:var(--reading-font,17px);line-height:1.9;color:#2e3b43}.srx .prose h2{font:700 clamp(21px,2.1vw,26px)/1.35 Merriweather,Georgia,serif;margin:36px 0 16px;scroll-margin-top:24px}.srx .prose h3{font:700 clamp(18px,1.8vw,22px)/1.4 Merriweather,Georgia,serif;margin:26px 0 14px;scroll-margin-top:24px}.srx .prose p{font-size:1em;line-height:1.88;margin:0 0 21px}.srx .prose blockquote{border-left:3px solid #15747b;background:#f2f1ec;margin:25px 0;padding:17px 20px;font-style:italic}.srx .footer{border-top:1px solid #dce2e4;margin-top:46px;padding:23px 0 40px;display:flex;gap:18px;flex-wrap:wrap;font-size:11px;color:#657479}",
+"@media(max-width:1150px){.srx .columns{grid-template-columns:minmax(0,700px)}.srx .rail,.srx .right{display:none}.srx .mobile-toc{display:block}.srx .concept-inline{display:block}.srx .wrap{padding:0 25px}}",
+"@media(max-width:520px){.srx .wrap{padding:0 16px}.srx .mast .wrap{min-height:64px}.srx .brand{font-size:22px}.srx .lab{max-width:120px;font-size:9px}.srx .head{padding:30px 15px 20px}.srx .hero{padding:0 15px;margin-bottom:26px}.srx h1{font-size:29px}.srx .summary{padding:18px 17px}.srx .summary h2{font-size:20px}.srx .summary li{font-size:12px}.srx .source-panel summary{flex-direction:column;align-items:flex-start}.srx .source-panel summary .status{text-align:left}}",
+"@media(prefers-reduced-motion:reduce){.srx *{scroll-behavior:auto!important;transition:none!important}}",
+".srx .source-panel{margin:0 0 23px;border:1px solid #dce2e4;background:#fff;border-radius:6px;overflow:hidden}.srx .source-panel summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 17px;font-size:12px;font-weight:800;color:#263b43}.srx .source-panel summary::-webkit-details-marker{display:none}.srx .source-panel summary .status{font:700 10px/1.4 Inter,Arial,sans-serif;color:#86581c;background:#fff5e7;border:1px solid #e9d8b7;padding:5px 8px;border-radius:3px;text-align:right}.srx .source-panel summary:focus-visible{outline:3px solid #15747b;outline-offset:-3px}.srx .source-body{padding:0 17px 16px;border-top:1px solid #e1e8e8;font:12px/1.75 Inter,Arial,sans-serif;color:#506169}.srx .source-body p{padding-top:11px}.srx .source-body strong{color:#213740}.srx .source-body .source-note{margin-top:11px;color:#856421;font-size:11px}",
+".srx .concept-card{border:1px solid #d0dedb;background:#fff;border-radius:6px;padding:16px 15px;color:#35494f;font:12px/1.65 Inter,Arial,sans-serif;box-shadow:0 8px 22px rgba(18,43,43,.04)}.srx .concept-card .label{font-size:10px;color:#15747b;font-weight:800;letter-spacing:.10em;text-transform:uppercase}.srx .concept-card h2{font:700 17px/1.35 Merriweather,Georgia,serif;color:#23343b;margin:9px 0}.srx .concept-card p{font:12px/1.67 Inter,Arial,sans-serif;color:#435b60;margin:0 0 9px}.srx .concept-card ul{padding-left:17px;margin:8px 0 0}.srx .concept-card li{margin:6px 0}.srx .concept-inline{display:none;margin:20px 0 25px}.srx .right{position:sticky;top:25px;max-height:calc(100vh - 50px);overflow-y:auto;padding-top:10px}.srx .knowledge-link{display:inline;border:0;border-bottom:1px dotted #15747b;background:#e7f2ef;color:#065d65;border-radius:3px;font:inherit;line-height:inherit;padding:0 2px;cursor:pointer;overflow-wrap:anywhere;box-decoration-break:clone;-webkit-box-decoration-break:clone}.srx .knowledge-link:hover,.srx .knowledge-link[aria-expanded=true]{background:#d0e9e4}.srx .related-note{font-style:italic;color:#536568;font-size:.94em}",
+"@media(max-width:1150px){.srx .concept-inline{display:block}}",
+".srx .path{border-top:2px solid #c5d8d4;margin-top:43px;padding-top:25px}.srx .path-kicker{color:#15747b;text-transform:uppercase;font:800 10px/1.4 Inter,Arial,sans-serif;letter-spacing:.12em}.srx .path-heading{color:#26343b;font:750 clamp(23px,2.4vw,29px)/1.3 Merriweather,Georgia,serif;margin:9px 0 10px!important}.srx .path-intro{color:#50646b;font:13px/1.7 Inter,Arial,sans-serif;max-width:640px;margin-bottom:23px!important}.srx .path-list{list-style:none;margin:0;padding:0;display:grid;gap:12px}.srx .path-card{min-width:0;display:grid;grid-template-columns:41px minmax(0,1fr);gap:14px;border:1px solid #d0dddb;border-radius:7px;background:#fff;padding:17px}.srx .path-card.current{background:#e9f3ef;border-color:#bcd8d2}.srx .path-number{width:37px;height:37px;border-radius:50%;display:grid;place-items:center;border:1px solid #b4d1cb;background:#f0f8f5;color:#0d6a72;font-size:15px;font-weight:800}.srx .path-card.current .path-number{background:#15747b;color:#fff}.srx .path-step{font:800 10px/1.4 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#15747b}.srx .path-title{font:750 clamp(16px,1.6vw,19px)/1.4 Merriweather,Georgia,serif;color:#253840;overflow-wrap:anywhere;margin:6px 0!important}.srx .path-meta{font:11px/1.5 Inter,Arial,sans-serif;color:#61767b}.srx .path-purpose{font:12px/1.65 Inter,Arial,sans-serif;color:#445b62;margin:9px 0!important}.srx .path-btn{min-height:44px;padding:10px 14px;border-radius:4px;border:1px solid #acd0c8;background:#eff8f5;color:#0b6670;font-size:12px;font-weight:800;margin-top:10px;text-align:left}.srx .path-detail{border-top:1px solid #d5e3e0;padding-top:13px;margin-top:12px;color:#455c60;font:12px/1.7 Inter,Arial,sans-serif}.srx .path-detail[hidden]{display:none}.srx .path-route{font:11px/1.6 Inter,Arial,sans-serif;color:#6a7c7f;overflow-wrap:anywhere;margin-top:8px}.srx .path-current-label{color:#147078;font:800 11px/1.5 Inter,Arial,sans-serif}.srx .path-footnote{margin-top:16px!important;font:11px/1.7 Inter,Arial,sans-serif;color:#6a7779}",
+"@media(max-width:520px){.srx .path-card{grid-template-columns:29px minmax(0,1fr);gap:11px;padding:14px 12px}.srx .path-number{width:29px;height:29px;font-size:12px}.srx .path-heading{font-size:22px}}",
+].join("")
+
+/**
+ * @framerSupportedLayoutWidth any
+ * @framerSupportedLayoutHeight auto
+ */
+export default function ScientificRadarArticleExperienceLab({style}:Props){
+ const [font,setFont]=React.useState<FontSetting>("default")
+ const [active,setActive]=React.useState<string>("srx-introduction")
+ const [open,setOpen]=React.useState(false)
+ const root=React.useRef<HTMLDivElement>(null)
+ const pendingMobileTarget=React.useRef<string|null>(null)
+
+ const [preview,setPreview]=React.useState<KnowledgeKey|null>(null)
+ const [openPathStep,setOpenPathStep]=React.useState<string|null>(null)
+ const suppressFocus=React.useRef(false)
+ const [position,setPosition]=React.useState({left:16,top:80})
+ const triggerRef=React.useRef<HTMLButtonElement|null>(null)
+ const popupRef=React.useRef<HTMLDivElement|null>(null)
+ const closingTimer=React.useRef<ReturnType<typeof setTimeout>|null>(null)
+ const cancelHide=()=>{if(closingTimer.current!==null){clearTimeout(closingTimer.current);closingTimer.current=null}}
+ const dismiss=(returnFocus:boolean)=>{cancelHide();setPreview(null);if(returnFocus&&triggerRef.current&&document.activeElement!==triggerRef.current){suppressFocus.current=true;requestAnimationFrame(()=>{triggerRef.current?.focus({preventScroll:true});requestAnimationFrame(()=>{suppressFocus.current=false})})}}
+ const deferHide=()=>{if(typeof document!=="undefined"&&(document.activeElement===triggerRef.current||popupRef.current?.contains(document.activeElement)))return;cancelHide();closingTimer.current=setTimeout(()=>setPreview(null),220)}
+ const showKnowledge=(key:KnowledgeKey,element:HTMLButtonElement)=>{
+  cancelHide()
+  triggerRef.current=element
+  const rect=element.getBoundingClientRect()
+  const width=Math.min(352,Math.max(220,window.innerWidth-24))
+  const left=Math.max(12,Math.min(window.innerWidth-width-12,rect.left))
+  setPosition({left,top:12})
+  setPreview(key)
+ }
+ React.useLayoutEffect(()=>{
+  if(!preview)return
+  const placePopup=()=>{
+   const popup=popupRef.current
+   const trigger=triggerRef.current
+   if(!popup||!trigger)return
+   const anchor=trigger.getBoundingClientRect()
+   const card=popup.getBoundingClientRect()
+   const margin=12
+   const gap=8
+   const left=Math.max(margin,Math.min(window.innerWidth-card.width-margin,anchor.left))
+   const below=window.innerHeight-anchor.bottom-margin
+   const above=anchor.top-margin
+   let top:number
+   if(below>=card.height+gap)top=anchor.bottom+gap
+   else if(above>=card.height+gap)top=anchor.top-card.height-gap
+   else top=Math.max(margin,Math.min(anchor.bottom+gap,window.innerHeight-card.height-margin))
+   setPosition(current=>Math.abs(current.left-left)<0.5&&Math.abs(current.top-top)<0.5?current:{left,top})
+  }
+  placePopup()
+  window.addEventListener("resize",placePopup)
+  return()=>window.removeEventListener("resize",placePopup)
+ },[preview])
+ const knowledgeButton=(key:KnowledgeKey,label:string)=><button type="button" className="knowledge-link" data-knowledge-trigger={key}
+  aria-label={"Explain "+label} aria-expanded={preview===key} aria-haspopup="dialog" aria-controls={preview===key?"srx-knowledge-popup":undefined}
+  onMouseEnter={e=>{if(window.matchMedia("(hover: hover) and (pointer: fine)").matches)showKnowledge(key,e.currentTarget)}}
+  onMouseLeave={deferHide}
+  onFocus={e=>{if(suppressFocus.current){suppressFocus.current=false;return}showKnowledge(key,e.currentTarget)}}
+  onClick={e=>{showKnowledge(key,e.currentTarget);if(e.detail===0)requestAnimationFrame(()=>popupRef.current?.querySelector<HTMLButtonElement>('button[aria-label="Close knowledge preview"]')?.focus())}}>{label}</button>
+ React.useEffect(()=>{
+  if(!preview)return
+  const onKey=(event:KeyboardEvent)=>{if(event.key==="Escape"){event.preventDefault();dismiss(true)}}
+  const onScroll=()=>dismiss(false)
+  const onFocusIn=(event:FocusEvent)=>{const node=event.target as Node|null;if(node&&(popupRef.current?.contains(node)||triggerRef.current?.contains(node)))return;dismiss(false)}
+  const onOutside=(event:PointerEvent)=>{
+   const node=event.target as Node|null
+   if(node&&popupRef.current?.contains(node))return
+   if(node&&triggerRef.current?.contains(node))return
+   dismiss(false)
+  }
+  document.addEventListener("keydown",onKey)
+  document.addEventListener("pointerdown",onOutside)
+  document.addEventListener("focusin",onFocusIn)
+  window.addEventListener("scroll",onScroll,true)
+  return()=>{document.removeEventListener("keydown",onKey);document.removeEventListener("pointerdown",onOutside);document.removeEventListener("focusin",onFocusIn);window.removeEventListener("scroll",onScroll,true)}
+ },[preview])
+ React.useEffect(()=>()=>cancelHide(),[])
+ const knowledgePopup=preview&&typeof document!=="undefined"&&createPortal(
+  <div id="srx-knowledge-popup" ref={popupRef} role="dialog" aria-modal={false} aria-label={knowledge[preview].title+" knowledge preview"} data-knowledge-popup={preview}
+   onMouseEnter={cancelHide} onMouseLeave={deferHide}
+   style={{position:"fixed",left:position.left,top:position.top,zIndex:2147483500,width:"min(352px,calc(100vw - 24px))",
+    maxHeight:"min(70vh,340px)",overflowY:"auto",boxSizing:"border-box",background:"#fff",border:"1px solid #b9d6d3",borderRadius:7,
+    padding:18,boxShadow:"0 17px 48px rgba(15,35,42,.24)",color:"#24383e",fontFamily:"Inter,Arial,sans-serif"}}>
+   <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
+    <span style={{fontSize:10,letterSpacing:".09em",color:"#15747b",fontWeight:800,textTransform:"uppercase"}}>{knowledge[preview].kind} · Selected knowledge link</span>
+    <button type="button" onClick={()=>dismiss(true)} aria-label="Close knowledge preview" style={{border:0,background:"#f2f1ec",borderRadius:4,padding:"6px 10px",cursor:"pointer",minHeight:44,minWidth:44}}>×</button>
+   </div>
+   <h3 style={{fontFamily:"Merriweather,Georgia,serif",fontSize:20,lineHeight:1.35,margin:"8px 0 10px"}}>{knowledge[preview].title}</h3>
+   <p style={{fontSize:12,lineHeight:1.7,margin:"0 0 10px"}}>{knowledge[preview].description}</p>
+   <p style={{fontSize:10,color:"#657378",lineHeight:1.5,margin:"0 0 12px"}}>{knowledge[preview].note}</p>
+   <a href={knowledge[preview].kind==="ScientificRadar"?"https://github.com/Centaurioun/ScientificRadar-web/blob/main/lib/content/fixtures.ts":knowledge[preview].href}
+    target="_blank" rel="noopener noreferrer"
+    style={{color:"#0a6870",fontSize:12,fontWeight:800,textDecoration:"underline",textUnderlineOffset:3}}>
+    {knowledge[preview].kind==="Wikipedia"?"Read encyclopedia entry ↗":"Inspect canonical article fixture ↗"}
+   </a>
+   {knowledge[preview].kind==="ScientificRadar"&&<p style={{fontSize:10,color:"#657378",marginTop:9}}>Production route: {knowledge[preview].href} · Navigation disabled until real Web integration.</p>}
+  </div>,document.body)
+ const conceptBox=()=>(
+  <section className="concept-card" aria-label="Key concept in this article">
+   <div className="label">Key concept · Why it matters</div>
+   <h2>Why spidroin assembly matters</h2>
+   <p>The important point is not the definition of a spidroin, but how its molecular organization changes between storage and spinning.</p>
+   <ul><li>Stable storage helps prevent premature solidification.</li><li>Duct conditions promote alignment and network formation.</li></ul>
+   <p style={{fontSize:10,color:"#68787b",marginTop:12}}>Editorial context · One selected concept · Demo</p>
+  </section>)
+
+ React.useEffect(()=>{
+  let frame=0
+  const update=()=>{
+   const headers=Array.from(root.current?.querySelectorAll<HTMLElement>("[data-section]")||[])
+   if(!headers.length)return
+   let current=headers[0].id
+   for(const h of headers){if(h.getBoundingClientRect().top<=160)current=h.id}
+   setActive(a=>a===current?a:current)
+  }
+  const onScroll=()=>{if(!frame)frame=requestAnimationFrame(()=>{frame=0;update()})}
+  update()
+  window.addEventListener("scroll",onScroll,{passive:true})
+  window.addEventListener("resize",onScroll)
+  return()=>{window.removeEventListener("scroll",onScroll);window.removeEventListener("resize",onScroll);if(frame)cancelAnimationFrame(frame)}
+ },[])
+ React.useLayoutEffect(()=>{
+  const id=pendingMobileTarget.current
+  if(!id||open)return
+  pendingMobileTarget.current=null
+  const target=root.current?.querySelector<HTMLElement>("#"+id)
+  if(!target)return
+  const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  target.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"})
+  if(document.activeElement===document.body){
+   const hadTabIndex=target.hasAttribute("tabindex")
+   if(!hadTabIndex)target.setAttribute("tabindex","-1")
+   target.focus({preventScroll:true})
+   if(!hadTabIndex)target.addEventListener("blur",()=>target.removeAttribute("tabindex"),{once:true})
+  }
+ },[open])
+ const navigate=(e:React.MouseEvent<HTMLAnchorElement>,id:string,mobile:boolean)=>{
+  const target=root.current?.querySelector<HTMLElement>("#"+id)
+  if(!target)return
+  e.preventDefault()
+  if(mobile){pendingMobileTarget.current=id;setActive(id);setOpen(false);return}
+  const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  target.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"})
+  setActive(id);setOpen(false)
+ }
+ const toc=(mobile:boolean)=><ul className={mobile?"":"toc"}>{sections.map(s=><li key={s.id} className={(active===s.id?"active ":"")+(s.level===3?"nested":"")}><a href={"#"+s.id} aria-current={active===s.id?"location":undefined} onClick={e=>navigate(e,s.id,mobile)}>{s.title}</a></li>)}</ul>
+ const fontSize=font==="small"?15:font==="large"?19:17
+ return <div ref={root} className="srx" style={style}>
+  <style>{css}</style>
+  <div className="mast"><div className="wrap"><div className="brand">Scientific<b>Radar</b></div><div className="lab">Article Reading Experience · M3/3 · Not published</div></div></div>
+  <header className="head">
+   <div className="kicker">Biology / Structural Biomaterials · <span className="type">Feature</span></div>
+   <h1>How Spiders Spin Liquid Protein Dope Into a Toughened Nanocomposite Fiber</h1>
+   <p className="dek">Inside a tapering microfluidic duct barely wider than a human hair, acidification and elongational shear transform globular spidroin micelles into interlocking beta-sheet nanocrystals.</p>
+   <div className="meta">ScientificRadar Stage A · Illustrative demo author · 28 October 2026 · 9 min (fixture)</div>
+  </header>
+  <figure className="hero"><img src={image} alt="Three-stage schematic of spidroin protein self-assembly from liquid micelles in the ampullate gland through the hyperbolic tapering duct into a semi-crystalline solid fiber."/><figcaption>Across a millimeter-scale spinning duct, a drop in pH from 7.6 to 5.0 combined with ion exchange and hydrodynamic shear aligns repetitive spidroin chains into antiparallel beta-sheet nanocrystals embedded in an extensible glycine-rich matrix. Credit: Original ScientificRadar diagram FIG-SR-2026-01 · CC0 1.0. Illustrative demo visual; not an experimental micrograph.</figcaption></figure>
+  <div className="wrap columns">
+   <aside className="rail" aria-label="Article outline"><h2>In this article</h2>{toc(false)}<div className="note">The highlighted section follows your reading position; select a heading to jump.</div></aside>
+   <main className="main">
+    <section className="summary" aria-labelledby="srx-summary"><h2 id="srx-summary">At a glance</h2><div className="small">Editorial summary adapted from existing Stage A Key Takeaways</div><ul>{takeaways.map(x=><li key={x}>{x}</li>)}</ul></section>
+    <details className="source-panel" data-testid="source-transparency"><summary><span>What underpins this story?</span><span className="status">Illustrative demo · Source status not verified</span></summary><div className="source-body"><p><strong>ScientificRadar editorial type:</strong> Feature. This is science journalism, not a peer-reviewed research article.</p><p><strong>Underlying reference status:</strong> Stage A illustrative synthesis records. No original study or DOI is verified by this demonstrator; do not infer peer-review status.</p><p><strong>Source note:</strong> Real publications will show only verified study type, source URL, DOI and dates. The existing citation list remains authoritative in Web.</p><div className="source-note">No AI trust score · No fabricated publication or citation metadata.</div></div></details>
+    <div className="tools"><strong>Article text size</strong><div className="size" role="group" aria-label="Article text size">{([["small","A−","Smaller text"],["default","A","Default text"],["large","A+","Larger text"]] as const).map(([v,l,a])=><button type="button" key={v} aria-label={a} aria-pressed={font===v} onClick={()=>setFont(v)}>{l}</button>)}</div></div>
+    <nav className="mobile-toc" aria-label="Article sections"><button type="button" aria-expanded={open} aria-controls="srx-sections-list" onClick={()=>setOpen(x=>!x)}>In this article <span aria-hidden="true">{open?"−":"+"}</span></button><div id="srx-sections-list" hidden={!open}>{open?toc(true):null}</div></nav>
+    <article className="prose" style={{"--reading-font":fontSize+"px"} as React.CSSProperties}>
+     <h2 data-section id="srx-introduction">Introduction</h2>
+     <p>When an orb-weaving spider drops from a branch on a single strand of major ampullate dragline silk, its lifeline must solve two seemingly contradictory mechanical problems at once: sufficient strength to support a load and enough extensibility to absorb energy.</p>
+     <p>Natural dragline silk bridges this divide through a hierarchy of molecular structures. The spider can store a concentrated protein solution and transform it into a solid thread as that solution travels through its spinning duct.</p>
+     <h2 data-section id="srx-storage">The Micellar Storage Paradox</h2>
+     <p>Major ampullate {knowledgeButton("spidroin","spidroins")} have a repetitive core flanked by terminal domains. In the gland reservoir, the proteins remain concentrated but fluid, rather than prematurely forming an insoluble fiber.</p>
+     <p>The original Stage A demonstration describes how terminal-domain interactions, water and ionic conditions contribute to this remarkable storage stability and prepare the proteins for the next stage.</p>
+     <div className="concept-inline">{conceptBox()}</div>
+     <h2 data-section id="srx-duct">Acidification and Shear</h2>
+     <p>As spinning dope flows through a narrowing duct, the pH falls while the ionic environment and flow field change. These coordinated transitions help align spidroin chains and drive assembly.</p>
+     <blockquote>The spider does not simply evaporate solvent: its spinning duct coordinates chemistry and flow to transform liquid dope into structured fiber. — Illustrative ScientificRadar synthesis</blockquote>
+     <p>Under elongational flow, less ordered segments can become oriented as small crystalline domains form inside an extensible network. Both structure and processing matter.</p>
+     <h2 data-section id="srx-nanocrystals">Two-Nanometer Crystals</h2>
+     <p>Natural dragline silk contains antiparallel {knowledgeButton("beta","beta-sheet")} nanocrystals embedded in a glycine-rich matrix. These load-bearing regions act together with more extensible molecular domains.</p>
+     <p>This demonstration preserves the original science story's main distinctions without presenting synthetic fixture numbers as newly verified measurements.</p>
+     <h3 data-section id="srx-bonds">Sacrificial Hydrogen Bonds</h3>
+     <p>Transient hydrogen bonds in less ordered regions can break and rearrange under mechanical stress. In the conceptual model, this behavior helps dissipate energy and delay catastrophic failure of the fiber.</p>
+     <p>By keeping the text and figures separate from reader controls, the same article should remain understandable when the reader increases or decreases the font size.</p>
+     <h2 data-section id="srx-outlook">Toward Synthetic Silk</h2>
+     <p>Recreating the full natural spinning sequence remains a materials-engineering challenge. Controlling the surrounding chemistry, flow and protein organization is as important as selecting the protein itself.</p>
+     <p className="related-note">A separate question about early chemical energy is explored in our {knowledgeButton("vent","alkaline hydrothermal vent explainer")}. Its proton-gradient setting differs from the spider spinning duct.</p>
+     <p>This Framer page is a design experiment based on the ScientificRadar Stage A corpus. It is not a published scholarly article and makes no claim of verified external citations.</p>
+    </article>
+    <section className="path" aria-labelledby="srx-reading-path-title" data-testid="editorial-reading-path">
+     <div className="path-kicker">Thematic Reading Trail · Three selected demo articles</div>
+     <h2 className="path-heading" id="srx-reading-path-title">Interfaces That Shape Function</h2>
+     <p className="path-intro">A guided theme across three scientific settings: natural fiber formation, engineered battery interfaces, and proposed early-Earth mineral chemistry. <strong>These examples are not the same mechanism or a chain of evidence.</strong></p>
+     <ol className="path-list">
+      {editorialPath.map((item,i)=><li key={item.id} className={"path-card "+(item.current?"current":"")}>
+       <div className="path-number" aria-hidden="true">{i+1}</div>
+       <div style={{minWidth:0}}>
+        <div className="path-step">{item.stage}</div>
+        <h3 className="path-title">{item.title}</h3>
+        <div className="path-meta">{item.category} · {item.kind} {item.current?"· Current article":""}</div>
+        <p className="path-purpose">{item.purpose}</p>
+        {item.current?
+          <span className="path-current-label" aria-label="Currently reading step one">✓ You are reading this step</span>:
+          <>
+           <button type="button" className="path-btn" aria-expanded={openPathStep===item.id} aria-controls={"srx-path-detail-"+i}
+            onClick={()=>setOpenPathStep(v=>v===item.id?null:item.id)}>{openPathStep===item.id?"Hide reading rationale −":"Why read this next? +"}</button>
+           <div className="path-detail" id={"srx-path-detail-"+i} hidden={openPathStep!==item.id}>
+            <p>{item.why}</p>
+            <p className="path-route"><strong>Canonical Web route:</strong> /article/{item.slug}</p>
+            <p className="path-route">This unpublished Framer prototype shows the intended destination, not a working production article link.</p>
+           </div>
+          </>
+        }
+       </div>
+      </li>)}
+     </ol>
+     <p className="path-footnote">A proposed editorial sequence from existing ScientificRadar demonstration content, not a verified production collection. It does not replace the site's Related Scientific Reading recommendations.</p>
+    </section>
+    <footer className="footer"><span>M1 · Summary, type and active headings</span><span>M2 · Knowledge links, source transparency, concept context</span><span>M3 · Editorial reading route (illustrative)</span></footer>
+   </main>
+   <aside className="right" aria-label="Editorial key concept">{conceptBox()}</aside>
+  </div>
+  {knowledgePopup}
+ </div>
+}
+addPropertyControls(ScientificRadarArticleExperienceLab,{})
