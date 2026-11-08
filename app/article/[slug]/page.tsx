@@ -8,6 +8,7 @@ import ArticleReader from "@/components/editorial/ArticleReader";
 import RelatedStories from "@/components/editorial/RelatedStories";
 import NewsletterDemo from "@/components/editorial/NewsletterDemo";
 import { contentRepository } from "@/lib/content/repository";
+import { validateWebEnvironment } from "@/lib/config/env";
 import { ReadingMeasureOption } from "@/lib/design/tokens";
 
 import { buildPageMetadata } from "@/lib/seo/metadata";
@@ -47,6 +48,7 @@ export default async function ArticlePage({
   const { slug } = await params;
   const resolvedSearchParams = await searchParams;
   const showReviewControls = resolvedSearchParams?.designReview === "1";
+  const studioPublishingUrl = validateWebEnvironment(process.env).studioPublishingUrl;
 
   const article = await contentRepository.getPublicArticle(slug);
   if (!article) {
@@ -81,6 +83,7 @@ export default async function ArticlePage({
             key={initialMeasure}
             article={article}
             authors={authors}
+            trustedImageOrigins={studioPublishingUrl ? [studioPublishingUrl] : []}
             initialMeasure={initialMeasure}
             showReviewControls={showReviewControls}
           />
