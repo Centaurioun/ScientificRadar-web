@@ -40,6 +40,35 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
   const leadArticle =
     allArticles.find((a) => a.featuredRank === 1) ?? allArticles[0];
+
+  if (!leadArticle) {
+    return (
+      <>
+        <SiteHeader />
+        <main id="main-content" className="flex-1">
+          <h1 className="sr-only">
+            ScientificRadar — Independent Science Magazine &amp; Long-Form
+            Research Explainers
+          </h1>
+          <section
+            aria-labelledby="empty-catalog-heading"
+            className="site-container py-16 md:py-24"
+          >
+            <h2
+              id="empty-catalog-heading"
+              className="font-editorial text-2xl font-bold text-[var(--sr-ink)]"
+            >
+              No published articles are available yet.
+            </h2>
+            <p className="mt-3 max-w-2xl text-[var(--sr-ink-secondary)]">
+              New research stories will appear here after publication.
+            </p>
+          </section>
+        </main>
+      </>
+    );
+  }
+
   const leadAuthors = await contentRepository.getAuthorsByIds(
     leadArticle.authorIds
   );

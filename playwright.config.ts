@@ -24,7 +24,12 @@ export default defineConfig({
     command: "node scripts/start-standalone.mjs",
     url: `${baseURL}/`,
     reuseExistingServer: false,
-    env: { HOSTNAME: "127.0.0.1", PORT: "4387" },
+    env: {
+      HOSTNAME: "127.0.0.1",
+      PORT: "4387",
+      SCIRAD_CONTENT_ADAPTER: process.env.SCIRAD_CONTENT_ADAPTER ?? "demo-fixtures",
+      SCIRAD_RUNTIME_MODE: process.env.SCIRAD_RUNTIME_MODE ?? "stage-a-demo",
+    },
     timeout: 60_000,
   },
 });
