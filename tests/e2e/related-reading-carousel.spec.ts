@@ -32,6 +32,12 @@ for (const width of [320, 390, 810, 1200, 1280]) {
       expect(ratio).toBeLessThan(0.36);
     }
 
+    if (width >= 1200) {
+      await expect(track).toHaveJSProperty("scrollWidth", await track.evaluate((element) => element.clientWidth));
+      await expect(section.getByRole("button", { name: "Previous related stories" })).toBeDisabled();
+      await expect(section.getByRole("button", { name: "Next related stories" })).toBeDisabled();
+    }
+
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
   });
 }
@@ -62,6 +68,29 @@ test("Related Reading controls advance and return one card without autoplay", as
 
   await page.waitForTimeout(1200);
   await expect.poll(() => track.evaluate((element) => element.scrollLeft)).toBeLessThanOrEqual(startingLeft + 2);
+});
+
+test("Related Reading controls and track support visible keyboard focus and native arrow scrolling", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(articleUrl, { waitUntil: "networkidle" });
+
+  const section = page.getByRole("region", { name: "Related Reading" });
+  const track = section.getByTestId("related-reading-track");
+  const next = section.getByRole("button", { name: "Next related stories" });
+
+  await next.focus();
+  await page.keyboard.press("Tab");
+  await expect(track).toBeFocused();
+  await expect.poll(() => track.evaluate((element) => getComputedStyle(element).outlineStyle)).toBe("solid");
+
+  await page.keyboard.press("Shift+Tab");
+  await expect(next).toBeFocused();
+  await expect.poll(() => next.evaluate((element) => getComputedStyle(element).outlineStyle)).toBe("solid");
+
+  const startingLeft = await track.evaluate((element) => element.scrollLeft);
+  await track.focus();
+  await page.keyboard.press("ArrowRight");
+  await expect.poll(() => track.evaluate((element) => element.scrollLeft)).toBeGreaterThan(startingLeft);
 });
 
 test("Related Reading respects reduced-motion preference", async ({ page }) => {
