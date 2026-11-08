@@ -52,6 +52,11 @@ jobs:
       - name: Run responsive Playwright suite
         run: npx playwright test
 
+      - name: Run empty published-catalog regression
+        env:
+          PLAYWRIGHT_EMPTY_CATALOG: "true"
+        run: npx playwright test --config=playwright.empty-catalog.config.ts
+
       - name: Upload Playwright traces, screenshots, video, and JUnit results on failure
         if: failure()
         uses: actions/upload-artifact@v4
