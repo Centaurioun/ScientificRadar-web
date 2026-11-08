@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { PublicArticle } from "@/lib/content/types";
+import { shouldShowRelatedReadingControls } from "@/lib/design/related-reading";
 import EditorialCard from "./EditorialCard";
 
 interface RelatedStoriesProps {
@@ -14,6 +15,7 @@ export default function RelatedStories({ articles }: RelatedStoriesProps) {
   const [canScrollPrevious, setCanScrollPrevious] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
   const [position, setPosition] = useState(0);
+  const [hasOverflow, setHasOverflow] = useState(false);
 
   useEffect(() => {
     const element = track.current;
@@ -24,6 +26,7 @@ export default function RelatedStories({ articles }: RelatedStoriesProps) {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
         const maximum = Math.max(0, element.scrollWidth - element.clientWidth);
+        setHasOverflow(maximum > 2);
         const nextPosition = Math.max(0, Math.min(maximum, element.scrollLeft));
         const firstSlide = element.querySelector<HTMLElement>("[data-related-slide]");
         const firstSlideBounds = firstSlide?.getBoundingClientRect();
@@ -95,7 +98,7 @@ export default function RelatedStories({ articles }: RelatedStoriesProps) {
           </p>
         </div>
 
-        {articles.length > 1 && (
+        {shouldShowRelatedReadingControls(articles.length, hasOverflow) && (
           <div
             className="flex items-center gap-2"
             role="group"

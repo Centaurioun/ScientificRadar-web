@@ -34,8 +34,8 @@ for (const width of [320, 390, 810, 1200, 1280]) {
 
     if (width >= 1200) {
       await expect(track).toHaveJSProperty("scrollWidth", await track.evaluate((element) => element.clientWidth));
-      await expect(section.getByRole("button", { name: "Previous related stories" })).toBeDisabled();
-      await expect(section.getByRole("button", { name: "Next related stories" })).toBeDisabled();
+      await expect(section.getByRole("button", { name: "Previous related stories" })).toHaveCount(0);
+      await expect(section.getByRole("button", { name: "Next related stories" })).toHaveCount(0);
     }
 
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
