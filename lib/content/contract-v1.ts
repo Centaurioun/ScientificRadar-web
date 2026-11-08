@@ -92,7 +92,8 @@ const UNSUPPORTED_RAW_HTML_PATTERNS: Array<{
 
 export function isSafePublishedMediaUrl(
   urlValue: string,
-  trustedMediaOrigins: ReadonlySet<string> = new Set()
+  trustedMediaOrigins: ReadonlySet<string> = new Set(),
+  allowLoopbackHttpMediaOrigin = false
 ): boolean {
   if (typeof urlValue !== "string") return false;
   const trimmed = urlValue.trim();
@@ -114,10 +115,10 @@ export function isSafePublishedMediaUrl(
 
   try {
     const parsed = new URL(trimmed);
-    if (parsed.protocol !== "https:") {
-      return false;
-    }
-    return trustedMediaOrigins.has(parsed.origin);
+    if (parsed.username || parsed.password || !trustedMediaOrigins.has(parsed.origin)) return false;
+    if (parsed.protocol === "https:") return true;
+    const isLoopback = ["localhost", "127.0.0.1", "[::1]"].includes(parsed.hostname);
+    return parsed.protocol === "http:" && allowLoopbackHttpMediaOrigin && isLoopback;
   } catch {
     return false;
   }
@@ -157,7 +158,8 @@ function validateMediaRecord(
   fieldPrefix: string,
   trustedMediaOrigins: ReadonlySet<string>,
   issues: SnapshotValidationIssue[],
-  requiresVerifiedRights: boolean
+  requiresVerifiedRights: boolean,
+  allowLoopbackHttpMediaOrigin: boolean
 ): void {
   if (typeof media.id !== "string" || !media.id.trim()) {
     issues.push({
@@ -167,11 +169,11 @@ function validateMediaRecord(
     });
   }
 
-  if (!isSafePublishedMediaUrl(media.src, trustedMediaOrigins)) {
+  if (!isSafePublishedMediaUrl(media.src, trustedMediaOrigins, allowLoopbackHttpMediaOrigin)) {
     issues.push({
       code: "UNSAFE_MEDIA_URL",
       field: `${fieldPrefix}.src`,
-      message: `Media URL "${media.src}" is not an approved same-origin path or trusted HTTPS origin (blob:/data: URLs are forbidden).`,
+      message: `Media URL "${media.src}" is not an approved same-origin path or configured HTTPS/loopback-development origin (blob:/data: URLs are forbidden).`,
     });
   }
 
@@ -265,10 +267,12 @@ export function validatePublicationSnapshotV1(
   input: unknown,
   options?: {
     trustedMediaOrigins?: string[];
+    allowLoopbackHttpMediaOrigin?: boolean;
   }
 ): SnapshotValidationResult {
   const issues: SnapshotValidationIssue[] = [];
   const trustedOrigins = new Set(options?.trustedMediaOrigins ?? []);
+  const allowLoopbackHttpMediaOrigin = options?.allowLoopbackHttpMediaOrigin === true;
   const emptyResult = (issue: SnapshotValidationIssue): SnapshotValidationResult => ({
     valid: false,
     isPubliclyRenderable: false,
@@ -503,7 +507,7 @@ export function validatePublicationSnapshotV1(
   }
 
   if (snapshot.hero) {
-    validateMediaRecord(snapshot.hero, "hero", trustedOrigins, issues, snapshot.status === "published");
+    validateMediaRecord(snapshot.hero, "hero", trustedOrigins, issues, snapshot.status === "published", allowLoopbackHttpMediaOrigin);
   }
 
   const sourceIds = new Set<string>();
@@ -655,7 +659,8 @@ export function validatePublicationSnapshotV1(
         `blocks[${idx}].media`,
         trustedOrigins,
         issues,
-        snapshot.status === "published"
+        snapshot.status === "published",
+        allowLoopbackHttpMediaOrigin
       );
     }
     if (block.type === "paragraph" && block.citations) {

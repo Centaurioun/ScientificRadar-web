@@ -19,6 +19,7 @@ export interface WebEnvironmentValidationResult {
   mode: RuntimeOperatingMode;
   adapter: ContentAdapterMode;
   studioPublishingUrl: string | null;
+  allowLoopbackHttpMediaOrigin: boolean;
   issues: WebEnvironmentValidationIssue[];
 }
 
@@ -58,7 +59,7 @@ export function validateWebEnvironment(
     });
   }
 
-  const studioPublishingUrl = resolveStudioPublishingUrl(env, mode, adapter, issues);
+  const studioPublishing = resolveStudioPublishingUrl(env, mode, adapter, issues);
 
   const siteUrl = (env.NEXT_PUBLIC_SITE_URL ?? env.APP_URL ?? "").trim();
   const enableIndexing = env.NEXT_PUBLIC_ENABLE_PRODUCTION_INDEXING === "true";
@@ -147,7 +148,8 @@ export function validateWebEnvironment(
     valid: !hasBlockers,
     mode,
     adapter,
-    studioPublishingUrl,
+    studioPublishingUrl: studioPublishing.url,
+    allowLoopbackHttpMediaOrigin: studioPublishing.allowLoopbackHttpMediaOrigin,
     issues,
   };
 }
@@ -157,35 +159,39 @@ function resolveStudioPublishingUrl(
   mode: RuntimeOperatingMode,
   adapter: ContentAdapterMode,
   issues: WebEnvironmentValidationIssue[]
-): string | null {
+): { url: string | null; allowLoopbackHttpMediaOrigin: boolean } {
   const raw = (env.SCIENTIFICRADAR_STUDIO_PUBLISHING_URL ?? "").trim();
-  if (adapter !== "published-snapshots") return null;
+  if (adapter !== "published-snapshots") return { url: null, allowLoopbackHttpMediaOrigin: false };
   if (!raw) {
     issues.push({
       severity: "blocker",
       variable: "SCIENTIFICRADAR_STUDIO_PUBLISHING_URL",
       message: "Published snapshot mode requires the public Studio API origin.",
     });
-    return null;
+    return { url: null, allowLoopbackHttpMediaOrigin: false };
   }
 
   try {
     const parsed = new URL(raw);
-    const isLoopback = ["localhost", "127.0.0.1", "::1"].includes(parsed.hostname);
-    const production = mode === "stage-c-production" || env.NEXT_PUBLIC_ENABLE_PRODUCTION_INDEXING === "true";
+    const isLoopback = ["localhost", "127.0.0.1", "::1", "[::1]"].includes(parsed.hostname);
+    const production = mode === "stage-c-production" ||
+      env.NODE_ENV === "production" ||
+      env.NEXT_PUBLIC_ENABLE_PRODUCTION_INDEXING === "true";
+    const allowLoopbackHttpMediaOrigin = parsed.protocol === "http:" && isLoopback && !production;
     if (
-      (parsed.protocol !== "https:" && !(parsed.protocol === "http:" && isLoopback && !production)) ||
+      (parsed.protocol !== "https:" && !allowLoopbackHttpMediaOrigin) ||
+      (production && isLoopback) ||
       parsed.username || parsed.password || parsed.pathname !== "/" || parsed.search || parsed.hash
     ) {
       throw new Error("invalid public origin");
     }
-    return parsed.origin;
+    return { url: parsed.origin, allowLoopbackHttpMediaOrigin };
   } catch {
     issues.push({
       severity: "blocker",
       variable: "SCIENTIFICRADAR_STUDIO_PUBLISHING_URL",
       message: "Studio public URL must be an HTTPS origin (or a loopback HTTP origin in non-production mode) with no path, credentials, query, or fragment.",
     });
-    return null;
+    return { url: null, allowLoopbackHttpMediaOrigin: false };
   }
 }

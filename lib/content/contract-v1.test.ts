@@ -271,6 +271,63 @@ test("media validator rejects blob:, data:, javascript:, and untrusted external 
     ),
     true
   );
+  assert.equal(
+    isSafePublishedMediaUrl(
+      "http://localhost:3000/api/public/media/abc",
+      new Set(["http://localhost:3000"]),
+      true
+    ),
+    true
+  );
+  assert.equal(
+    isSafePublishedMediaUrl(
+      "http://localhost:3000/api/public/media/abc",
+      new Set(["http://localhost:3000"])
+    ),
+    false
+  );
+  assert.equal(
+    isSafePublishedMediaUrl(
+      "http://localhost:3001/api/public/media/abc",
+      new Set(["http://localhost:3000"]),
+      true
+    ),
+    false
+  );
+  assert.equal(
+    isSafePublishedMediaUrl(
+      "http://media.example.com/api/public/media/abc",
+      new Set(["http://media.example.com"]),
+      true
+    ),
+    false
+  );
+});
+
+test("snapshot validation accepts only the configured loopback HTTP media origin when explicitly enabled", () => {
+  const base = adaptPublicArticleToSnapshotV1(DEMO_ARTICLES[0]);
+  const toLocalStudioMedia = <T extends { src: string; rightsEvidence?: { assetRevisionId: string } }>(media: T) => ({
+    ...media,
+    src: `http://localhost:3000/api/public/media/${media.rightsEvidence?.assetRevisionId}`,
+  });
+  const snapshot = {
+    ...base,
+    status: "published" as const,
+    hero: base.hero ? toLocalStudioMedia(withTestRights(base.hero, "local-hero")) : undefined,
+    blocks: base.blocks.map((block) => block.type === "figure"
+      ? { ...block, media: toLocalStudioMedia(withTestRights(block.media, `local-${block.media.id}`)) }
+      : block),
+  };
+  const options = {
+    trustedMediaOrigins: ["http://localhost:3000"],
+    allowLoopbackHttpMediaOrigin: true,
+  };
+  assert.equal(validatePublicationSnapshotV1(snapshot, options).valid, true);
+  assert.equal(validatePublicationSnapshotV1(snapshot, { trustedMediaOrigins: options.trustedMediaOrigins }).valid, false);
+  assert.equal(validatePublicationSnapshotV1(snapshot, {
+    ...options,
+    trustedMediaOrigins: ["http://localhost:3001"],
+  }).valid, false);
 });
 
 test("contract validator flags broken citation references, synthetic demo DOIs, and unsupported Studio HTML nodes", () => {

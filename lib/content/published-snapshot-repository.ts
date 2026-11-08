@@ -25,12 +25,20 @@ export class PublishedSnapshotContentRepository implements PublishedContentRepos
   private readonly baseUrl: URL | null;
   private readonly fetcher: FetchLike;
   private readonly trustedMediaOrigins: string[];
+  private readonly allowLoopbackHttpMediaOrigin: boolean;
 
-  constructor(baseUrl: string | null | undefined, fetcher: FetchLike = fetch) {
+  constructor(
+    baseUrl: string | null | undefined,
+    fetcher: FetchLike = fetch,
+    allowLoopbackHttpMediaOrigin = false
+  ) {
     this.fetcher = fetcher;
+    this.allowLoopbackHttpMediaOrigin = allowLoopbackHttpMediaOrigin;
     try {
       const candidate = new URL(baseUrl ?? "");
-      if (candidate.protocol === "https:" || candidate.hostname === "localhost" || candidate.hostname === "127.0.0.1" || candidate.hostname === "::1") {
+      const isLoopback = ["localhost", "127.0.0.1", "[::1]"].includes(candidate.hostname);
+      if (candidate.protocol === "https:" ||
+        (candidate.protocol === "http:" && allowLoopbackHttpMediaOrigin && isLoopback)) {
         this.baseUrl = candidate;
         this.trustedMediaOrigins = [candidate.origin];
       } else {
@@ -71,6 +79,7 @@ export class PublishedSnapshotContentRepository implements PublishedContentRepos
     for (const candidate of payload) {
       const validation = validatePublicationSnapshotV1(candidate, {
         trustedMediaOrigins: this.trustedMediaOrigins,
+        allowLoopbackHttpMediaOrigin: this.allowLoopbackHttpMediaOrigin,
       });
       if (!validation.isPubliclyRenderable) continue;
       const snapshot = candidate as PublishedSnapshotRecordV1;
@@ -124,6 +133,7 @@ export class PublishedSnapshotContentRepository implements PublishedContentRepos
     const payload = await this.requestJson(`/api/publications/${encodeURIComponent(slug)}`);
     const validation = validatePublicationSnapshotV1(payload, {
       trustedMediaOrigins: this.trustedMediaOrigins,
+      allowLoopbackHttpMediaOrigin: this.allowLoopbackHttpMediaOrigin,
     });
     if (!validation.isPubliclyRenderable) return null;
     const snapshot = payload as PublishedSnapshotRecordV1;

@@ -39,18 +39,36 @@ test("published snapshot adapter requires a credential-free public Studio origin
 
   const local = validateWebEnvironment({
     SCIRAD_CONTENT_ADAPTER: "published-snapshots",
-    SCIENTIFICRADAR_STUDIO_PUBLISHING_URL: "http://127.0.0.1:4317",
+    SCIENTIFICRADAR_STUDIO_PUBLISHING_URL: "http://localhost:3000",
   });
   assert.equal(local.valid, true);
-  assert.equal(local.studioPublishingUrl, "http://127.0.0.1:4317");
+  assert.equal(local.studioPublishingUrl, "http://localhost:3000");
+  assert.equal(local.allowLoopbackHttpMediaOrigin, true);
 
   const productionLoopback = validateWebEnvironment({
     SCIRAD_RUNTIME_MODE: "stage-c-production",
     SCIRAD_CONTENT_ADAPTER: "published-snapshots",
-    SCIENTIFICRADAR_STUDIO_PUBLISHING_URL: "http://127.0.0.1:4317",
+    SCIENTIFICRADAR_STUDIO_PUBLISHING_URL: "http://localhost:3000",
     NEXT_PUBLIC_SITE_URL: "https://scientificradar.com",
   });
   assert.equal(productionLoopback.valid, false);
+  assert.equal(productionLoopback.allowLoopbackHttpMediaOrigin, false);
+
+  const productionBuildLoopback = validateWebEnvironment({
+    NODE_ENV: "production",
+    SCIRAD_CONTENT_ADAPTER: "published-snapshots",
+    SCIENTIFICRADAR_STUDIO_PUBLISHING_URL: "http://localhost:3000",
+  });
+  assert.equal(productionBuildLoopback.valid, false);
+  assert.equal(productionBuildLoopback.allowLoopbackHttpMediaOrigin, false);
+
+  const productionHttpsLoopback = validateWebEnvironment({
+    NODE_ENV: "production",
+    SCIRAD_CONTENT_ADAPTER: "published-snapshots",
+    SCIENTIFICRADAR_STUDIO_PUBLISHING_URL: "https://localhost:3000",
+  });
+  assert.equal(productionHttpsLoopback.valid, false);
+  assert.equal(productionHttpsLoopback.studioPublishingUrl, null);
 
   const pathAndCredentials = validateWebEnvironment({
     SCIRAD_CONTENT_ADAPTER: "published-snapshots",

@@ -199,7 +199,11 @@ export function createContentRepository(
 
   if (configuredAdapter === "published-snapshots") {
     return validation.studioPublishingUrl
-      ? new PublishedSnapshotContentRepository(validation.studioPublishingUrl)
+      ? new PublishedSnapshotContentRepository(
+          validation.studioPublishingUrl,
+          fetch,
+          validation.allowLoopbackHttpMediaOrigin
+        )
       : new UnavailablePublishedContentRepository();
   }
   if (configuredAdapter === "demo-fixtures" && !productionRequested) {

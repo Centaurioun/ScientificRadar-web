@@ -189,3 +189,44 @@ test("unavailable published adapter never falls back to demo fixtures", async ()
   });
   assert.ok(prodDemo instanceof UnavailablePublishedContentRepository);
 });
+
+test("local HTTP publishing origin is accepted only with explicit loopback media permission and exact host/port", async () => {
+  const base = publishedSnapshot({ id: "local-public-id", slug: "local-public-article" });
+  const localizeMedia = <T extends { src: string; rightsEvidence?: { assetRevisionId: string } }>(media: T, port = 3000) => ({
+    ...media,
+    src: `http://localhost:${port}/api/public/media/${media.rightsEvidence?.assetRevisionId}`,
+  });
+  const localSnapshot = {
+    ...base,
+    hero: base.hero ? localizeMedia(base.hero) : undefined,
+    blocks: base.blocks.map((block) => block.type === "figure"
+      ? { ...block, media: localizeMedia(block.media) }
+      : block),
+  };
+  const configured = new PublishedSnapshotContentRepository(
+    "http://localhost:3000",
+    mockFetch([localSnapshot], []),
+    true
+  );
+  assert.deepEqual((await configured.listPublicArticles()).map((article) => article.slug), ["local-public-article"]);
+
+  const implicitPermission = new PublishedSnapshotContentRepository(
+    "http://localhost:3000",
+    mockFetch([localSnapshot], [])
+  );
+  assert.deepEqual(await implicitPermission.listPublicArticles(), []);
+
+  const wrongPortSnapshot = {
+    ...localSnapshot,
+    hero: localSnapshot.hero ? localizeMedia(localSnapshot.hero, 3001) : undefined,
+    blocks: localSnapshot.blocks.map((block) => block.type === "figure"
+      ? { ...block, media: localizeMedia(block.media, 3001) }
+      : block),
+  };
+  const wrongPort = new PublishedSnapshotContentRepository(
+    "http://localhost:3000",
+    mockFetch([wrongPortSnapshot], []),
+    true
+  );
+  assert.deepEqual(await wrongPort.listPublicArticles(), []);
+});
