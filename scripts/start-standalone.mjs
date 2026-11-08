@@ -14,11 +14,11 @@ if (existsSync("public")) {
   cpSync("public", `${standaloneDirectory}/public`, { recursive: true });
 }
 
-const server = spawn(process.execPath, [`${standaloneDirectory}/server.js`], {
+const server = spawn(process.execPath, [`${standaloneDirectory}/server.js`, ...process.argv.slice(2)], {
   env: {
     ...process.env,
     HOSTNAME: process.env.HOSTNAME ?? "127.0.0.1",
-    PORT: process.env.PORT ?? "4387",
+    PORT: process.env.PORT ?? "3000",
   },
   stdio: "inherit",
 });

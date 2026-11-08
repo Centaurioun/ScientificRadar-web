@@ -7,10 +7,10 @@ owned by ScientificRadar Studio and are not implemented in this repository.
 
 ## Runtime and build
 
-- Use Node.js 20, 22, or 24 (Node 26 is outside the declared support range).
+- Use the patched Node.js 24 LTS release pinned in `.nvmrc` (currently 24.22.2).
 - Install from the committed npm lockfile with `npm ci`.
 - Run `npm run check` and `npm run test:responsive` before promoting a build.
-- Build an immutable artifact with `npm run build`; run it with
+- Build an immutable standalone artifact with `npm run build`; run it with
   `npm run start -- --hostname 127.0.0.1 --port 3000` behind a staging reverse
   proxy that terminates HTTPS.
 - Configure the proxy to preserve the original host and HTTPS scheme. Do not

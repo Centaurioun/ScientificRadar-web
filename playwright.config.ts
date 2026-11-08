@@ -21,7 +21,7 @@ export default defineConfig({
     video: "retain-on-failure",
   },
   webServer: {
-    command: "node scripts/serve-standalone-for-playwright.mjs",
+    command: "node scripts/start-standalone.mjs",
     url: `${baseURL}/`,
     reuseExistingServer: false,
     env: { HOSTNAME: "127.0.0.1", PORT: "4387" },

@@ -29,16 +29,13 @@ jobs:
       - name: Check out source
         uses: actions/checkout@v4
 
-      # Keep Node aligned with the repository's existing quality workflow; update deliberately.
-      - name: Set up Node.js 26.13.0
+      - name: Set up Node.js 24.22.2
         uses: actions/setup-node@v4
         with:
-          node-version: "26.13.0"
+          node-version: "24.22.2"
 
-      # There is no committed package lock. npm resolves the declared ranges for
-      # each run; this install is intentionally not described as frozen/reproducible.
-      - name: Install npm dependencies
-        run: npm install --no-audit --no-fund
+      - name: Install npm dependencies from lockfile
+        run: npm ci --no-audit --no-fund
 
       - name: Install Playwright Chromium and operating-system dependencies
         run: npx playwright install --with-deps chromium
